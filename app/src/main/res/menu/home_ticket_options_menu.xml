@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/clear"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/clear_ticket"
+        app:iconTint="@drawable/ticket_options_menu"
+
+        />
+    <item
+        android:id="@+id/edit"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/edit_ticket"
+        app:iconTint="@drawable/ticket_options_menu"
+
+        />
+
+    <item
+        android:id="@+id/assign"
+        android:icon="@drawable/ic_assign"
+        android:title="@string/assign_ticket"
+        app:iconTint="@drawable/ticket_options_menu"
+
+        />
+
+    <item
+        android:id="@+id/merge"
+        android:icon="@drawable/ic_merge"
+        android:title="@string/merge_ticket"
+        app:iconTint="@drawable/ticket_options_menu"
+
+        />
+    <item
+        android:id="@+id/split"
+        android:icon="@drawable/ic_split"
+        android:title="@string/split_ticket"
+        app:iconTint="@drawable/ticket_options_menu"
+
+        />
+</menu>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_trans"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/searchDialog"
+            layout="@layout/dialog_customer_search"
+            android:layout_gravity="center"
+            android:layout_marginStart="300dp"
+            android:layout_marginEnd="300dp"
+            />
+
+
+        <FrameLayout
+            android:id="@+id/flAddCustomerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:layout_marginStart="300dp"
+            android:layout_marginEnd="300dp"
+            >
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/addCustomerLayout"
+                layout="@layout/add_customer_layout"
+                android:layout_gravity="center"
+                />
+        </FrameLayout>
+
+
+    </FrameLayout>
+</layout>

@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:id="@+id/llSettingsLand"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+
+
+        >
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".7"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="3dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <com.google.android.material.appbar.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimary">
+
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbarSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:layout_marginEnd="24dp"
+                            android:text="@string/settings"
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            android:textSize="22sp" />
+                    </androidx.appcompat.widget.Toolbar>
+                </com.google.android.material.appbar.AppBarLayout>
+
+                <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/printers"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal"
+
+                            >
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp"
+                                android:paddingTop="24dp"
+                                android:paddingBottom="24dp"
+                                >
+
+                                <ImageView
+                                    android:id="@+id/iconPrinter"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:padding="3dp"
+                                    android:src="@drawable/ic_printer"
+                                    app:tint="@color/grey4" />
+
+                                <androidx.legacy.widget.Space
+                                    android:layout_width="36dp"
+                                    android:layout_height="0dp" />
+
+                                <TextView
+                                    android:id="@+id/tvPrinter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/printers"
+                                    android:textColor="@color/black"
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            >
+
+                            <androidx.legacy.widget.Space
+                                android:layout_width="76dp"
+                                android:layout_height="0dp" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/grey3" />
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/customerDisplays"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+
+                            >
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp"
+                                android:paddingTop="24dp"
+                                android:paddingBottom="24dp"
+                                >
+
+                                <ImageView
+                                    android:id="@+id/iconDisplay"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:padding="3dp"
+                                    android:src="@drawable/ic_display"
+                                    app:tint="@color/grey4" />
+
+                                <androidx.legacy.widget.Space
+                                    android:layout_width="36dp"
+                                    android:layout_height="0dp" />
+
+                                <TextView
+                                    android:id="@+id/tvDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/customer_display"
+                                    android:textColor="@color/black"
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            >
+
+                            <androidx.legacy.widget.Space
+                                android:layout_width="76dp"
+                                android:layout_height="0dp" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/grey3" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/generalSettings"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+
+                            >
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp"
+                                android:paddingTop="24dp"
+                                android:paddingBottom="24dp"
+
+                                >
+
+                                <ImageView
+                                    android:id="@+id/iconSetting"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:padding="3dp"
+                                    android:src="@drawable/ic_settings"
+                                    app:tint="@color/grey4" />
+
+                                <androidx.legacy.widget.Space
+                                    android:layout_width="36dp"
+                                    android:layout_height="0dp" />
+
+                                <TextView
+                                    android:id="@+id/tvGeneral"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/general"
+                                    android:textColor="@color/black"
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            >
+
+                            <androidx.legacy.widget.Space
+                                android:layout_width="76dp"
+                                android:layout_height="0dp" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/grey3" />
+                        </LinearLayout>
+
+                        <androidx.legacy.widget.Space
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:textColor="@color/grey4"
+                            android:text="mail@gmail.com"
+                            android:textStyle="bold"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="14dp"
+                            android:layout_marginBottom="8dp"
+                            />
+                        <FrameLayout
+                            android:id="@+id/logout"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginBottom="16dp"
+                            android:background="@drawable/logout_btn"
+                            android:layout_marginStart="24dp"
+                            android:layout_marginEnd="24dp"
+                            >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:text="@string/logout"
+                                />
+                        </FrameLayout>
+
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.3">
+
+            <FrameLayout
+                android:id="@+id/flPrintersDetailsLand"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:clickable="true"
+                android:focusable="true"
+                >
+                <include
+                    android:id="@+id/printersDetailsLayout"
+                    layout="@layout/printer_layout" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/flCustomerDisplaysDetailsLand"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone"
+                >
+                <include
+                    android:id="@+id/customerDisplaysDetailsLayout"
+                    layout="@layout/customer_display_layout" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/flGeneralSettingsDetailsLand"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone"
+                >
+                <include
+                    android:id="@+id/generalSettingsDetailsLayout"
+                    layout="@layout/general_settings" />
+
+            </FrameLayout>
+
+        </FrameLayout>
+    </LinearLayout>
+
+
+</layout>

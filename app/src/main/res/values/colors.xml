@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#9F56DB</color>
+    <color name="colorPrimaryDark">#893EC6</color>
+    <color name="colorAccent">#9F56DB</color>
+
+    <color name="start_color">#9F56DB</color>
+    <color name="end_color">#6C5BCE</color>
+
+
+    <color name="grey0">#fafafa</color>
+    <color name="grey1">#f5f5f5</color>
+    <color name="grey2">#eee</color>
+    <color name="grey3">#dadada</color>
+    <color name="grey4">#747474</color>
+    <color name="grey5">#FDFDFD</color>
+    <color name="grey6">#f8f8f8</color>
+    <color name="grey7">#dadada</color>
+    <color name="grey8">#ccc</color>
+    <color name="grey9">#DADADA</color>
+    <color name="grey10">#c7c7c7</color>
+    <color name="grey11">#909090</color>
+    <color name="grey12">#c4c4c4</color>
+
+    <color name="white">#fff</color>
+    <color name="black">#000000</color>
+    <color name="black1">#222020</color>
+    <color name="primary_trans">#889F56DB</color>
+
+    <color name="black_trans">#55000000</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="cancel">#D32C0C</color>
+    <color name="black20">#25000000</color>
+    <color name="white_disable">#88ffffff</color>
+    <color name="white_trans2">#30f5f5f5</color>
+    <color name="primary_trans2">#109F56DB</color>
+
+
+</resources>

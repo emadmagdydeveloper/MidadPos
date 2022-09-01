@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_navigation"
+    app:startDestination="@id/sales">
+
+    <fragment
+        android:id="@+id/sales"
+        android:name="com.midad_pos.uis.activity_home.fragments.SalesFragment"
+        android:label=""
+        tools:layout="@layout/fragment_sales"
+
+        />
+    <fragment
+        android:id="@+id/receipts"
+        android:name="com.midad_pos.uis.activity_home.fragments.ReceiptFragment"
+        android:label=""
+        tools:layout="@layout/fragment_receipt" />
+
+</navigation>

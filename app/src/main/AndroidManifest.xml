@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.midad_pos">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.camera" />
+
+    <application
+        android:name="com.midad_pos.share.App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
+        tools:ignore="AllowBackup"
+        tools:targetApi="q">
+        <activity
+            android:name=".uis.activity_cash_management.CashManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_shift.ShiftActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_web_view.WebViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_support.SupportActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_settings.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_items.ItemsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_refund.RefundActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_send_ticket_email.SendTicketEmailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_receipts.ReceiptsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_drawer_base.DrawerBaseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_home.HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_sign_up_2.SignUp2Activity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_sign_up.SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_login.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_choose_signin.ChooseSignInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".uis.activity_splash.SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+    </application>
+
+</manifest>

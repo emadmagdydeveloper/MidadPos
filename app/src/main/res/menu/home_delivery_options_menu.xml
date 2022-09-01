@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <item
+        android:id="@+id/inPlace"
+        android:title="@string/in_place"
+
+        />
+    <item
+        android:id="@+id/takeAway"
+        android:title="@string/takeaway"
+
+        />
+    <item
+        android:id="@+id/delivery"
+        android:title="@string/delivery"
+
+        />
+
+</menu>
