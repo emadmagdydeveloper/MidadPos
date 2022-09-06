@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".uis.activity_choose_signin.ChooseSignInActivity">
+            <FrameLayout
+                android:id="@+id/logo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@color/colorPrimary"
+                app:layout_constraintDimensionRatio="1:.25"
+                >
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/logo_white"
+                    android:layout_gravity="center"
+                    />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/flAction"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/logo"
+
+                >
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp"
+                    >
+                    <Button
+                        android:id="@+id/btnRegister"
+                        android:layout_width="350dp"
+                        android:layout_height="52dp"
+                        app:backgroundTint="@null"
+                        android:background="@drawable/small_rounded_primary"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:text="@string/registration"
+                        />
+
+                    <Button
+                        android:id="@+id/btnLogin"
+                        android:layout_width="350dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/small_rounded_stroke_primary"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="15sp"
+                        android:text="@string/sign_in"
+                        android:layout_marginTop="16dp"
+                        app:backgroundTint="@null"
+
+                        />
+                </LinearLayout>
+
+            </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</layout>
+

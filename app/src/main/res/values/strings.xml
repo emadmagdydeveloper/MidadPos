@@ -14,7 +14,7 @@
     <string name="next">Next</string>
     <string name="business_type">Business type</string>
     <string name="sign_up">Sign Up</string>
-    <string name="termsLink"><![CDATA[<font color ="#000000">I agree to Midad POS </font><a href="https://www.google.com"><font color="#9F56DB">Terms of Use </font></a> <font color="#000000">and have read acknowledged </font> <a href="https://www.google.com"><font color="#9F56DB">Privacy Policy</font></a>]]></string>
+    <string name="termsLink"><![CDATA[<font color ="#000000">I agree to Midad POS </font><a href="https://www.google.com" color= "#9F56DB">Terms of use</a> <font color="#000000">and have read acknowledged </font> <a href="https://www.google.com" color="#9F56DB">Privacy Policy</a>]]></string>
     <string name="ticket">Ticket</string>
     <string name="save">Save</string>
     <string name="charge">Charge</string>
@@ -125,6 +125,13 @@
     <string name="clear">Clear</string>
     <string name="enter_pin">Enter PIN</string>
     <string name="time_clock">time clock</string>
+    <string name="check_network">Check network connection</string>
+    <string name="something_wrong">Something went wrong try again later.</string>
+    <string name="confirm">OK</string>
+    <string name="store_not_selected">Store is not selected</string>
+    <string name="continuee">Continue</string>
+    <string name="select_store">Select store</string>
+    <string name="no_pos"><![CDATA[There are no available pos in store </br> sign out from one of your devices or add one or more pos in]]></string>
 
 
     <string-array name="delivery_options">

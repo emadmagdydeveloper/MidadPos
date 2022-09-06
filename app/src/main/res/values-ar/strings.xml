@@ -15,7 +15,7 @@
     <string name="next">التالي</string>
     <string name="business_type">نوع العمل</string>
     <string name="sign_up">إنشاء حساب</string>
-    <string name="termsLink"><![CDATA[<font color ="#000000">أوافق على </font>  <a href="https://www.google.com"><font color="#000000">شروط إستخدام </font></a> <font color="#000000">تطبيق مداد نقطة بيع</font> <font color="#000000">كما اتطلعت على </font> <a href="https://www.google.com"><font color="#9F56DB">السياسة والخصوصية</font></a>]]></string>
+    <string name="termsLink"><![CDATA[<font color ="#000000">أوافق على </font><a href="https://www.google.com" color= "#9F56DB">شروط إستخدام</a> <font color="#000000">تطبيق مداد نقطة بيع كما اتطلعت على </font> <a href="https://www.google.com" color="#9F56DB">السياسة والخصوصية</a>]]></string>
     <string name="ticket">تذكرة</string>
     <string name="save">حفظ</string>
     <string name="charge">التكلفة</string>
@@ -126,6 +126,14 @@
     <string name="clear">إزالة</string>
     <string name="enter_pin">أدخل PIN</string>
     <string name="time_clock">تسجيل الوقت</string>
+    <string name="check_network">تحقق من الاتصال بالانترنت</string>
+    <string name="something_wrong">لقد حدث خطأ. حاول مرة اخرى لاحقا.</string>
+    <string name="confirm">موافق</string>
+    <string name="store_not_selected">لم يتم إختيار متجر</string>
+    <string name="continuee">المتابعة</string>
+    <string name="select_store">إختر المتجر</string>
+    <string name="no_pos"><![CDATA[لا توجد اجهزة pos متوفرة في المتجر</br> قم بتسجيل الخروج من احد اجهزتك او قم بالاضافة pos إضافي في واحد في ]]></string>
+
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

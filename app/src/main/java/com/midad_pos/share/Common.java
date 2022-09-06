@@ -13,13 +13,19 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
 
 import com.midad_pos.R;
+import com.midad_pos.databinding.AlertDialogBinding;
 
 import java.io.File;
 
@@ -57,6 +63,29 @@ public class Common {
 
     }
 
+    public static void createAlertDialog(Context context, String title, boolean isHtml) {
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .create();
+        dialog.setCanceledOnTouchOutside(false);
+
+        AlertDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.alert_dialog, null, false);
+        if (isHtml) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                binding.tvTitle.setText(Html.fromHtml(title, Html.FROM_HTML_MODE_COMPACT));
+            } else {
+                binding.tvTitle.setText(Html.fromHtml(title));
+
+            }
+            binding.tvTitle.setMovementMethod(LinkMovementMethod.getInstance());
+            binding.tvTitle.setClickable(true);
+
+        } else {
+            binding.tvTitle.setText(title);
+        }
+        dialog.setView(binding.getRoot());
+        binding.btnConfirm.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public static String getImagePath(Context context, Uri uri) {

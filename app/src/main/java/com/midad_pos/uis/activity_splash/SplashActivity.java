@@ -57,13 +57,12 @@ public class SplashActivity extends BaseActivity {
 
                     @Override
                     public void onComplete() {
-                        /*if (getUserModel()!=null){
+                        if (getUserModel()!=null){
                             navigateToHomeActivity();
                         }else {
                             navigateToChooseActivity();
-                        }*/
+                        }
 
-                        navigateToHomeActivity();
 
 
 

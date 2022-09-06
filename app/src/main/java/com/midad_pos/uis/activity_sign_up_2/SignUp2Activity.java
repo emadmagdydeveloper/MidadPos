@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,16 +55,24 @@ public class SignUp2Activity extends BaseActivity implements OnCountryPickerList
     private void initView() {
         setUpToolbar(binding.toolbarSignUp, getString(R.string.registration), R.color.colorPrimary, R.color.white);
 
+        binding.tvTerms.setClickable(true);
+        binding.tvTerms.setMovementMethod(LinkMovementMethod.getInstance());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            binding.tvTerms.setText(Html.fromHtml(getString(R.string.termsLink), Html.FROM_HTML_MODE_COMPACT));
+        } else {
+            binding.tvTerms.setText(Html.fromHtml(getString(R.string.termsLink)));
+
+        }
         mvvm = ViewModelProviders.of(this).get(SignUp2Mvvm.class);
         mvvm.setSignUpModel(model);
         mvvm.getSignUpModel().observe(this, signUpModel -> {
             binding.setModel(signUpModel);
         });
 
-        spinnerBusinessType = new SpinnerBusinessType(this,getLang());
+        spinnerBusinessType = new SpinnerBusinessType(this, getLang());
         binding.spinner.setAdapter(spinnerBusinessType);
 
-        mvvm.getBusinessType().observe(this,list -> {
+        mvvm.getBusinessType().observe(this, list -> {
             spinnerBusinessType.updateList(list);
         });
 
@@ -93,7 +103,7 @@ public class SignUp2Activity extends BaseActivity implements OnCountryPickerList
         Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
         finish();
-        overridePendingTransition(0,0);
+        overridePendingTransition(0, 0);
     }
 
     private Country getCountryBySim() {
@@ -106,6 +116,7 @@ public class SignUp2Activity extends BaseActivity implements OnCountryPickerList
 
         return null;
     }
+
     private void showCountryPicker() {
         CountryPicker.Builder builder =
                 new CountryPicker.Builder().with(this)
@@ -117,6 +128,7 @@ public class SignUp2Activity extends BaseActivity implements OnCountryPickerList
         countryPicker.showDialog(this);
 
     }
+
     @Override
     public void onSelectCountry(Country country) {
         binding.flag.setImageResource(country.getFlag());

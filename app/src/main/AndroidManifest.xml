@@ -29,6 +29,9 @@
         tools:ignore="AllowBackup"
         tools:targetApi="q">
         <activity
+            android:name=".uis.activity_store.StoreActivity"
+            android:exported="false" />
+        <activity
             android:name=".uis.activity_cash_management.CashManagementActivity"
             android:exported="false" />
         <activity
