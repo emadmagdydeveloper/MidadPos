@@ -10,7 +10,6 @@ public class WereHouse implements Serializable {
     private String email;
     private String address;
     private List<POSModel> pos;
-    private POSModel selectedPos;
 
     public String getId() {
         return id;
@@ -41,11 +40,4 @@ public class WereHouse implements Serializable {
         return name.toString();
     }
 
-    public POSModel getSelectedPos() {
-        return selectedPos;
-    }
-
-    public void setSelectedPos(POSModel selectedPos) {
-        this.selectedPos = selectedPos;
-    }
-}
+  }

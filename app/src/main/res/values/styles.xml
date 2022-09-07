@@ -14,6 +14,11 @@
 
     </style>
 
+    <style name="text_input_appearance" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">17sp</item>
+
+    </style>
+
 
 
 

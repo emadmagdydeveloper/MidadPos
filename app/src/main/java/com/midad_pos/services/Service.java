@@ -1,5 +1,6 @@
 package com.midad_pos.services;
 
+import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 
 import io.reactivex.Single;
@@ -14,4 +15,11 @@ public interface Service {
     @POST("api/auth/login")
     Single<Response<UserModel>> login(@Field("email") String email,
                                       @Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("api/items/storeCategory")
+    Single<Response<StatusResponse>> addCategory(@Field("user_id") String user_id,
+                                                 @Field("name") String name,
+                                                 @Field("color") String color
+    );
 }

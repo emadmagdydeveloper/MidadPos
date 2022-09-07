@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,7 @@ import com.midad_pos.adapter.SpinnerCountryAdapter;
 import com.midad_pos.databinding.ActivityHomeBinding;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
+import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.mvvm.HomeMvvm;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
@@ -50,6 +52,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class HomeActivity extends DrawerBaseActivity {
     private HomeMvvm mvvm;
+    private BaseMvvm baseMvvm;
     private ActivityHomeBinding binding;
     private SpinnerCountryAdapter spinnerCountryAdapter;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -87,6 +90,7 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
     private void initView() {
+        baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         mvvm = ViewModelProviders.of(this).get(HomeMvvm.class);
         codeScanner = new CodeScanner(this, binding.scanCode);
 
@@ -126,14 +130,17 @@ public class HomeActivity extends DrawerBaseActivity {
         if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
             initCodeScanner(mvvm.getCamera().getValue());
         }
+        baseMvvm.getOnUserRefreshed().observe(this,aBoolean -> {
+            Log.e("ffff","fff");
+        });
         mvvm.getSelectedCategory().observe(this, selectedCategory -> {
             if (binding.toolBarHomeLayout.toolbarTitle != null) {
-                binding.toolBarHomeLayout.toolbarTitle.setTitle(selectedCategory.getTitle());
+                binding.toolBarHomeLayout.toolbarTitle.setTitle(selectedCategory.getName());
 
             }
 
             if (binding.llSpinnerFilter != null) {
-                binding.setTitle(selectedCategory.getTitle());
+                binding.setTitle(selectedCategory.getName());
             }
         });
 
@@ -424,7 +431,7 @@ public class HomeActivity extends DrawerBaseActivity {
         int id = -1;
         PopupMenu popupMenu = new PopupMenu(this, view);
         for (CategoryModel categoryModel : categories) {
-            popupMenu.getMenu().add(1, id, 1, categoryModel.getTitle());
+            popupMenu.getMenu().add(1, id, 1, categoryModel.getName());
             id += 1;
         }
 
@@ -717,6 +724,7 @@ public class HomeActivity extends DrawerBaseActivity {
     protected void onResume() {
         super.onResume();
         updateSelectedPos(0);
+        showPinCodeView();
         if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
             initCodeScanner(mvvm.getCamera().getValue());
         }

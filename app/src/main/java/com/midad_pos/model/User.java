@@ -16,7 +16,6 @@ public class User implements Serializable {
     private List<WereHouse> warehouses;
     private String access_token;
     private String token_type;
-    private WereHouse selectedWereHouse;
 
 
 
@@ -69,11 +68,5 @@ public class User implements Serializable {
         return token_type;
     }
 
-    public WereHouse getSelectedWereHouse() {
-        return selectedWereHouse;
-    }
 
-    public void setSelectedWereHouse(WereHouse selectedWereHouse) {
-        this.selectedWereHouse = selectedWereHouse;
-    }
 }

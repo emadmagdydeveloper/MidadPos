@@ -10,9 +10,7 @@ import android.widget.BaseAdapter;
 import androidx.databinding.DataBindingUtil;
 
 import com.midad_pos.R;
-import com.midad_pos.databinding.BusinessSpinnerRowBinding;
 import com.midad_pos.databinding.SpinnerRowBinding;
-import com.midad_pos.model.BusinessTypeModel;
 import com.midad_pos.model.CategoryModel;
 
 import java.util.List;
@@ -44,7 +42,7 @@ public class SpinnerCategoryAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         @SuppressLint("ViewHolder") SpinnerRowBinding binding = DataBindingUtil.inflate(inflater, R.layout.spinner_row,viewGroup,false);
-        binding.setTitle(list.get(i).getTitle());
+        binding.setTitle(list.get(i).getName());
         return binding.getRoot();
     }
 

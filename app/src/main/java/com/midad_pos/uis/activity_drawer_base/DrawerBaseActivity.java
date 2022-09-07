@@ -3,6 +3,8 @@ package com.midad_pos.uis.activity_drawer_base;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -13,10 +15,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.navigation.NavigationView;
 import com.midad_pos.R;
 import com.midad_pos.databinding.ActivityDrawerBaseBinding;
+import com.midad_pos.databinding.NavigationViewHeaderBinding;
+import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.share.App;
 import com.midad_pos.uis.activity_base.BaseActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
@@ -29,14 +34,28 @@ import java.util.Objects;
 
 public class DrawerBaseActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ActivityDrawerBaseBinding binding;
+    private NavigationViewHeaderBinding navigationViewHeaderBinding;
+    private BaseMvvm baseMvvm;
+
     private int selectedPos = 0;
 
     @Override
     public void setContentView(View view) {
         binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_drawer_base, null, false);
+        navigationViewHeaderBinding = DataBindingUtil.bind(binding.navigationView.getHeaderView(0));
         binding.frameLayoutContent.addView(view);
         super.setContentView(binding.getRoot());
         binding.navigationView.setNavigationItemSelectedListener(this);
+        baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
+        baseMvvm.getOnUserRefreshed().observe(this,aBoolean -> {
+            navigationViewHeaderBinding.setModel(getUserModel());
+        });
+
+        navigationViewHeaderBinding.lock.setOnClickListener(v -> {
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
+            showPinCodeView();
+
+        });
 
     }
 

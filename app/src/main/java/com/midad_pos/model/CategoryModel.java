@@ -4,11 +4,13 @@ import java.io.Serializable;
 
 public class CategoryModel implements Serializable {
     private int id;
-    private String title;
+    private String name;
+    private String color;
+    private int count;
 
-    public CategoryModel(int id, String title) {
+    public CategoryModel(int id, String name) {
         this.id = id;
-        this.title = title;
+        this.name = name;
     }
 
     public int getId() {
@@ -19,11 +21,23 @@ public class CategoryModel implements Serializable {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public int getCount() {
+        return count;
     }
 }

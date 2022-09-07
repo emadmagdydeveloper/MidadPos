@@ -132,7 +132,16 @@
     <string name="store_not_selected">لم يتم إختيار متجر</string>
     <string name="continuee">المتابعة</string>
     <string name="select_store">إختر المتجر</string>
+    <string name="pos_not_selected">لم يتم إختيارPOS</string>
+    <string name="select_pos">إختيار الPOS</string>
     <string name="no_pos"><![CDATA[لا توجد اجهزة pos متوفرة في المتجر</br> قم بتسجيل الخروج من احد اجهزتك او قم بالاضافة pos إضافي في واحد في ]]></string>
+    <string name="wrong_pin_code">رمز الpin خاطئ</string>
+    <string name="create_category">إنشاء فئة</string>
+    <string name="category_name">إسم الفئة</string>
+    <string name="category_color">لون الفئة</string>
+    <string name="assing_items">تعيين عنصر</string>
+    <string name="create_item">إنشاء عنصر</string>
+    <string name="empty_field">لا يمكن ان يكون هذا الحقل فارغا</string>
 
 
     <string-array name="delivery_options">

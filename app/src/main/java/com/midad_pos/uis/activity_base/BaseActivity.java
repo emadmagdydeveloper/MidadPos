@@ -3,6 +3,7 @@ package com.midad_pos.uis.activity_base;
 import android.Manifest;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
@@ -17,6 +18,7 @@ import com.midad_pos.databinding.ActivityBaseLayoutBinding;
 import com.midad_pos.databinding.ToolbarBinding;
 import com.midad_pos.language.Language;
 import com.midad_pos.model.AppSettingModel;
+import com.midad_pos.model.User;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.preferences.Preferences;
@@ -148,7 +150,7 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    private void updatePinView(String number) {
+    protected void updatePinView(String number) {
         mvvm.getPinCode().setValue(number);
         if (number.isEmpty()) {
             binding.pinView.firstPinView.setText("");
@@ -160,8 +162,32 @@ public class BaseActivity extends AppCompatActivity {
                 pinNumber += number;
                 binding.pinView.firstPinView.setText(pinNumber);
                 if (pinNumber.length() == 4) {
-                    binding.pinContainer.setVisibility(View.GONE);
-                    binding.container.setVisibility(View.VISIBLE);
+                    UserModel userModel = getUserModel();
+                    User user = getUserByPin(pinNumber);
+                    if (user==null){
+                        binding.pinView.tvEnterPinCode.setTextColor(getResources().getColor(R.color.cancel));
+                        binding.pinView.tvEnterPinCode.setText(R.string.wrong_pin_code);
+                        binding.pinView.firstPinView.setItemBackgroundResources(R.drawable.circle_wrong_pin);
+                        binding.pinView.firstPinView.setTextColor(getResources().getColor(R.color.cancel));
+
+                        new Handler()
+                                .postDelayed(()->{
+                                    binding.pinView.tvEnterPinCode.setTextColor(getResources().getColor(R.color.black));
+                                    binding.pinView.tvEnterPinCode.setText(R.string.enter_pin);
+                                    binding.pinView.firstPinView.setItemBackgroundResources(R.drawable.circle_pin);
+                                    binding.pinView.firstPinView.setTextColor(getResources().getColor(R.color.colorPrimary));
+
+                                    updatePinView("");
+                                },500);
+                    }else {
+                        userModel.getData().setSelectedUser(user);
+                        setUserModel(userModel);
+                        mvvm.getOnUserRefreshed().setValue(true);
+                        binding.pinContainer.setVisibility(View.GONE);
+                        binding.container.setVisibility(View.VISIBLE);
+                    }
+
+
                 }
             }
         }
@@ -169,7 +195,7 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    public void showPinCodeView(){
+    protected void showPinCodeView(){
         if (binding!=null){
             binding.pinContainer.setVisibility(View.VISIBLE);
             binding.container.setVisibility(View.GONE);
@@ -177,6 +203,17 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public User getUserByPin(String pinCode){
+        UserModel userModel = getUserModel();
+        Log.e("code",pinCode+"__"+userModel.getData().getAnotherUsers().size()+"");
+        for (User user:userModel.getData().getAnotherUsers()){
+            if (user.getPin_code().equals(pinCode)){
+                return user;
+            }
+        }
+
+        return null;
+    }
 
     protected String getLang() {
         Paper.init(this);

@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_items;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.midad_pos.R;
 import com.midad_pos.databinding.ActivityItemsBinding;
 import com.midad_pos.mvvm.ItemsMvvm;
+import com.midad_pos.uis.activity_add_category.AddCategoryActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 
 import java.util.concurrent.TimeUnit;
@@ -118,6 +120,7 @@ public class ItemsActivity extends DrawerBaseActivity {
 
                 }
             });
+
 
             setUpCategorySearch();
 
@@ -291,6 +294,21 @@ public class ItemsActivity extends DrawerBaseActivity {
             });
         }
 
+        if (binding.categoryLayout!=null){
+            binding.categoryLayout.categoryFab.setOnClickListener(v -> {
+                navigateToAddCategoryActivity();
+            });
+        }
+
+        if (binding.categoryDetailsLayout!=null){
+            binding.categoryDetailsLayout.categoryFab.setOnClickListener(v -> {
+                navigateToAddCategoryActivity();
+            });
+        }
+
+
+
+
         binding.items.setOnClickListener(view -> {
             mvvm.getPositions().setValue(0);
             updateSelections(0);
@@ -305,6 +323,13 @@ public class ItemsActivity extends DrawerBaseActivity {
             mvvm.getPositions().setValue(2);
             updateSelections(2);
         });
+
+    }
+
+    private void navigateToAddCategoryActivity() {
+        Intent intent = new Intent(this, AddCategoryActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0,0);
 
     }
 
