@@ -1,5 +1,6 @@
 package com.midad_pos.services;
 
+import com.midad_pos.model.CategoryDataModel;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 
@@ -7,7 +8,9 @@ import io.reactivex.Single;
 import retrofit2.Response;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface Service {
 
@@ -22,4 +25,8 @@ public interface Service {
                                                  @Field("name") String name,
                                                  @Field("color") String color
     );
+
+    @GET("api/home/categories")
+    Single<Response<CategoryDataModel>> categories(@Query("user_id") String user_id);
+
 }

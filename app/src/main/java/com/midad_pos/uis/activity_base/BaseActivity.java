@@ -45,6 +45,13 @@ public class BaseActivity extends AppCompatActivity {
         initViews();
     }
 
+    protected BaseMvvm getBaseMvvm(){
+        if (mvvm==null){
+            mvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
+
+        }
+        return mvvm;
+    }
     @Override
     protected void attachBaseContext(Context newBase) {
         Paper.init(newBase);
@@ -169,7 +176,6 @@ public class BaseActivity extends AppCompatActivity {
                         binding.pinView.tvEnterPinCode.setText(R.string.wrong_pin_code);
                         binding.pinView.firstPinView.setItemBackgroundResources(R.drawable.circle_wrong_pin);
                         binding.pinView.firstPinView.setTextColor(getResources().getColor(R.color.cancel));
-
                         new Handler()
                                 .postDelayed(()->{
                                     binding.pinView.tvEnterPinCode.setTextColor(getResources().getColor(R.color.black));
@@ -185,6 +191,8 @@ public class BaseActivity extends AppCompatActivity {
                         mvvm.getOnUserRefreshed().setValue(true);
                         binding.pinContainer.setVisibility(View.GONE);
                         binding.container.setVisibility(View.VISIBLE);
+                        updatePinView("");
+
                     }
 
 
@@ -203,9 +211,17 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    protected void hidePinCodeView(){
+        if (binding!=null){
+            binding.pinContainer.setVisibility(View.GONE);
+            binding.container.setVisibility(View.VISIBLE);
+            updatePinView("");
+        }
+    }
+
+
     public User getUserByPin(String pinCode){
         UserModel userModel = getUserModel();
-        Log.e("code",pinCode+"__"+userModel.getData().getAnotherUsers().size()+"");
         for (User user:userModel.getData().getAnotherUsers()){
             if (user.getPin_code().equals(pinCode)){
                 return user;
@@ -253,6 +269,13 @@ public class BaseActivity extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        new Handler().postDelayed(this::showPinCodeView,1000);
+
+    }
 
     @Override
     public void onBackPressed() {

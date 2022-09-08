@@ -1,6 +1,7 @@
 package com.midad_pos.mvvm;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -9,15 +10,27 @@ import androidx.lifecycle.MutableLiveData;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
 import com.midad_pos.model.AddCustomerModel;
+import com.midad_pos.model.CategoryDataModel;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
+import com.midad_pos.remote.Api;
+import com.midad_pos.tags.Tags;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
+
 public class HomeMvvm extends AndroidViewModel {
+    private final String TAG = HomeMvvm.class.getName();
     private MutableLiveData<List<CategoryModel>> categories;
     private MutableLiveData<CategoryModel> selectedCategory;
     private MutableLiveData<String> selectedDeliveryOptions;
@@ -31,6 +44,8 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<Integer> countryPos;
     private MutableLiveData<Boolean> isScanOpened;
     private MutableLiveData<Integer> camera;
+    private MutableLiveData<String> onError;
+    private CompositeDisposable disposable = new CompositeDisposable();
 
 
     public HomeMvvm(@NonNull Application application) {
@@ -39,7 +54,6 @@ public class HomeMvvm extends AndroidViewModel {
         getCountriesData().setValue(new ArrayList<>(Arrays.asList(countries)));
         getCountryPos().setValue(0);
         getAddCustomerModel();
-        getCategoryData();
     }
 
     public MutableLiveData<List<CategoryModel>> getCategories() {
@@ -122,6 +136,14 @@ public class HomeMvvm extends AndroidViewModel {
         return countryPos;
     }
 
+    public MutableLiveData<String> getOnError() {
+        if (onError == null) {
+            onError = new MutableLiveData<>();
+
+        }
+        return onError;
+    }
+
     public void searchCustomer(String query) {
         getSearchQueryCustomer().setValue(query);
     }
@@ -134,13 +156,64 @@ public class HomeMvvm extends AndroidViewModel {
         return ticketCount;
     }
 
-    public void getCategoryData() {
+    public void getCategoryData(String user_id) {
         List<CategoryModel> list = new ArrayList<>();
 
-        list.add(new CategoryModel(0, getApplication().getApplicationContext().getString(R.string.all_items)));
-        list.add(new CategoryModel(0, getApplication().getApplicationContext().getString(R.string.discounts_items)));
+        list.add(new CategoryModel(-1, getApplication().getApplicationContext().getString(R.string.all_items)));
+        list.add(new CategoryModel(-2, getApplication().getApplicationContext().getString(R.string.discounts_items)));
         getCategories().setValue(list);
         getSelectedCategory().setValue(list.get(0));
+
+        Api.getService(Tags.base_url)
+                .categories(user_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<CategoryDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<CategoryDataModel> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    list.addAll(response.body().getData());
+                                    getCategories().setValue(list);
+                                } else {
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
     }
 
     public MutableLiveData<Boolean> getIsScanOpened() {

@@ -3,6 +3,7 @@ package com.midad_pos.uis.activity_drawer_base;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -36,7 +37,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
     private ActivityDrawerBaseBinding binding;
     private NavigationViewHeaderBinding navigationViewHeaderBinding;
     private BaseMvvm baseMvvm;
-
+    private int itemId;
     private int selectedPos = 0;
 
     @Override
@@ -59,7 +60,19 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
     }
 
-    protected void setUpDrawer(Toolbar toolbar,boolean isNormal) {
+    protected BaseMvvm getBaseMvvm(){
+        return baseMvvm;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navigationViewHeaderBinding.setModel(getUserModel());
+
+
+    }
+
+    protected void setUpDrawer(Toolbar toolbar, boolean isNormal) {
         if (isNormal){
             setSupportActionBar(toolbar);
             Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
@@ -83,7 +96,9 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         binding.drawerLayout.closeDrawer(GravityCompat.START);
 
+        itemId  = item.getItemId();
         if (item.getItemId() == R.id.sales) {
+            hidePinCodeView();
             if (selectedPos!=0){
                 App app = (App) getApplicationContext();
                 app.killAllActivities();
@@ -101,10 +116,14 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
                 navigation(ShiftActivity.class);
             }
 
+
         }else if (item.getItemId() == R.id.items) {
+            Log.e("tt","2");
+
             if (selectedPos!=3){
                 navigation(ItemsActivity.class);
             }
+
 
         }else if (item.getItemId() == R.id.settings) {
             if (selectedPos!=4){
@@ -136,6 +155,10 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         this.selectedPos = pos;
         binding.navigationView.getMenu().getItem(pos).setChecked(true);
     }
+
+
+
+
 
 
     @Override

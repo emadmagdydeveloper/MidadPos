@@ -142,6 +142,8 @@
     <string name="assing_items">Assign items</string>
     <string name="create_item">Create item</string>
     <string name="empty_field">This field cannot be blank</string>
+    <string name="item">item</string>
+    <string name="category">Category</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

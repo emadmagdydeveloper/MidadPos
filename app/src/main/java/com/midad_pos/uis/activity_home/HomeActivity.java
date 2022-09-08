@@ -66,7 +66,7 @@ public class HomeActivity extends DrawerBaseActivity {
         setContentView(binding.getRoot());
         setUpDrawer(binding.toolBarHomeLayout.toolBarHome, true);
         updateSelectedPos(0);
-
+        showPinCodeView();
         initView();
     }
 
@@ -88,6 +88,7 @@ public class HomeActivity extends DrawerBaseActivity {
         invalidateOptionsMenu();
 
     }
+
 
     private void initView() {
         baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
@@ -131,7 +132,7 @@ public class HomeActivity extends DrawerBaseActivity {
             initCodeScanner(mvvm.getCamera().getValue());
         }
         baseMvvm.getOnUserRefreshed().observe(this,aBoolean -> {
-            Log.e("ffff","fff");
+
         });
         mvvm.getSelectedCategory().observe(this, selectedCategory -> {
             if (binding.toolBarHomeLayout.toolbarTitle != null) {
@@ -369,6 +370,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
         }
 
+        mvvm.getCategoryData(getUserModel().getData().getSelectedUser().getId());
     }
 
     private void initCodeScanner(int camera) {
@@ -428,20 +430,22 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
     private void createFilterPopupMenu(View view, List<CategoryModel> categories) {
-        int id = -1;
+        int pos = 0;
         PopupMenu popupMenu = new PopupMenu(this, view);
         for (CategoryModel categoryModel : categories) {
-            popupMenu.getMenu().add(1, id, 1, categoryModel.getName());
-            id += 1;
+            popupMenu.getMenu().add(1, pos, 1, categoryModel.getName());
+            pos += 1;
         }
 
 
         popupMenu.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == -1) {
+            if (item.getItemId() == 0) {
                 mvvm.getSelectedCategory().setValue(Objects.requireNonNull(mvvm.getCategories().getValue()).get(0));
-            } else if (item.getItemId() == 0) {
+            } else if (item.getItemId() == 1) {
                 mvvm.getSelectedCategory().setValue(Objects.requireNonNull(mvvm.getCategories().getValue()).get(1));
 
+            }else {
+                mvvm.getSelectedCategory().setValue(Objects.requireNonNull(mvvm.getCategories().getValue()).get(item.getItemId()));
             }
             return true;
         });
@@ -724,7 +728,6 @@ public class HomeActivity extends DrawerBaseActivity {
     protected void onResume() {
         super.onResume();
         updateSelectedPos(0);
-        showPinCodeView();
         if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
             initCodeScanner(mvvm.getCamera().getValue());
         }
@@ -753,6 +756,7 @@ public class HomeActivity extends DrawerBaseActivity {
         if (codeScanner != null) {
             codeScanner.releaseResources();
         }
+
         super.onPause();
     }
 

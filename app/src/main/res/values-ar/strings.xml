@@ -142,6 +142,8 @@
     <string name="assing_items">تعيين عنصر</string>
     <string name="create_item">إنشاء عنصر</string>
     <string name="empty_field">لا يمكن ان يكون هذا الحقل فارغا</string>
+    <string name="item">عنصر</string>
+    <string name="category">فئة</string>
 
 
     <string-array name="delivery_options">

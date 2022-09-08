@@ -7,6 +7,7 @@ public class CategoryModel implements Serializable {
     private String name;
     private String color;
     private int count;
+    private boolean isSelected;
 
     public CategoryModel(int id, String name) {
         this.id = id;
@@ -39,5 +40,14 @@ public class CategoryModel implements Serializable {
 
     public int getCount() {
         return count;
+    }
+
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

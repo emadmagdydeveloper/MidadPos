@@ -10,9 +10,13 @@ import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.midad_pos.R;
+import com.midad_pos.adapter.CategoryAdapter;
 import com.midad_pos.databinding.ActivityItemsBinding;
+import com.midad_pos.model.CategoryModel;
+import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.mvvm.ItemsMvvm;
 import com.midad_pos.uis.activity_add_category.AddCategoryActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
@@ -29,6 +33,8 @@ import io.reactivex.schedulers.Schedulers;
 public class ItemsActivity extends DrawerBaseActivity {
     private ItemsMvvm mvvm;
     private ActivityItemsBinding binding;
+    private CategoryAdapter categoryAdapter;
+
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Override
@@ -36,18 +42,127 @@ public class ItemsActivity extends DrawerBaseActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_items, null, false);
         setContentView(binding.getRoot());
-        setUpDrawer(binding.toolbarItems,true);
+        setUpDrawer(binding.toolbarItems, true);
         updateSelectedPos(3);
         initView();
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mvvm.getCategoriesData(getUserModel().getData().getSelectedUser().getId());
+
+    }
+
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(ItemsMvvm.class);
+
         if (mvvm.getPositions().getValue() != null) {
             updateSelections(mvvm.getPositions().getValue());
 
         }
+
+
+        mvvm.getIsDeleteMode().observe(this, aBoolean -> {
+            if (aBoolean){
+                if (binding.categoryLayout != null) {
+                    binding.categoryLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
+                }
+
+                if (binding.categoryDetailsLayout != null) {
+                    binding.categoryDetailsLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
+                }
+            }else {
+                if (binding.categoryLayout != null) {
+                    binding.categoryLayout.toolbarDeleteModel.setVisibility(View.GONE);
+                }
+
+                if (binding.categoryDetailsLayout != null) {
+                    binding.categoryDetailsLayout.toolbarDeleteModel.setVisibility(View.GONE);
+                }
+            }
+
+        });
+
+        mvvm.getDeletedCategoryIds().observe(this, list -> {
+            if (binding.categoryLayout != null) {
+                binding.categoryLayout.setDeleteCount(list.size()+"");
+            }
+
+            if (binding.categoryDetailsLayout != null) {
+                binding.categoryDetailsLayout.setDeleteCount(list.size()+"");
+            }
+        });
+
+        mvvm.getIsCategoryLoading().observe(this, isLoading -> {
+            if (binding.categoryLayout != null) {
+
+            }
+
+            if (binding.categoryDetailsLayout != null) {
+
+            }
+        });
+
+        mvvm.getCategories().observe(this, categories -> {
+            if (categoryAdapter != null) {
+                categoryAdapter.updateList(categories);
+            }
+            if (binding.categoryLayout != null) {
+                if (categories.size() > 0) {
+
+                    binding.categoryLayout.llNoCategories.setVisibility(View.GONE);
+
+                } else {
+                    binding.categoryLayout.llNoCategories.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            if (binding.categoryDetailsLayout != null) {
+                if (categories.size() > 0) {
+
+                    binding.categoryDetailsLayout.llNoCategories.setVisibility(View.GONE);
+
+                } else {
+                    binding.categoryDetailsLayout.llNoCategories.setVisibility(View.VISIBLE);
+
+                }
+
+            }
+
+        });
+
+
+        categoryAdapter = new CategoryAdapter(this);
+
+        if (binding.categoryLayout != null) {
+            binding.categoryLayout.recView.setLayoutManager(new LinearLayoutManager(this));
+            binding.categoryLayout.recView.setDrawingCacheEnabled(true);
+            binding.categoryLayout.recView.setItemViewCacheSize(20);
+            binding.categoryLayout.recView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+            binding.categoryLayout.recView.setAdapter(categoryAdapter);
+
+            binding.categoryLayout.imageNormalMode.setOnClickListener(v -> {
+                mvvm.clearDeletedCategoryIds();
+            });
+        }
+
+        if (binding.categoryDetailsLayout != null) {
+            binding.categoryDetailsLayout.recView.setLayoutManager(new LinearLayoutManager(this));
+            binding.categoryDetailsLayout.recView.setDrawingCacheEnabled(true);
+            binding.categoryDetailsLayout.recView.setItemViewCacheSize(20);
+            binding.categoryDetailsLayout.recView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+            binding.categoryDetailsLayout.recView.setAdapter(categoryAdapter);
+
+            binding.categoryDetailsLayout.imageNormalMode.setOnClickListener(v -> {
+                mvvm.clearDeletedCategoryIds();
+            });
+        }
+
 
         if (binding.flItemDetailsLand != null) {
             mvvm.getPositions().setValue(mvvm.getPositions().getValue() != -1 ? mvvm.getPositions().getValue() : 0);
@@ -294,19 +409,17 @@ public class ItemsActivity extends DrawerBaseActivity {
             });
         }
 
-        if (binding.categoryLayout!=null){
+        if (binding.categoryLayout != null) {
             binding.categoryLayout.categoryFab.setOnClickListener(v -> {
                 navigateToAddCategoryActivity();
             });
         }
 
-        if (binding.categoryDetailsLayout!=null){
+        if (binding.categoryDetailsLayout != null) {
             binding.categoryDetailsLayout.categoryFab.setOnClickListener(v -> {
                 navigateToAddCategoryActivity();
             });
         }
-
-
 
 
         binding.items.setOnClickListener(view -> {
@@ -324,12 +437,13 @@ public class ItemsActivity extends DrawerBaseActivity {
             updateSelections(2);
         });
 
+
     }
 
     private void navigateToAddCategoryActivity() {
         Intent intent = new Intent(this, AddCategoryActivity.class);
         startActivity(intent);
-        overridePendingTransition(0,0);
+        overridePendingTransition(0, 0);
 
     }
 
@@ -368,7 +482,6 @@ public class ItemsActivity extends DrawerBaseActivity {
 
                             @Override
                             public void afterTextChanged(Editable editable) {
-                                Log.e("ttt", "tt");
                                 emitter.onNext(editable.toString());
 
                             }
@@ -377,8 +490,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                     }
 
 
-                }).debounce(1, TimeUnit.SECONDS)
-                .distinct()
+                }).debounce(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((query) -> mvvm.searchItems(query));
@@ -429,8 +541,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                     }
 
 
-                }).debounce(1, TimeUnit.SECONDS)
-                .distinct()
+                }).debounce(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((query) -> mvvm.searchCategories(query));
@@ -480,8 +591,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                     }
 
 
-                }).debounce(1, TimeUnit.SECONDS)
-                .distinct()
+                }).debounce(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((query) -> mvvm.searchDiscount(query));
@@ -510,7 +620,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                 binding.flItemDetailsLand.setVisibility(View.VISIBLE);
                 binding.flCategoryDetailsLand.setVisibility(View.GONE);
                 binding.flDiscountsDetailsLand.setVisibility(View.GONE);
-                if (binding.iconItem!=null&&binding.iconCategory!=null&&binding.iconDiscount!=null&&binding.tvItem!=null&&binding.tvCategory!=null&&binding.tvDiscount!=null){
+                if (binding.iconItem != null && binding.iconCategory != null && binding.iconDiscount != null && binding.tvItem != null && binding.tvCategory != null && binding.tvDiscount != null) {
                     binding.iconItem.setColorFilter(getResources().getColor(R.color.colorPrimary));
                     binding.iconCategory.setColorFilter(getResources().getColor(R.color.grey4));
                     binding.iconDiscount.setColorFilter(getResources().getColor(R.color.grey4));
@@ -541,7 +651,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                 binding.flCategoryDetailsLand.setVisibility(View.VISIBLE);
                 binding.flDiscountsDetailsLand.setVisibility(View.GONE);
 
-                if (binding.iconItem!=null&&binding.iconCategory!=null&&binding.iconDiscount!=null&&binding.tvItem!=null&&binding.tvCategory!=null&&binding.tvDiscount!=null){
+                if (binding.iconItem != null && binding.iconCategory != null && binding.iconDiscount != null && binding.tvItem != null && binding.tvCategory != null && binding.tvDiscount != null) {
                     binding.iconItem.setColorFilter(getResources().getColor(R.color.grey4));
                     binding.iconCategory.setColorFilter(getResources().getColor(R.color.colorPrimary));
                     binding.iconDiscount.setColorFilter(getResources().getColor(R.color.grey4));
@@ -573,7 +683,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                 binding.flCategoryDetailsLand.setVisibility(View.GONE);
                 binding.flDiscountsDetailsLand.setVisibility(View.VISIBLE);
 
-                if (binding.iconItem!=null&&binding.iconCategory!=null&&binding.iconDiscount!=null&&binding.tvItem!=null&&binding.tvCategory!=null&&binding.tvDiscount!=null){
+                if (binding.iconItem != null && binding.iconCategory != null && binding.iconDiscount != null && binding.tvItem != null && binding.tvCategory != null && binding.tvDiscount != null) {
                     binding.iconItem.setColorFilter(getResources().getColor(R.color.grey4));
                     binding.iconCategory.setColorFilter(getResources().getColor(R.color.grey4));
                     binding.iconDiscount.setColorFilter(getResources().getColor(R.color.colorPrimary));
@@ -588,6 +698,8 @@ public class ItemsActivity extends DrawerBaseActivity {
 
 
     }
+
+
 
     @Override
     protected void onDestroy() {
@@ -606,6 +718,33 @@ public class ItemsActivity extends DrawerBaseActivity {
         } else {
             super.onBackPressed();
         }
+
+
+    }
+
+    public void updateDeleteModel(int adapterPosition) {
+        if (mvvm.getDeletedCategoryIds().getValue()!=null&&mvvm.getDeletedCategoryIds().getValue().size()==0){
+            mvvm.getIsDeleteMode().setValue(true);
+            mvvm.addCategoryIdsToDelete(adapterPosition);
+            categoryAdapter.notifyItemChanged(adapterPosition);
+
+        }
+
+
+    }
+
+    public void selectDeleteCategory(int adapterPosition,CategoryModel categoryModel) {
+        if (mvvm.getIsDeleteMode().getValue()!=null&&mvvm.getIsDeleteMode().getValue()){
+            if (categoryModel.isSelected()){
+                categoryModel.setSelected(false);
+                mvvm.removeCategoryIdFromDeletedList(adapterPosition);
+            }else {
+                mvvm.addCategoryIdsToDelete(adapterPosition);
+
+            }
+            categoryAdapter.notifyItemChanged(adapterPosition);
+        }
+
 
 
     }

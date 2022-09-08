@@ -7,6 +7,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="deleteCount"
+            type="String" />
 
     </data>
 
@@ -25,87 +28,154 @@
 
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                >
 
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolBarHome"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorPrimary"
-                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
-
-
-                    <LinearLayout
+                    >
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/toolBarHome"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPrimary"
+                        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
+
 
                         <LinearLayout
-                            android:id="@+id/llSearch"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="56dp"
                             android:gravity="center_vertical"
-                            android:visibility="gone"
+                            android:orientation="horizontal">
 
-                            >
+                            <LinearLayout
+                                android:id="@+id/llSearch"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:visibility="gone"
+
+                                >
+
+                                <ImageView
+                                    android:id="@+id/arrowBackLand"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:padding="3dp"
+                                    android:rotation='@{lang.equals("ar")?180:0}'
+                                    android:src="@drawable/ic_back_arrow"
+                                    app:tint="@color/white"
+
+                                    />
+
+                                <EditText
+                                    android:id="@+id/search"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="56dp"
+                                    android:background="@color/transparent"
+                                    android:hint="@string/search"
+                                    android:lines="1"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:textColor="@color/white"
+                                    android:textColorHint="@color/white_disable"
+                                    android:textCursorDrawable="@drawable/cursor"
+                                    android:textSize="20sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/categories"
+                                android:textColor="@color/white"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <androidx.legacy.widget.Space
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
 
                             <ImageView
-                                android:id="@+id/arrowBackLand"
+                                android:id="@+id/searchIconLand"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
-                                android:padding="3dp"
-                                android:rotation='@{lang.equals("ar")?180:0}'
-                                android:src="@drawable/ic_back_arrow"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:src="@drawable/ic_search"
                                 app:tint="@color/white"
 
                                 />
 
-                            <EditText
-                                android:id="@+id/search"
-                                android:layout_width="match_parent"
-                                android:layout_height="56dp"
-                                android:background="@color/transparent"
-                                android:hint="@string/search"
-                                android:lines="1"
-                                android:paddingStart="16dp"
-                                android:paddingEnd="16dp"
-                                android:textColor="@color/white"
-                                android:textColorHint="@color/white_disable"
-                                android:textCursorDrawable="@drawable/cursor"
-                                android:textSize="20sp" />
+
                         </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/categories"
-                            android:textColor="@color/white"
-                            android:textSize="22sp"
-                            android:textStyle="bold" />
 
-                        <androidx.legacy.widget.Space
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
+                    </com.google.android.material.appbar.MaterialToolbar>
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbarDeleteModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:background="@color/grey1"
+                        app:contentInsetStart="0dp"
+                        app:contentInsetEnd="0dp"
+                        android:visibility="gone"
 
-                        <ImageView
-                            android:id="@+id/searchIconLand"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@color/white"
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="8dp"
-                            android:src="@drawable/ic_search"
-                            app:tint="@color/white" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
 
+                            >
+                            <ImageView
+                                android:id="@+id/imageNormalMode"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_close"
+                                android:tint="@color/grey4"
+                                android:padding="3dp"
+                                />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="20sp"
+                                android:textColor="@color/black"
+                                android:text='@{deleteCount+" "+@string/category}'
+                                android:layout_marginStart="36dp"
+                                android:layout_marginEnd="36dp"
 
-                    </LinearLayout>
+                                />
+                            <androidx.legacy.widget.Space
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                />
+                            <ImageView
+                                android:id="@+id/imageDelete"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginEnd="16dp"
+                                android:src="@drawable/ic_delete"
+                                android:tint="@color/grey4"
+                                />
+                        </LinearLayout>
+                    </androidx.appcompat.widget.Toolbar>
+                </FrameLayout>
 
-
-                </com.google.android.material.appbar.MaterialToolbar>
             </com.google.android.material.appbar.AppBarLayout>
 
             <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -127,11 +197,13 @@
 
 
         <LinearLayout
-            android:id="@+id/ll_no_items"
+            android:id="@+id/ll_no_categories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone"
+            >
 
             <FrameLayout
                 android:layout_width="180dp"
@@ -172,6 +244,8 @@
                 android:textColor="@color/grey4"
                 android:textSize="17sp" />
         </LinearLayout>
+
+
 
     </FrameLayout>
 </layout>

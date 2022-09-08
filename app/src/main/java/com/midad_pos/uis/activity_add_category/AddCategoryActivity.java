@@ -19,7 +19,6 @@ import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.uis.activity_base.BaseActivity;
 
 public class AddCategoryActivity extends BaseActivity {
-    private BaseMvvm baseMvvm;
     private AddCategoryMvvm mvvm;
     private ActivityAddCategoryBinding binding;
 
@@ -31,7 +30,6 @@ public class AddCategoryActivity extends BaseActivity {
     }
 
     private void initView() {
-        baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         mvvm = ViewModelProviders.of(this).get(AddCategoryMvvm.class);
         binding.setLang(getLang());
 
@@ -44,8 +42,15 @@ public class AddCategoryActivity extends BaseActivity {
             binding.edtCategoryName.setText(mvvm.getCategoryName().getValue());
         }
 
-        mvvm.getAddedSuccess().observe(this,action->{
-            baseMvvm.getOnCategoryAdded().setValue(true);
+        mvvm.getAddedSuccess().observe(this, action -> {
+            if (action.isEmpty()) {
+                finish();
+
+            } else {
+                mvvm.getCategoryName().setValue("");
+                binding.edtCategoryName.setText(null);
+
+            }
         });
 
 

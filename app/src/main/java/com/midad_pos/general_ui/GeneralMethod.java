@@ -1,11 +1,13 @@
 package com.midad_pos.general_ui;
 
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
 import androidx.databinding.BindingAdapter;
 
 
@@ -88,6 +90,21 @@ public class GeneralMethod {
 
     }
 
+
+    @BindingAdapter("color")
+    public static void color(CardView view, String color) {
+        if (color != null) {
+            try {
+                int c = Color.parseColor(color);
+                view.setCardBackgroundColor(c);
+            } catch (Exception e) {
+                view.setCardBackgroundColor(view.getContext().getResources().getColor(R.color.cat1));
+
+            }
+
+        }
+
+    }
 
 
 }

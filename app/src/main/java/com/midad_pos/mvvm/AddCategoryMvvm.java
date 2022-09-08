@@ -82,7 +82,8 @@ public class AddCategoryMvvm extends AndroidViewModel {
             return;
         }
         Api.getService(Tags.base_url)
-                .addCategory(user_id, getCategoryName().getValue(), getColor().getValue()).subscribeOn(Schedulers.io())
+                .addCategory(user_id, getCategoryName().getValue(), getColor().getValue())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<StatusResponse>>() {
                     @Override
@@ -92,22 +93,25 @@ public class AddCategoryMvvm extends AndroidViewModel {
 
                     @Override
                     public void onSuccess(Response<StatusResponse> response) {
-                        disposable.clear();
                         if (response.isSuccessful()) {
                             if (response.body() != null) {
                                 if (response.body().getStatus() == 200) {
                                     getAddedSuccess().setValue(action);
+
                                 } else {
                                     getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
                                 }
                             } else {
 
                                 getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
 
                             }
+                            disposable.clear();
                         } else {
 
                             getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+                            disposable.clear();
 
                             try {
                                 Log.e(TAG, response.code() + "__" + response.errorBody().string());
@@ -125,6 +129,8 @@ public class AddCategoryMvvm extends AndroidViewModel {
                             getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
 
                         }
+                        disposable.clear();
+
                     }
                 });
     }
