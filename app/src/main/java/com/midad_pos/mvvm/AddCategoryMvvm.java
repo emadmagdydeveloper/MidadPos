@@ -30,6 +30,8 @@ public class AddCategoryMvvm extends AndroidViewModel {
     private MutableLiveData<String> color;
     private MutableLiveData<String> addedSuccess;
     private MutableLiveData<String> onError;
+    private MutableLiveData<Boolean> isDialogShow;
+
     private CompositeDisposable disposable = new CompositeDisposable();
 
 
@@ -74,6 +76,14 @@ public class AddCategoryMvvm extends AndroidViewModel {
             addedSuccess = new MutableLiveData<>();
         }
         return addedSuccess;
+    }
+
+    public MutableLiveData<Boolean> getIsDialogShow() {
+        if (isDialogShow == null) {
+            isDialogShow = new MutableLiveData<>();
+            isDialogShow.setValue(false);
+        }
+        return isDialogShow;
     }
 
 

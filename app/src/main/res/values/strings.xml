@@ -144,6 +144,7 @@
     <string name="empty_field">This field cannot be blank</string>
     <string name="item">item</string>
     <string name="category">Category</string>
+    <string name="assign_items_to_category">Assign items to category</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

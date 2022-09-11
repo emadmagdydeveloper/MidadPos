@@ -42,11 +42,23 @@ public class AddCategoryActivity extends BaseActivity {
             binding.edtCategoryName.setText(mvvm.getCategoryName().getValue());
         }
 
+        if (mvvm.getIsDialogShow().getValue()!=null&&mvvm.getIsDialogShow().getValue()){
+            binding.flDialog.setVisibility(View.VISIBLE);
+        }else {
+            binding.flDialog.setVisibility(View.GONE);
+
+        }
+
         mvvm.getAddedSuccess().observe(this, action -> {
             if (action.isEmpty()) {
                 finish();
 
-            } else {
+            }else if (action.equals("assignItems")){
+                binding.flDialog.setVisibility(View.VISIBLE);
+                mvvm.getIsDialogShow().setValue(true);
+                mvvm.getCategoryName().setValue("");
+                binding.edtCategoryName.setText(null);
+            }else {
                 mvvm.getCategoryName().setValue("");
                 binding.edtCategoryName.setText(null);
 
@@ -78,6 +90,7 @@ public class AddCategoryActivity extends BaseActivity {
         binding.card8.setOnClickListener(v -> {
             updateCategoryCheckedColor(7);
         });
+
 
 
         binding.btnSave.setOnClickListener(v -> {
@@ -139,6 +152,17 @@ public class AddCategoryActivity extends BaseActivity {
             overridePendingTransition(0, 0);
         });
 
+        binding.assignDialog.closeDialog.setOnClickListener(v -> {
+            binding.flDialog.setVisibility(View.GONE);
+            mvvm.getIsDialogShow().setValue(false);
+        });
+        binding.assignDialog.tvOpenSearch.setOnClickListener(v -> {
+            binding.assignDialog.llSearch.setVisibility(View.VISIBLE);
+        });
+        binding.assignDialog.closeSearch.setOnClickListener(v -> {
+            binding.assignDialog.llSearch.setVisibility(View.GONE);
+            binding.assignDialog.edtSearch.setText("");
+        });
 
     }
 
@@ -244,8 +268,13 @@ public class AddCategoryActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(0, 0);
+        if (binding.flDialog.getVisibility()==View.VISIBLE){
+            binding.flDialog.setVisibility(View.GONE);
+        }else {
+            super.onBackPressed();
+            overridePendingTransition(0, 0);
+        }
+
 
     }
 }

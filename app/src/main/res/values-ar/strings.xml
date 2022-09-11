@@ -144,6 +144,7 @@
     <string name="empty_field">لا يمكن ان يكون هذا الحقل فارغا</string>
     <string name="item">عنصر</string>
     <string name="category">فئة</string>
+    <string name="assign_items_to_category">تعيين العناصر لفئة معينة</string>
 
 
     <string-array name="delivery_options">

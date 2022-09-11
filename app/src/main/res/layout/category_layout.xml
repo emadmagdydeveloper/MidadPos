@@ -218,6 +218,7 @@
             android:src="@drawable/ic_add"
             app:tint="@color/white"
             app:borderWidth="0dp"
+            app:elevation="0dp"
 
             />
 
@@ -271,6 +272,8 @@
                 android:text="@string/to_add_category"
                 />
         </LinearLayout>
+
+
 
 
 
