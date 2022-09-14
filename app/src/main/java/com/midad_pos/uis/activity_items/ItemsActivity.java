@@ -19,6 +19,7 @@ import com.midad_pos.model.CategoryModel;
 import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.mvvm.ItemsMvvm;
 import com.midad_pos.uis.activity_add_category.AddCategoryActivity;
+import com.midad_pos.uis.activity_add_item.AddItemActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 
 import java.util.concurrent.TimeUnit;
@@ -436,6 +437,23 @@ public class ItemsActivity extends DrawerBaseActivity {
             mvvm.getPositions().setValue(2);
             updateSelections(2);
         });
+
+        if (binding.itemsLayout!=null){
+            binding.itemsLayout.fabAddItem.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AddItemActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0,0);
+            });
+        }
+
+        if (binding.itemsDetailsLayout!=null){
+            binding.itemsDetailsLayout.fabAddItem.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AddItemActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0,0);
+            });
+        }
+
 
 
     }

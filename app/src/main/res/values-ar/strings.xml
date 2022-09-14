@@ -145,6 +145,19 @@
     <string name="item">عنصر</string>
     <string name="category">فئة</string>
     <string name="assign_items_to_category">تعيين العناصر لفئة معينة</string>
+    <string name="sold_by">يتم البيع ب</string>
+    <string name="each">بالوحدة</string>
+    <string name="weight">بالوزن</string>
+    <string name="price">السعر</string>
+    <string name="leave_blank">إترك هذا الحقل فارغا لتحديد السعر أثناء عملية البيع</string>
+    <string name="cost">التكلفة</string>
+    <string name="sku">SKU</string>
+    <string name="barcode">الباركود</string>
+    <string name="inventory">المخزون</string>
+    <string name="track_stock">تعقب المخزون</string>
+    <string name="representation_pos">العرض في نقطة البيع POS</string>
+    <string name="color_shape">اللون والشكل</string>
+    <string name="image">صورة</string>
 
 
     <string-array name="delivery_options">

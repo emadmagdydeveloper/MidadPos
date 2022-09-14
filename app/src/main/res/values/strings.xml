@@ -145,13 +145,25 @@
     <string name="item">item</string>
     <string name="category">Category</string>
     <string name="assign_items_to_category">Assign items to category</string>
+    <string name="sold_by">Sold by</string>
+    <string name="each">Each</string>
+    <string name="weight">Weight</string>
+    <string name="price">Price</string>
+    <string name="leave_blank">Leave the field blank to indicate the price upon sale</string>
+    <string name="cost">Cost</string>
+    <string name="sku">SKU</string>
+    <string name="barcode">Barcode</string>
+    <string name="inventory">Inventory</string>
+    <string name="track_stock">Track stock</string>
+    <string name="representation_pos">Representation on POS</string>
+    <string name="color_shape">Color and shape</string>
+    <string name="image">Image</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>
         <item>@string/takeaway</item>
         <item>@string/delivery</item>
     </string-array>
-
 
 
 </resources>

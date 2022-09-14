@@ -29,6 +29,9 @@
         tools:ignore="AllowBackup"
         tools:targetApi="q">
         <activity
+            android:name=".uis.activity_add_item.AddItemActivity"
+            android:exported="false" />
+        <activity
             android:name=".uis.activity_add_category.AddCategoryActivity"
             android:exported="false" />
         <activity
