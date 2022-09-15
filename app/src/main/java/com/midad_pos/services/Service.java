@@ -1,6 +1,7 @@
 package com.midad_pos.services;
 
 import com.midad_pos.model.CategoryDataModel;
+import com.midad_pos.model.HomeIndexModel;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 
@@ -28,5 +29,8 @@ public interface Service {
 
     @GET("api/home/categories")
     Single<Response<CategoryDataModel>> categories(@Query("user_id") String user_id);
+
+    @GET("api/home/index")
+    Single<Response<HomeIndexModel>> homeIndex(@Query("user_id") String user_id);
 
 }

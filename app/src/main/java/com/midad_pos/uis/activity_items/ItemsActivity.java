@@ -717,29 +717,6 @@ public class ItemsActivity extends DrawerBaseActivity {
 
     }
 
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposable.clear();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (binding.flItemsLayout != null && binding.flItemsLayout.getVisibility() == View.VISIBLE) {
-            binding.flItemsLayout.setVisibility(View.GONE);
-        } else if (binding.flCategoryLayout != null && binding.flCategoryLayout.getVisibility() == View.VISIBLE) {
-            binding.flCategoryLayout.setVisibility(View.GONE);
-        } else if (binding.flDiscountLayout != null && binding.flDiscountLayout.getVisibility() == View.VISIBLE) {
-            binding.flDiscountLayout.setVisibility(View.GONE);
-        } else {
-            super.onBackPressed();
-        }
-
-
-    }
-
     public void updateDeleteModel(int adapterPosition) {
         if (mvvm.getDeletedCategoryIds().getValue()!=null&&mvvm.getDeletedCategoryIds().getValue().size()==0){
             mvvm.getIsDeleteMode().setValue(true);
@@ -766,4 +743,26 @@ public class ItemsActivity extends DrawerBaseActivity {
 
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposable.clear();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (binding.flItemsLayout != null && binding.flItemsLayout.getVisibility() == View.VISIBLE) {
+            binding.flItemsLayout.setVisibility(View.GONE);
+        } else if (binding.flCategoryLayout != null && binding.flCategoryLayout.getVisibility() == View.VISIBLE) {
+            binding.flCategoryLayout.setVisibility(View.GONE);
+        } else if (binding.flDiscountLayout != null && binding.flDiscountLayout.getVisibility() == View.VISIBLE) {
+            binding.flDiscountLayout.setVisibility(View.GONE);
+        } else {
+            super.onBackPressed();
+        }
+
+
+    }
+
 }

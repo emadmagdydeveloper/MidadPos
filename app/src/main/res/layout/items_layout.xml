@@ -149,6 +149,7 @@
             android:layout_margin="16dp"
             android:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_add"
+            app:borderWidth="0dp"
             app:tint="@color/white"
             />
 

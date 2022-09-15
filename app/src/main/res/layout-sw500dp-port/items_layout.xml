@@ -145,6 +145,7 @@
             android:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_add"
             app:tint="@color/white"
+            app:borderWidth="0dp"
             />
 
 

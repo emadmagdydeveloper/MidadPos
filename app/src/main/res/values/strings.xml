@@ -158,6 +158,11 @@
     <string name="representation_pos">Representation on POS</string>
     <string name="color_shape">Color and shape</string>
     <string name="image">Image</string>
+    <string name="ch_photo">Choose photo</string>
+    <string name="take_photo">Take photo</string>
+    <string name="modifiers">Modifiers</string>
+    <string name="taxes">Taxes</string>
+    <string name="no_category">No category</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

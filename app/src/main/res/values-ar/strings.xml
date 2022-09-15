@@ -158,6 +158,11 @@
     <string name="representation_pos">العرض في نقطة البيع POS</string>
     <string name="color_shape">اللون والشكل</string>
     <string name="image">صورة</string>
+    <string name="ch_photo">إختر صورة</string>
+    <string name="take_photo">إلتقاط صورة</string>
+    <string name="modifiers">المُعدِلات</string>
+    <string name="taxes">الضرائب</string>
+    <string name="no_category">بدون فئة</string>
 
 
     <string-array name="delivery_options">
