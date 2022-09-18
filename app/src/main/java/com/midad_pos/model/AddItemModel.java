@@ -152,6 +152,7 @@ public class AddItemModel extends BaseObservable implements Serializable {
         if (cost.isEmpty()){
             cost ="0";
 
+
         }
         this.cost = cost.replace(".","");
         this.cost = this.cost.replace(",","");
