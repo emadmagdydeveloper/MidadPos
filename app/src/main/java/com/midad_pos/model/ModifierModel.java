@@ -7,6 +7,7 @@ public class ModifierModel implements Serializable {
     private String id;
     private String title;
     private List<Data> modifiers_data;
+    private boolean isChecked = false;
 
     public String getId() {
         return id;
@@ -46,5 +47,13 @@ public class ModifierModel implements Serializable {
         public String getModifier_id() {
             return modifier_id;
         }
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 }

@@ -163,6 +163,10 @@
     <string name="modifiers">المُعدِلات</string>
     <string name="taxes">الضرائب</string>
     <string name="no_category">بدون فئة</string>
+    <string name="perm_denied">الوصول للصور مرفوض</string>
+    <string name="barcode_types">أنواع الباركود</string>
+    <string name="wait">إنتظر قليلا...</string>
+    <string name="suc">تم بنجاح !</string>
 
 
     <string-array name="delivery_options">

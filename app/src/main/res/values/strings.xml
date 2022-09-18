@@ -163,6 +163,10 @@
     <string name="modifiers">Modifiers</string>
     <string name="taxes">Taxes</string>
     <string name="no_category">No category</string>
+    <string name="perm_denied">Permission denied</string>
+    <string name="barcode_types">Barcode types</string>
+    <string name="wait">wait...</string>
+    <string name="suc">Success!</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

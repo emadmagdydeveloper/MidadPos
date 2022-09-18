@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="model"
+            type="com.midad_pos.model.TaxModel" />
+    </data>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="@{model.checked}"
+        android:clickable="false"
+        android:focusable="false"
+        android:gravity="start"
+        android:longClickable="false"
+        android:text='@{model.name}'
+        android:textAlignment="viewStart"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+
+
+        />
+</layout>

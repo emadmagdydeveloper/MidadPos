@@ -370,7 +370,13 @@ public class HomeActivity extends DrawerBaseActivity {
 
         }
 
-        mvvm.getCategoryData(getUserModel().getData().getSelectedUser().getId());
+        if (getUserModel().getData().getSelectedUser()!=null){
+            mvvm.getCategoryData(getUserModel().getData().getSelectedUser().getId());
+
+        }else {
+            mvvm.getCategoryData(getUserModel().getData().getUser().getId());
+
+        }
     }
 
     private void initCodeScanner(int camera) {

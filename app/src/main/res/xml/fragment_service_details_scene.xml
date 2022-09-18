@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start"
+        app:duration="500"
+
+
+        />
+    <ConstraintSet android:id="@+id/start">
+        <Constraint
+            android:id="@+id/pager"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            />
+
+        <Constraint
+            android:id="@+id/tab"
+            android:layout_width="0dp"
+            android:layout_height="5dp"
+            android:layout_marginBottom="30dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@id/pager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+
+            />
+
+        <Constraint
+            android:id="@+id/cardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="-16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pager"
+
+            />
+
+        <Constraint
+            android:id="@+id/cardImage"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="8dp"
+            android:visibility="visible"
+            app:elevation="3dp"
+            app:layout_constraintBottom_toTopOf="@id/cardView"
+            app:layout_constraintStart_toStartOf="@id/cardView"
+            app:layout_constraintTop_toTopOf="@id/cardView"
+
+            />
+
+        <Constraint
+            android:id="@+id/exoPlayer"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:elevation="0dp"
+            android:visibility="invisible"
+            app:elevation="0dp"
+            app:layout_constraintEnd_toEndOf="@id/cardView"
+            app:layout_constraintStart_toStartOf="@id/cardView"
+            app:layout_constraintTop_toBottomOf="@id/cardView"
+
+            />
+
+
+        <Constraint
+            android:id="@+id/flVideo"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="@id/cardView"
+            app:layout_constraintStart_toStartOf="@id/cardView"
+            app:layout_constraintTop_toBottomOf="@id/cardView"
+
+            />
+
+        <Constraint
+            android:id="@+id/recView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="@id/flVideo"
+            app:layout_constraintStart_toStartOf="@id/flVideo"
+            app:layout_constraintTop_toBottomOf="@id/flVideo"
+
+            />
+
+
+        <Constraint
+            android:id="@+id/cardDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recView"
+
+            />
+
+        <Constraint
+            android:id="@+id/btnBook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:minWidth="120dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardDetails"
+
+            />
+
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+
+        <Constraint
+            android:id="@+id/pager"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            />
+
+        <Constraint
+            android:id="@+id/tab"
+            android:layout_width="0dp"
+            android:layout_height="5dp"
+            android:layout_marginBottom="30dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/pager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+
+            />
+
+        <Constraint
+            android:id="@+id/cardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="-16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pager"
+
+            />
+
+        <Constraint
+            android:id="@+id/cardImage"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="8dp"
+            android:visibility="invisible"
+            app:elevation="3dp"
+            app:layout_constraintBottom_toTopOf="@id/cardView"
+            app:layout_constraintStart_toStartOf="@id/cardView"
+            app:layout_constraintTop_toTopOf="@id/cardView"
+
+            />
+
+        <Constraint
+            android:id="@+id/exoPlayer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:elevation="0dp"
+            android:visibility="visible"
+            app:elevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            />
+
+        <Constraint
+            android:id="@+id/flVideo"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="@id/cardView"
+            app:layout_constraintStart_toStartOf="@id/cardView"
+            app:layout_constraintTop_toBottomOf="@id/cardView"
+
+            />
+
+        <Constraint
+            android:id="@+id/recView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="@id/flVideo"
+            app:layout_constraintStart_toStartOf="@id/flVideo"
+            app:layout_constraintTop_toBottomOf="@id/flVideo"
+
+            />
+
+
+        <Constraint
+            android:id="@+id/cardDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recView"
+
+            />
+
+        <Constraint
+            android:id="@+id/btnBook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:minWidth="120dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardDetails"
+
+            />
+
+    </ConstraintSet>
+
+
+</MotionScene>

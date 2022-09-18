@@ -26,5 +26,17 @@ public class HomeIndexModel extends StatusResponse implements Serializable {
         public List<TaxModel> getTaxes() {
             return taxes;
         }
+
+        public void setUnits(List<UnitModel> units) {
+            this.units = units;
+        }
+
+        public void setModifiers(List<ModifierModel> modifiers) {
+            this.modifiers = modifiers;
+        }
+
+        public void setTaxes(List<TaxModel> taxes) {
+            this.taxes = taxes;
+        }
     }
 }

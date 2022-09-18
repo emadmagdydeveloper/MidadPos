@@ -7,13 +7,13 @@ import java.io.Serializable;
 public class StatusResponse implements Serializable {
     @SerializedName(value = "code",alternate = {"status"})
     protected int status;
-    protected String message;
+    protected Object message;
 
     public int getStatus() {
         return status;
     }
 
-    public String getMessage() {
+    public Object getMessage() {
         return message;
     }
 }

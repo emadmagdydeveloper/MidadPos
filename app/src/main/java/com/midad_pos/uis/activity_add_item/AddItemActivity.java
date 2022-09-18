@@ -1,29 +1,63 @@
 package com.midad_pos.uis.activity_add_item;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.bumptech.glide.Glide;
 import com.midad_pos.R;
+import com.midad_pos.adapter.ModifierAdapter;
+import com.midad_pos.adapter.TaxesAdapter;
+import com.midad_pos.adapter.UnitAdapter;
 import com.midad_pos.databinding.ActivityAddItemBinding;
 import com.midad_pos.model.AddItemModel;
 import com.midad_pos.model.CategoryModel;
+import com.midad_pos.model.ModifierModel;
+import com.midad_pos.model.TaxModel;
+import com.midad_pos.model.UnitModel;
 import com.midad_pos.mvvm.AddItemMvvm;
+import com.midad_pos.share.Common;
+import com.midad_pos.uis.activity_add_category.AddCategoryActivity;
 import com.midad_pos.uis.activity_base.BaseActivity;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 public class AddItemActivity extends BaseActivity {
     private AddItemMvvm mvvm;
     private ActivityAddItemBinding binding;
+    private ActivityResultLauncher<String[]> permissions;
+    private ActivityResultLauncher<Intent> launcher;
+    private String imagePath = "";
+    private Uri outPutUri;
+    private int req;
+    private UnitAdapter unitAdapter;
+    private ModifierAdapter modifierAdapter;
+    private TaxesAdapter taxesAdapter;
+    private boolean forImageIntent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +72,19 @@ public class AddItemActivity extends BaseActivity {
 
         mvvm.getAddItemModel().observe(this, model -> {
             binding.setModel(model);
+            if (!model.isShape() && !model.getImage().isEmpty()) {
+                Glide.with(this)
+                        .asBitmap()
+                        .load(model.getImage())
+                        .into(binding.image);
+                binding.closeImage.setVisibility(View.VISIBLE);
+                binding.icon.setVisibility(View.GONE);
+                Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setShape(false);
+            }
 
         });
-        mvvm.getIsValid().observe(this, isLoading -> {
+        mvvm.getIsLoading().observe(this, isLoading -> {
+
             if (isLoading) {
                 binding.loader.setVisibility(View.VISIBLE);
                 binding.scrollView.setVisibility(View.GONE);
@@ -49,14 +93,30 @@ public class AddItemActivity extends BaseActivity {
                 binding.scrollView.setVisibility(View.VISIBLE);
             }
         });
+        mvvm.getOnAddedSuccess().observe(this, aBoolean -> {
+            finish();
+            Toast.makeText(this, R.string.suc, Toast.LENGTH_SHORT).show();
+        });
         mvvm.getHomeData().observe(this, homeData -> {
+            binding.setShowModifier(homeData.getModifiers().size() > 0);
+            binding.setShowTaxes(homeData.getTaxes().size() > 0);
+            if (unitAdapter != null) {
+                unitAdapter.updateList(homeData.getUnits());
+            }
 
+            if (modifierAdapter != null) {
+                modifierAdapter.updateList(homeData.getModifiers());
+            }
+
+            if (taxesAdapter != null) {
+                taxesAdapter.updateList(homeData.getTaxes());
+            }
         });
 
 
-        updateCategoryCheckedColor(mvvm.getSelectedColorPos().getValue()!=null?mvvm.getSelectedColorPos().getValue():0);
+        updateCategoryCheckedColor(mvvm.getSelectedColorPos().getValue() != null ? mvvm.getSelectedColorPos().getValue() : 0);
 
-        updateShapes(mvvm.getSelectedShapePos().getValue()!=null?mvvm.getSelectedShapePos().getValue():0);
+        updateShapes(mvvm.getSelectedShapePos().getValue() != null ? mvvm.getSelectedShapePos().getValue() : 0);
 
         binding.arrow.setOnClickListener(v -> {
             finish();
@@ -77,45 +137,153 @@ public class AddItemActivity extends BaseActivity {
         });
 
 
-        binding.card1.setOnClickListener(v -> {
-            updateCategoryCheckedColor(0);
+        binding.card1.setOnClickListener(v -> updateCategoryCheckedColor(0));
+        binding.card2.setOnClickListener(v -> updateCategoryCheckedColor(1));
+        binding.card3.setOnClickListener(v -> updateCategoryCheckedColor(2));
+        binding.card4.setOnClickListener(v -> updateCategoryCheckedColor(3));
+        binding.card5.setOnClickListener(v -> updateCategoryCheckedColor(4));
+        binding.card6.setOnClickListener(v -> updateCategoryCheckedColor(5));
+        binding.card7.setOnClickListener(v -> updateCategoryCheckedColor(6));
+        binding.card8.setOnClickListener(v -> updateCategoryCheckedColor(7));
+
+
+        binding.shape1.setOnClickListener(v -> updateShapes(0));
+        binding.shape2.setOnClickListener(v -> updateShapes(1));
+        binding.shape3.setOnClickListener(v -> updateShapes(2));
+        binding.shape4.setOnClickListener(v -> updateShapes(3));
+
+        binding.closeImage.setOnClickListener(v -> {
+            binding.closeImage.setVisibility(View.GONE);
+            binding.image.setImageBitmap(null);
+            binding.image.setImageResource(R.color.grey1);
+            binding.icon.setVisibility(View.GONE);
+            Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setImage("");
+            Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setShape(true);
+            mvvm.getAddItemModel().setValue(mvvm.getAddItemModel().getValue());
+
         });
-        binding.card2.setOnClickListener(v -> {
-            updateCategoryCheckedColor(1);
+
+        permissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), permissions -> {
+            if (req == 1) {
+                if (permissions.containsValue(false)) {
+                    Toast.makeText(this, R.string.perm_denied, Toast.LENGTH_SHORT).show();
+                } else {
+                    openCamera();
+                }
+            } else if (req == 2) {
+                if (permissions.containsValue(false)) {
+                    Toast.makeText(this, R.string.perm_denied, Toast.LENGTH_SHORT).show();
+                } else {
+                    openGallery();
+                }
+            }
         });
-        binding.card3.setOnClickListener(v -> {
-            updateCategoryCheckedColor(2);
+
+        launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            forImageIntent = true;
+
+            if (req == 2 && result.getResultCode() == RESULT_OK && result.getData() != null) {
+                Uri uri = result.getData().getData();
+                Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setUri(uri.toString());
+
+                Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setImage(Common.getImagePath(this, uri));
+
+                Glide.with(this)
+                        .asBitmap()
+                        .load(uri)
+                        .into(binding.image);
+                binding.closeImage.setVisibility(View.VISIBLE);
+                binding.icon.setVisibility(View.GONE);
+                mvvm.getAddItemModel().getValue().setShape(false);
+            } else if (req == 1 && result.getResultCode() == RESULT_OK) {
+                Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setImage(imagePath);
+                Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setUri(outPutUri.toString());
+
+                binding.closeImage.setVisibility(View.VISIBLE);
+                binding.icon.setVisibility(View.GONE);
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imagePath)
+                        .into(binding.image);
+                mvvm.getAddItemModel().getValue().setShape(false);
+
+
+            }
         });
-        binding.card4.setOnClickListener(v -> {
-            updateCategoryCheckedColor(3);
+
+        unitAdapter = new UnitAdapter(this);
+        modifierAdapter = new ModifierAdapter(this);
+        taxesAdapter = new TaxesAdapter(this);
+        if (binding.recViewUnit != null) {
+            binding.recViewUnit.setLayoutManager(new LinearLayoutManager(this));
+            binding.recViewUnit.setAdapter(unitAdapter);
+
+        } else if (binding.recViewUnitLand != null) {
+            binding.recViewUnitLand.setLayoutManager(new GridLayoutManager(this, 2));
+            binding.recViewUnitLand.setAdapter(unitAdapter);
+
+        }
+
+        if (binding.recViewModifiers != null) {
+            binding.recViewModifiers.setLayoutManager(new LinearLayoutManager(this));
+            binding.recViewModifiers.setAdapter(modifierAdapter);
+
+        } else if (binding.recViewModifiersLand != null) {
+            binding.recViewModifiersLand.setLayoutManager(new GridLayoutManager(this, 2));
+            binding.recViewModifiersLand.setAdapter(modifierAdapter);
+
+        }
+
+        if (binding.recViewTaxes != null) {
+            binding.recViewTaxes.setLayoutManager(new LinearLayoutManager(this));
+            binding.recViewTaxes.setAdapter(taxesAdapter);
+
+        } else if (binding.recViewTaxesLand != null) {
+            binding.recViewTaxesLand.setLayoutManager(new GridLayoutManager(this, 2));
+            binding.recViewTaxesLand.setAdapter(taxesAdapter);
+
+        }
+
+        binding.edtPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                binding.edtPrice.setSelection(Objects.requireNonNull(binding.edtPrice.getText()).toString().length());
+            }
         });
-        binding.card5.setOnClickListener(v -> {
-            updateCategoryCheckedColor(4);
-        });
-        binding.card6.setOnClickListener(v -> {
-            updateCategoryCheckedColor(5);
-        });
-        binding.card7.setOnClickListener(v -> {
-            updateCategoryCheckedColor(6);
-        });
-        binding.card8.setOnClickListener(v -> {
-            updateCategoryCheckedColor(7);
+
+        binding.edtCost.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                binding.edtCost.setSelection(Objects.requireNonNull(binding.edtCost.getText()).toString().length());
+            }
         });
 
 
+        binding.llBarcodeType.setOnClickListener(this::createBarcodeTypePopupMenu);
+        binding.llChooseImage.setOnClickListener(v -> checkPhotoPermission());
 
-        binding.shape1.setOnClickListener(v -> {
-            updateShapes(0);
-        });
-        binding.shape2.setOnClickListener(v -> {
-            updateShapes(1);
-        });
-        binding.shape3.setOnClickListener(v -> {
-            updateShapes(2);
-        });
-        binding.shape4.setOnClickListener(v -> {
-            updateShapes(3);
-        });
+        binding.llTakeImage.setOnClickListener(v -> checkCameraPermission());
+
     }
 
     private void createCategoryPopupMenu(View view) {
@@ -136,7 +304,8 @@ public class AddItemActivity extends BaseActivity {
             } else {
                 if (mvvm.getCategories().getValue() != null) {
                     AddItemModel model = mvvm.getAddItemModel().getValue();
-                    Objects.requireNonNull(model).setCategoryModel(mvvm.getCategories().getValue().get(item.getItemId()));
+                    CategoryModel categoryModel = mvvm.getCategories().getValue().get(item.getItemId());
+                    Objects.requireNonNull(model).setCategoryModel(categoryModel);
                     mvvm.getAddItemModel().setValue(model);
 
                 }
@@ -147,15 +316,42 @@ public class AddItemActivity extends BaseActivity {
         popupMenu.show();
     }
 
-    private void navigateToAddCategory() {
+    private void createBarcodeTypePopupMenu(View view) {
+        int pos = 0;
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        if (mvvm.getBarcodeTypes().getValue() != null) {
+            for (String name : mvvm.getBarcodeTypes().getValue()) {
+                popupMenu.getMenu().add(1, pos, 1, name);
+                pos += 1;
+            }
+        }
 
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            if (mvvm.getCategories().getValue() != null) {
+                AddItemModel model = mvvm.getAddItemModel().getValue();
+                String name = mvvm.getBarcodeTypes().getValue().get(item.getItemId());
+                Objects.requireNonNull(model).setBarcode_type(name);
+                mvvm.getAddItemModel().setValue(model);
+
+            }
+            return true;
+        });
+
+        popupMenu.show();
+    }
+
+
+    private void navigateToAddCategory() {
+        Intent intent = new Intent(this, AddCategoryActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
 
     }
 
     @SuppressLint("ResourceType")
     private void updateCategoryCheckedColor(int pos) {
-        Log.e("pos",pos+"");
-        String color = "";
+        String color;
         switch (pos) {
             case 1:
                 color = getResources().getString(R.color.cat2);
@@ -254,14 +450,16 @@ public class AddItemActivity extends BaseActivity {
         Objects.requireNonNull(model).setColor(color);
         mvvm.getAddItemModel().setValue(model);
 
+        binding.btnSave.setOnClickListener(v -> mvvm.addItem(this));
+
     }
 
     @SuppressLint("ResourceType")
     private void updateShapes(int pos) {
-        String shape = "";
+        String shape;
         switch (pos) {
             case 1:
-                shape ="2";
+                shape = "3";
 
                 binding.shapeCheck1.setVisibility(View.GONE);
                 binding.shapeCheck2.setVisibility(View.VISIBLE);
@@ -271,7 +469,7 @@ public class AddItemActivity extends BaseActivity {
 
                 break;
             case 2:
-                shape ="3";
+                shape = "1";
                 binding.shapeCheck1.setVisibility(View.GONE);
                 binding.shapeCheck2.setVisibility(View.GONE);
                 binding.shapeCheck3.setVisibility(View.VISIBLE);
@@ -279,7 +477,7 @@ public class AddItemActivity extends BaseActivity {
 
                 break;
             case 3:
-                shape ="4";
+                shape = "4";
                 binding.shapeCheck1.setVisibility(View.GONE);
                 binding.shapeCheck2.setVisibility(View.GONE);
                 binding.shapeCheck3.setVisibility(View.GONE);
@@ -289,7 +487,7 @@ public class AddItemActivity extends BaseActivity {
 
 
             default:
-                shape = "1";
+                shape = "2";
                 binding.shapeCheck1.setVisibility(View.VISIBLE);
                 binding.shapeCheck2.setVisibility(View.GONE);
                 binding.shapeCheck3.setVisibility(View.GONE);
@@ -304,11 +502,98 @@ public class AddItemActivity extends BaseActivity {
         mvvm.getAddItemModel().setValue(model);
     }
 
+    public void checkCameraPermission() {
+        req = 1;
+        String[] permissions = new String[]{WRITE_PERM, CAM_PERM};
+        if (ContextCompat.checkSelfPermission(this, WRITE_PERM) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, CAM_PERM) == PackageManager.PERMISSION_GRANTED) {
+            openCamera();
+        } else {
+            this.permissions.launch(permissions);
+        }
+    }
+
+    public void checkPhotoPermission() {
+        req = 2;
+        String[] permissions = new String[]{READ_PERM};
+        if (ContextCompat.checkSelfPermission(this, READ_PERM) == PackageManager.PERMISSION_GRANTED
+
+        ) {
+            openGallery();
+        } else {
+            this.permissions.launch(permissions);
+        }
+    }
+
+    private void openCamera() {
+        req = 1;
+        String authority = getPackageName() + ".provider";
+        outPutUri = FileProvider.getUriForFile(this, authority, getCameraOutPutFile());
+
+        Intent intentCamera = new Intent();
+        intentCamera.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, outPutUri);
+        intentCamera.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        launcher.launch(intentCamera);
+
+
+    }
+
+    private void openGallery() {
+        req = 2;
+        Intent intentGallery = new Intent();
+        intentGallery.setAction(Intent.ACTION_GET_CONTENT);
+        intentGallery.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intentGallery.setType("image/*");
+        launcher.launch(Intent.createChooser(intentGallery, "Choose photos"));
+
+
+    }
+
+    private File getCameraOutPutFile() {
+        File file = null;
+        String stamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date());
+        String imageName = "JPEG_" + stamp + "_";
+
+        File appFile = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        try {
+            file = File.createTempFile(imageName, ".jpg", appFile);
+            imagePath = file.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return file;
+    }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(0, 0);
+
+    }
+
+    public void selectSoldBy(UnitModel model) {
+        Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setUnit_id(model.getId());
+        mvvm.getAddItemModel().setValue(mvvm.getAddItemModel().getValue());
+    }
+
+    public void selectExtraData(ModifierModel model) {
+        Objects.requireNonNull(mvvm.getAddItemModel().getValue()).addModifier(model);
+    }
+
+    public void selectTaxes(TaxModel model) {
+        Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setTax_id(model.getId());
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!forImageIntent){
+            mvvm.getCategoryData(getUserModel().getData().getUser().getId());
+            forImageIntent = false;
+        }
 
     }
 }

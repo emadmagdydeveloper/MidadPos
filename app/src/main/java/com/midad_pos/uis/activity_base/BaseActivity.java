@@ -31,10 +31,10 @@ import io.paperdb.Paper;
 public class BaseActivity extends AppCompatActivity {
     private ActivityBaseLayoutBinding binding;
     private BaseMvvm mvvm;
-    public static final String READ_REQ = Manifest.permission.READ_EXTERNAL_STORAGE;
-    public static final String WRITE_REQ = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-    public static final String CAM_REQ = Manifest.permission.CAMERA;
-    public static final String fineLocPerm = Manifest.permission.ACCESS_FINE_LOCATION;
+    public static final String READ_PERM = Manifest.permission.READ_EXTERNAL_STORAGE;
+    public static final String WRITE_PERM = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    public static final String CAM_PERM = Manifest.permission.CAMERA;
+    public static final String FINELOCPerm = Manifest.permission.ACCESS_FINE_LOCATION;
 
 
     @Override
@@ -222,11 +222,18 @@ public class BaseActivity extends AppCompatActivity {
 
     public User getUserByPin(String pinCode){
         UserModel userModel = getUserModel();
-        for (User user:userModel.getData().getAnotherUsers()){
-            if (user.getPin_code().equals(pinCode)){
-                return user;
+        if (userModel.getData().getAnotherUsers().size()>0){
+            for (User user:userModel.getData().getAnotherUsers()){
+                if (user.getPin_code().equals(pinCode)){
+                    return user;
+                }
+            }
+        }else {
+            if (userModel.getData().getUser().getPin_code().equals(pinCode)){
+                return userModel.getData().getUser();
             }
         }
+
 
         return null;
     }

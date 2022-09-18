@@ -89,8 +89,6 @@ public class ShiftActivity extends DrawerBaseActivity {
                 String num = editable.toString().trim();
 
 
-                Log.e("ddd", num);
-
                 if (num.isEmpty() || num.equals("0.00") || num.equals("0")) {
                     num = "0.00";
                     binding.openShiftLayout.edtAmount.setText(num);

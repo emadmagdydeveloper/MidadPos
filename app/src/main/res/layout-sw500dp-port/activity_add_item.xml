@@ -71,6 +71,8 @@
                         android:layout_height="wrap_content"
                         android:background="@color/transparent"
                         android:text="@string/save"
+                        android:enabled="@{model.valid}"
+                        android:textColor="@{model.valid?@color/white:@color/white_disable}"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -198,7 +200,7 @@
                                     android:text="@string/sold_by"
                                     />
                                 <androidx.recyclerview.widget.RecyclerView
-                                    android:id="@+id/recViewUnit"
+                                    android:id="@+id/recViewUnitLand"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="16dp"
@@ -234,6 +236,7 @@
 
                                     >
                                     <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/edtPrice"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:background="@color/transparent"
@@ -242,7 +245,8 @@
                                         android:hint="@string/price"
                                         android:lines="1"
                                         android:textSize="18sp"
-                                        android:inputType="numberDecimal"
+                                        android:inputType="number"
+                                        android:maxLength="10"
                                         android:text="@={model.price}"
 
                                         />
@@ -269,6 +273,7 @@
 
                                     >
                                     <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/edtCost"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:background="@color/transparent"
@@ -277,7 +282,8 @@
                                         android:hint="0.00"
                                         android:lines="1"
                                         android:textSize="18sp"
-                                        android:inputType="numberDecimal"
+                                        android:inputType="number"
+                                        android:maxLength="10"
                                         android:textColor="@color/black"
                                         android:text="@={model.cost}"
 
@@ -310,7 +316,6 @@
                                 android:orientation="horizontal"
                                 android:gravity="center_vertical"
                                 android:layout_marginTop="8dp"
-                                android:layout_marginBottom="8dp"
                                 >
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="0dp"
@@ -329,7 +334,6 @@
                                         android:hint="@string/sku"
                                         android:lines="1"
                                         android:textSize="15sp"
-                                        android:inputType="number"
                                         android:textColor="@color/black"
                                         android:text="@={model.sku}"
 
@@ -367,6 +371,55 @@
 
                             </LinearLayout>
 
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:textColor="@color/grey4"
+                                android:textSize="13sp"
+                                android:text="@string/barcode_types"
+                                />
+
+                            <LinearLayout
+                                android:id="@+id/llBarcodeType"
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal"
+                                >
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:gravity="center_vertical"
+                                    android:text="@{model.barcode_type}"
+
+                                    />
+                                <androidx.legacy.widget.Space
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    />
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_drop_down"
+                                    android:padding="4dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginEnd="16dp"
+                                    app:tint="@color/grey4"
+                                    />
+                            </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/grey3"
+                                android:layout_marginBottom="8dp"
+                                />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
@@ -398,7 +451,7 @@
                                 />
 
                             <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/recViewModifiers"
+                                android:id="@+id/recViewModifiersLand"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="16dp"
@@ -433,7 +486,7 @@
                                 />
 
                             <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/recViewTaxes"
+                                android:id="@+id/recViewTaxesLand"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="16dp"
@@ -870,6 +923,8 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     android:src="@color/grey1"
+                                    android:scaleType="centerCrop"
+
                                     />
 
                                 <ImageView
