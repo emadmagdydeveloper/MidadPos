@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.MessageQueue;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -60,6 +61,11 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
     }
 
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     protected BaseMvvm getBaseMvvm(){
         return baseMvvm;
     }
@@ -90,19 +96,21 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
     }
 
-
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         binding.drawerLayout.closeDrawer(GravityCompat.START);
 
         itemId  = item.getItemId();
+
         if (item.getItemId() == R.id.sales) {
-            hidePinCodeView();
             if (selectedPos!=0){
                 App app = (App) getApplicationContext();
                 app.killAllActivities();
+                hidePinCodeView();
+
+
             }
+
 
 
 
@@ -118,7 +126,6 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
 
         }else if (item.getItemId() == R.id.items) {
-            Log.e("tt","2");
 
             if (selectedPos!=3){
                 navigation(ItemsActivity.class);
@@ -149,16 +156,10 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         overridePendingTransition(0, 0);
     }
 
-
-
     public void updateSelectedPos(int pos) {
         this.selectedPos = pos;
         binding.navigationView.getMenu().getItem(pos).setChecked(true);
     }
-
-
-
-
 
 
     @Override
@@ -171,5 +172,15 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        hidePinCodeView();
+    }
 }

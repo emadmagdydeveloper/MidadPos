@@ -1,6 +1,8 @@
 package com.midad_pos.general_ui;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
@@ -8,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 
 
@@ -17,24 +20,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
+
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GeneralMethod {
 
-    @BindingAdapter("error")
-    public static void errorValidation(View view, String error) {
-        if (view instanceof EditText) {
-            EditText ed = (EditText) view;
-            ed.setError(error);
-        } else if (view instanceof TextView) {
-            TextView tv = (TextView) view;
-            tv.setError(error);
-
-
-        }
-    }
 
     @BindingAdapter("image")
     public static void image(View view, String imageUrl) {
@@ -110,25 +104,89 @@ public class GeneralMethod {
 
     @BindingAdapter("extra")
     public static void extra(TextView view, ModifierModel model) {
-        if (model!=null){
+        if (model != null) {
             StringBuilder stringBuilder = new StringBuilder();
-            for (ModifierModel.Data data:model.getModifiers_data()){
+            for (ModifierModel.Data data : model.getModifiers_data()) {
                 stringBuilder.append(data.getTitle());
                 stringBuilder.append(",");
             }
 
             int length = stringBuilder.length();
             int lastIndex = stringBuilder.lastIndexOf(",");
-            if (lastIndex==(length-1)){
+            if (lastIndex == (length - 1)) {
                 String substring = stringBuilder.substring(0, length - 1);
                 view.setText(substring);
-            }else {
+            } else {
                 view.setText(stringBuilder.toString());
             }
         }
 
     }
 
+
+    @BindingAdapter("imageColor")
+    public static void imageColor(ImageView view, ItemModel model) {
+        if (model != null) {
+            if (model.getImage_type().equals("color")) {
+                switch (model.getShape()) {
+                    case "1":
+                        view.setImageResource(R.drawable.ic_fill_hard_circle);
+                        break;
+                    case "2":
+                        view.setImageResource(R.drawable.ic_fill_square);
+                        break;
+                    case "3":
+                        view.setImageResource(R.drawable.ic_fill_circle);
+                        break;
+                    case "4":
+                        view.setImageResource(R.drawable.ic_fill_6_shape);
+                        break;
+                }
+
+                try {
+                    view.setColorFilter(Color.parseColor(model.getColor()));
+
+                } catch (Exception e) {
+                    view.setColorFilter(ContextCompat.getColor(view.getContext(), R.color.cat1));
+
+                }
+
+            }
+        }
+
+    }
+
+    @BindingAdapter("textItemColor")
+    public static void textColor(TextView view, ItemModel model) {
+        if (model != null) {
+            if (model.getImage_type().equals("color")) {
+                @SuppressLint("ResourceType") String color = view.getContext().getResources().getString(R.color.cat1);
+                if (model.getColor().equalsIgnoreCase(color)) {
+                    view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.black));
+                } else {
+                    view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
+
+                }
+
+            }
+        }
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    @BindingAdapter("variant")
+    public static void variantPrice(TextView view, ItemModel model) {
+        if (model != null) {
+            if (model.isIs_variant()) {
+                view.setText(model.getVariants().size() + " " + view.getContext().getString(R.string.variants));
+            } else {
+                String price = model.getPrice();
+
+                view.setText(model.getPrice().equals("0") ? view.getContext().getString(R.string.variable) : String.format(Locale.US, "%.2f", Float.parseFloat(price)));
+            }
+        }
+
+    }
 }
 
 

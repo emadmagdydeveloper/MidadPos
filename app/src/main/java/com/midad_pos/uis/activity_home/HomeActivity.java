@@ -27,9 +27,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
+import com.midad_pos.adapter.HomeItemAdapter;
 import com.midad_pos.adapter.SpinnerCountryAdapter;
 import com.midad_pos.databinding.ActivityHomeBinding;
 import com.midad_pos.model.CategoryModel;
@@ -58,6 +60,7 @@ public class HomeActivity extends DrawerBaseActivity {
     private final CompositeDisposable disposable = new CompositeDisposable();
     private CodeScanner codeScanner;
     private ActivityResultLauncher<String> permissions;
+    private HomeItemAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +68,6 @@ public class HomeActivity extends DrawerBaseActivity {
         binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_home, null, false);
         setContentView(binding.getRoot());
         setUpDrawer(binding.toolBarHomeLayout.toolBarHome, true);
-        updateSelectedPos(0);
-        showPinCodeView();
         initView();
     }
 
@@ -163,7 +164,29 @@ public class HomeActivity extends DrawerBaseActivity {
 
         mvvm.getCountryPos().observe(this, pos -> binding.addCustomerDialog.addCustomerLayout.spinnerCountry.setSelection(pos));
 
+        mvvm.getIsLoading().observe(this,isLoading->{
+            if (isLoading){
+                binding.llNoItems.setVisibility(View.GONE);
+                binding.loader.setVisibility(View.VISIBLE);
+            }else {
+                binding.loader.setVisibility(View.GONE);
 
+            }
+        });
+
+        mvvm.getItems().observe(this,items->{
+            if (adapter!=null){
+                adapter.updateList(items);
+            }
+            if (items.size()>0){
+                binding.llNoItems.setVisibility(View.GONE);
+            }else {
+                if (mvvm.getIsLoading().getValue()!=null&&!mvvm.getIsLoading().getValue()){
+                    binding.llNoItems.setVisibility(View.VISIBLE);
+
+                }
+            }
+        });
         if (mvvm.getSearchQuery().getValue() != null && !mvvm.getSearchQuery().getValue().isEmpty()) {
             if (binding.llSearch != null && binding.edtSearch != null) {
                 binding.llSearch.setVisibility(View.VISIBLE);
@@ -180,6 +203,26 @@ public class HomeActivity extends DrawerBaseActivity {
             }
 
 
+        }
+
+        adapter = new HomeItemAdapter(this);
+
+        if (binding.recView!=null){
+            binding.recView.setLayoutManager(new GridLayoutManager(this,3));
+            binding.recView.setHasFixedSize(true);
+            binding.recView.setAdapter(adapter);
+        }
+
+        if (binding.recViewPort!=null){
+            binding.recViewPort.setLayoutManager(new GridLayoutManager(this,5));
+            binding.recViewPort.setHasFixedSize(true);
+            binding.recViewPort.setAdapter(adapter);
+        }
+
+        if (binding.recViewLand!=null){
+            binding.recViewLand.setLayoutManager(new GridLayoutManager(this,5));
+            binding.recViewLand.setHasFixedSize(true);
+            binding.recViewLand.setAdapter(adapter);
         }
 
         binding.addCustomerDialog.addCustomerLayout.setLang(getLang());
@@ -370,13 +413,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
         }
 
-        if (getUserModel().getData().getSelectedUser()!=null){
-            mvvm.getCategoryData(getUserModel().getData().getSelectedUser().getId());
 
-        }else {
-            mvvm.getCategoryData(getUserModel().getData().getUser().getId());
-
-        }
     }
 
     private void initCodeScanner(int camera) {
@@ -445,14 +482,8 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
         popupMenu.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == 0) {
-                mvvm.getSelectedCategory().setValue(Objects.requireNonNull(mvvm.getCategories().getValue()).get(0));
-            } else if (item.getItemId() == 1) {
-                mvvm.getSelectedCategory().setValue(Objects.requireNonNull(mvvm.getCategories().getValue()).get(1));
-
-            }else {
-                mvvm.getSelectedCategory().setValue(Objects.requireNonNull(mvvm.getCategories().getValue()).get(item.getItemId()));
-            }
+            mvvm.getSelectedCategory().setValue(Objects.requireNonNull(mvvm.getCategories().getValue()).get(item.getItemId()));
+            mvvm.search(mvvm.getSearchQuery().getValue());
             return true;
         });
 
@@ -734,6 +765,16 @@ public class HomeActivity extends DrawerBaseActivity {
     protected void onResume() {
         super.onResume();
         updateSelectedPos(0);
+        mvvm.getItemsData();
+
+        if (getUserModel().getData().getSelectedUser()!=null){
+            mvvm.getCategoryData(getUserModel().getData().getSelectedUser().getId());
+
+        }else {
+            mvvm.getCategoryData(getUserModel().getData().getUser().getId());
+
+        }
+
         if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
             initCodeScanner(mvvm.getCamera().getValue());
         }
@@ -764,13 +805,18 @@ public class HomeActivity extends DrawerBaseActivity {
         }
 
         super.onPause();
+
+
     }
+
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         disposable.clear();
     }
+
 
 
 }

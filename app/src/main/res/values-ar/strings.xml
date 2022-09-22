@@ -167,6 +167,23 @@
     <string name="barcode_types">أنواع الباركود</string>
     <string name="wait">إنتظر قليلا...</string>
     <string name="suc">تم بنجاح !</string>
+    <string name="variants">متغيرات</string>
+    <string name="variable">متغير</string>
+    <string name="deleting">جار الحذف...</string>
+    <string name="edit_category">تعديل الفئة</string>
+    <string name="delete_category">حذف الفئة</string>
+    <string name="delete">حذف</string>
+    <string name="cancel">إلغاء</string>
+    <string name="are_sure_delete_cat">هل انت متأكد من انك تريد حذف الفئة ؟</string>
+    <string name="are_sure_delete_item">هل انت متأكد من انك تريد حذف العنصر ؟</string>
+
+    <string name="creating_cat">جار إنشاء فئة...</string>
+    <string name="creating_item">جار إنشاء عنصر...</string>
+    <string name="delete_item">حذف عنصر</string>
+    <string name="edit_item">تعديل العنصر</string>
+    <string name="updating">جار التعديل...</string>
+    <string name="no_existing_items">لم يتم إيجاد عناصر حالية</string>
+    <string name="assigning_items">جار تعيين العناصر...</string>
 
 
     <string-array name="delivery_options">

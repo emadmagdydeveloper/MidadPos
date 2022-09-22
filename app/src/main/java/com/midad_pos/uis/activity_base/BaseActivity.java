@@ -277,12 +277,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        new Handler().postDelayed(this::showPinCodeView,1000);
 
-    }
 
     @Override
     public void onBackPressed() {
@@ -290,5 +285,6 @@ public class BaseActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
 
     }
+
 
 }

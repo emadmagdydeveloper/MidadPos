@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -217,6 +218,7 @@ public class ReceiptsActivity extends DrawerBaseActivity {
 
         dialog.show();
     }
+
 
 
 }

@@ -2,20 +2,27 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="enabled"
+            type="Boolean" />
+    </data>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black_trans"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="650dp"
-            android:orientation="vertical"
-            android:background="@color/white"
             android:layout_gravity="center"
-            >
+            android:background="@color/white"
+            android:orientation="vertical">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -55,8 +62,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@color/transparent"
+                    android:enabled="@{enabled}"
                     android:text="@string/save"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@{enabled?@color/colorPrimary:@color/grey3}"
                     android:textSize="15sp"
                     app:backgroundTint="@null" />
 
@@ -65,16 +73,16 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
-                android:background="@color/grey3"
-                />
+                android:background="@color/grey3" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                >
+                android:paddingEnd="16dp">
+
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -82,6 +90,7 @@
                     app:tint="@color/grey3"
 
                     />
+
                 <LinearLayout
                     android:id="@+id/llSearch"
                     android:layout_width="match_parent"
@@ -89,8 +98,8 @@
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:visibility="gone"
-                    >
+                    android:visibility="gone">
+
                     <EditText
                         android:id="@+id/edtSearch"
                         android:layout_width="0dp"
@@ -98,46 +107,68 @@
                         android:layout_weight="1"
                         android:background="@color/transparent"
                         android:hint="@string/search"
-                        android:textColorHint="@color/grey4"
-                        android:textSize="14sp"
                         android:lines="1"
-                        />
+                        android:textColorHint="@color/grey4"
+                        android:textSize="14sp" />
+
                     <ImageView
                         android:id="@+id/closeSearch"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="center_vertical"
-                        android:src="@drawable/ic_close"
-                        android:tint="@color/grey4"
                         android:padding="5dp"
-                        />
+                        android:src="@drawable/ic_close"
+                        android:tint="@color/grey4" />
                 </LinearLayout>
+
                 <TextView
                     android:id="@+id/tvOpenSearch"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="15sp"
-                    android:textColor="@color/grey4"
-                    android:text="@string/search"
                     android:gravity="center_vertical"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    />
+                    android:text="@string/search"
+                    android:textColor="@color/grey4"
+                    android:textSize="15sp" />
             </LinearLayout>
 
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
-                android:background="@color/grey3"
-                />
+                android:background="@color/grey3" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/tvNoItems"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
-                />
+                android:text="@string/no_existing_items"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="120dp"
+                android:visibility="gone"
+                >
+                <include
+                    layout="@layout/loader"
+                    />
+            </FrameLayout>
+
         </LinearLayout>
 
     </FrameLayout>

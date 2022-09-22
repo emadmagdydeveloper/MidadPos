@@ -167,6 +167,23 @@
     <string name="barcode_types">Barcode types</string>
     <string name="wait">wait...</string>
     <string name="suc">Success!</string>
+    <string name="variants">Variants</string>
+    <string name="variable">Variable</string>
+    <string name="deleting">Deleting...</string>
+    <string name="edit_category">Edit category</string>
+    <string name="delete_category">Delete category</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="are_sure_delete_cat">Are you sure you want to delete the category?</string>
+    <string name="are_sure_delete_item">Are you sure you want to delete the item?</string>
+
+    <string name="creating_cat">Creating category...</string>
+    <string name="creating_item">Creating item...</string>
+    <string name="delete_item">Delete item</string>
+    <string name="edit_item">Edit item</string>
+    <string name="updating">Updating...</string>
+    <string name="no_existing_items">No existing items found</string>
+    <string name="assigning_items">Assigning items...</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

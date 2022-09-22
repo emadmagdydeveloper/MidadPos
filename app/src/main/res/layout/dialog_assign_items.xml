@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    <data>
+        <variable
+            name="enabled"
+            type="Boolean" />
+    </data>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@color/white"
+        android:clickable="true"
+        android:focusable="true"
         >
 
         <LinearLayout
@@ -49,9 +55,11 @@
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
                 android:text="@string/save"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@{enabled?@color/colorPrimary:@color/grey3}"
                 android:textSize="15sp"
-                app:backgroundTint="@null" />
+                app:backgroundTint="@null"
+                android:enabled="@{enabled}"
+                />
         </LinearLayout>
 
         <View
@@ -130,5 +138,29 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             />
+        <TextView
+            android:id="@+id/tvNoItems"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:text="@string/no_existing_items"
+            android:visibility="gone"
+            />
+
+        <FrameLayout
+            android:id="@+id/loader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="120dp"
+            android:visibility="gone"
+            >
+            <include
+                layout="@layout/loader"
+                />
+        </FrameLayout>
     </LinearLayout>
 </layout>

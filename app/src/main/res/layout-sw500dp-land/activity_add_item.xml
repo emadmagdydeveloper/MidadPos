@@ -13,6 +13,9 @@
             name="model"
             type="com.midad_pos.model.AddItemModel" />
 
+        <variable
+            name="title"
+            type="String" />
         <import type="android.view.View"/>
 
     </data>
@@ -55,7 +58,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/create_item"
+                        android:text="@{title}"
                         android:textColor="@color/white"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -1024,6 +1027,48 @@
 
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardDelete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginStart="190dp"
+                        android:layout_marginEnd="190dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardElevation="3dp"
+                        android:visibility="gone"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            >
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_delete"
+                                android:tint="@color/grey4"
+                                android:padding="3dp"
+                                />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                android:textColor="@color/black"
+                                android:text="@string/delete_item"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:textAllCaps="true"
+
+                                />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
 
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.view.View;
 
@@ -116,5 +117,6 @@ public class StoreActivity extends BaseActivity {
 
         popupMenu.show();
     }
+
 
 }

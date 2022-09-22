@@ -2,6 +2,7 @@ package com.midad_pos.uis.activity_support;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
@@ -213,4 +214,6 @@ public class SupportActivity extends DrawerBaseActivity {
 
 
     }
+
+
 }

@@ -1,6 +1,7 @@
 package com.midad_pos.uis.activity_settings;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -234,4 +235,6 @@ public class SettingsActivity extends DrawerBaseActivity {
 
 
     }
+
+
 }

@@ -36,14 +36,14 @@
     <color name="white_trans2">#30f5f5f5</color>
     <color name="primary_trans2">#109F56DB</color>
 
-    <color name="cat1">#e2e2e2</color>
-    <color name="cat2">#f44336</color>
-    <color name="cat3">#e91e63</color>
-    <color name="cat4">#ff9800</color>
-    <color name="cat5">#cddc39</color>
-    <color name="cat6">#4caf50</color>
-    <color name="cat7">#2196f3</color>
-    <color name="cat8">#9c27b0</color>
+    <color name="cat1">#ffe2e2e2</color>
+    <color name="cat2">#fff44336</color>
+    <color name="cat3">#ffe91e63</color>
+    <color name="cat4">#ffff9800</color>
+    <color name="cat5">#ffcddc39</color>
+    <color name="cat6">#ff4caf50</color>
+    <color name="cat7">#ff2196f3</color>
+    <color name="cat8">#ff9c27b0</color>
     <color name="green">#558B2F</color>
 
 

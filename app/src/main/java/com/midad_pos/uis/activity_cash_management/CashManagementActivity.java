@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.midad_pos.R;
 import com.midad_pos.databinding.ActivityCashManagementBinding;
@@ -35,4 +36,6 @@ public class CashManagementActivity extends BaseActivity {
         overridePendingTransition(0,0);
 
     }
+
+
 }

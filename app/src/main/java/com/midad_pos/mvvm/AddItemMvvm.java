@@ -46,6 +46,8 @@ public class AddItemMvvm extends AndroidViewModel {
     private MutableLiveData<String> onError;
     private MutableLiveData<Boolean> isLoading;
     private MutableLiveData<Boolean> onAddedSuccess;
+    private MutableLiveData<Boolean> deletedSuccess;
+
 
     private MutableLiveData<List<String>> barcodeTypes;
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -145,6 +147,12 @@ public class AddItemMvvm extends AndroidViewModel {
             selectedShapePos.setValue(0);
         }
         return selectedShapePos;
+    }
+    public MutableLiveData<Boolean> getDeletedSuccess() {
+        if (deletedSuccess == null) {
+            deletedSuccess = new MutableLiveData<>();
+        }
+        return deletedSuccess;
     }
 
     public void getCategoryData(String user_id) {
@@ -280,7 +288,7 @@ public class AddItemMvvm extends AndroidViewModel {
     public void addItem(Context context){
         if (getAddItemModel().getValue()!=null){
             AddItemModel model = getAddItemModel().getValue();
-            ProgressDialog dialog = Common.createProgressDialog(context,context.getString(R.string.wait));
+            ProgressDialog dialog = Common.createProgressDialog(context,context.getString(R.string.creating_item));
             dialog.setCanceledOnTouchOutside(false);
             dialog.setCancelable(false);
             dialog.show();
@@ -388,6 +396,67 @@ public class AddItemMvvm extends AndroidViewModel {
         }
 
     }
+
+    public void deleteItem(Context context, String user_id, String category_id) {
+        ProgressDialog dialog = Common.createProgressDialog(context,context.getString(R.string.deleting));
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+        List<Integer> ids = new ArrayList<>();
+        ids.add(Integer.valueOf(category_id));
+        Api.getService(Tags.base_url)
+                .deleteItems(user_id,ids)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<StatusResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<StatusResponse> response) {
+                        dialog.dismiss();
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    getDeletedSuccess().setValue(true);
+
+                                } else {
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dialog.dismiss();
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+
+                    }
+                });
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();

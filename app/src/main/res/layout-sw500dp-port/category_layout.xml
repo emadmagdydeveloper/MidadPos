@@ -78,7 +78,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="22sp"
-                                android:textStyle="bold"
                                 android:textColor="@color/white"
                                 android:text="@string/categories"
                                 android:layout_marginStart="24dp"
@@ -247,6 +246,17 @@
                 android:text="@string/to_add_category"
                 />
         </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/loader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            >
+            <include
+                layout="@layout/loader"
+                />
+        </FrameLayout>
 
 
 

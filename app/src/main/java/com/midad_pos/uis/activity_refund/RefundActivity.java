@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.midad_pos.R;
 import com.midad_pos.databinding.ActivityReceiptsBinding;
@@ -27,4 +28,7 @@ public class RefundActivity extends BaseActivity {
             overridePendingTransition(0,0);
         });
     }
+
+
+
 }

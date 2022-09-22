@@ -6,15 +6,18 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -29,8 +32,10 @@ import com.midad_pos.adapter.ModifierAdapter;
 import com.midad_pos.adapter.TaxesAdapter;
 import com.midad_pos.adapter.UnitAdapter;
 import com.midad_pos.databinding.ActivityAddItemBinding;
+import com.midad_pos.databinding.AlertDeleteDialogBinding;
 import com.midad_pos.model.AddItemModel;
 import com.midad_pos.model.CategoryModel;
+import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
 import com.midad_pos.model.TaxModel;
 import com.midad_pos.model.UnitModel;
@@ -58,17 +63,33 @@ public class AddItemActivity extends BaseActivity {
     private ModifierAdapter modifierAdapter;
     private TaxesAdapter taxesAdapter;
     private boolean forImageIntent = false;
+    private ItemModel itemModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_item);
+        getDataFromIntent();
         initView();
+    }
+
+    private void getDataFromIntent() {
+        Intent intent = getIntent();
+        itemModel = (ItemModel) intent.getSerializableExtra("data");
     }
 
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(AddItemMvvm.class);
         binding.setLang(getLang());
+        if (itemModel==null){
+            binding.setTitle(getString(R.string.create_item));
+            binding.cardDelete.setVisibility(View.GONE);
+
+        }else {
+            binding.setTitle(getString(R.string.edit_item));
+            binding.cardDelete.setVisibility(View.VISIBLE);
+
+        }
 
         mvvm.getAddItemModel().observe(this, model -> {
             binding.setModel(model);
@@ -113,6 +134,7 @@ public class AddItemActivity extends BaseActivity {
             }
         });
 
+        mvvm.getOnError().observe(this,error-> Toast.makeText(this, error, Toast.LENGTH_SHORT).show());
 
         updateCategoryCheckedColor(mvvm.getSelectedColorPos().getValue() != null ? mvvm.getSelectedColorPos().getValue() : 0);
 
@@ -299,6 +321,11 @@ public class AddItemActivity extends BaseActivity {
 
         popupMenu.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == 0) {
+                AddItemModel addItemModel = mvvm.getAddItemModel().getValue();
+                if (addItemModel!=null){
+                    addItemModel.setCategoryModel(null);
+                    mvvm.getAddItemModel().setValue(addItemModel);
+                }
             } else if (item.getItemId() == 1) {
                 navigateToAddCategory();
             } else {
@@ -451,7 +478,7 @@ public class AddItemActivity extends BaseActivity {
         mvvm.getAddItemModel().setValue(model);
 
         binding.btnSave.setOnClickListener(v -> mvvm.addItem(this));
-
+        binding.cardDelete.setOnClickListener(v -> createAlertDialog());
     }
 
     @SuppressLint("ResourceType")
@@ -587,6 +614,25 @@ public class AddItemActivity extends BaseActivity {
 
     }
 
+    private void createAlertDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .create();
+        dialog.setCanceledOnTouchOutside(false);
+
+        AlertDeleteDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.alert_delete_dialog, null, false);
+        binding.setTitle(getString(R.string.delete_item));
+        binding.setContent(getString(R.string.are_sure_delete_item));
+        dialog.setView(binding.getRoot());
+        binding.btnCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+        binding.btnDelete.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+        dialog.show();
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -596,4 +642,6 @@ public class AddItemActivity extends BaseActivity {
         }
 
     }
+
+
 }

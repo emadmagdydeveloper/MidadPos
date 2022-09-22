@@ -69,7 +69,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="22sp"
-                            android:textStyle="bold"
                             android:textColor="@color/white"
                             android:text="@string/categories"
                             android:layout_marginStart="24dp"
@@ -121,6 +120,7 @@
             android:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_add"
             app:tint="@color/white"
+            app:borderWidth="0dp"
             />
 
 

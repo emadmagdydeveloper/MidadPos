@@ -76,6 +76,7 @@ public class App extends MultiDexApplication {
         });
     }
 
+
     public void killAllActivities(){
         for (Activity activity:runningActivities){
             activity.finish();

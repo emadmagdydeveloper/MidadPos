@@ -7,21 +7,25 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.midad_pos.R;
 import com.midad_pos.adapter.CategoryAdapter;
+import com.midad_pos.adapter.ItemAdapter;
 import com.midad_pos.databinding.ActivityItemsBinding;
 import com.midad_pos.model.CategoryModel;
-import com.midad_pos.mvvm.BaseMvvm;
+import com.midad_pos.model.ItemModel;
 import com.midad_pos.mvvm.ItemsMvvm;
 import com.midad_pos.uis.activity_add_category.AddCategoryActivity;
 import com.midad_pos.uis.activity_add_item.AddItemActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -35,6 +39,7 @@ public class ItemsActivity extends DrawerBaseActivity {
     private ItemsMvvm mvvm;
     private ActivityItemsBinding binding;
     private CategoryAdapter categoryAdapter;
+    private ItemAdapter itemAdapter;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -49,12 +54,6 @@ public class ItemsActivity extends DrawerBaseActivity {
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mvvm.getCategoriesData(getUserModel().getData().getSelectedUser().getId());
-
-    }
 
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(ItemsMvvm.class);
@@ -66,7 +65,7 @@ public class ItemsActivity extends DrawerBaseActivity {
 
 
         mvvm.getIsDeleteMode().observe(this, aBoolean -> {
-            if (aBoolean){
+            if (aBoolean) {
                 if (binding.categoryLayout != null) {
                     binding.categoryLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
                 }
@@ -74,7 +73,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                 if (binding.categoryDetailsLayout != null) {
                     binding.categoryDetailsLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
                 }
-            }else {
+            } else {
                 if (binding.categoryLayout != null) {
                     binding.categoryLayout.toolbarDeleteModel.setVisibility(View.GONE);
                 }
@@ -86,24 +85,105 @@ public class ItemsActivity extends DrawerBaseActivity {
 
         });
 
+        mvvm.getIsItemsDeleteMode().observe(this, aBoolean -> {
+            if (aBoolean) {
+                if (binding.itemsLayout != null) {
+                    binding.itemsLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
+                }
+
+                if (binding.itemsDetailsLayout != null) {
+                    binding.itemsDetailsLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (binding.itemsLayout != null) {
+                    binding.itemsLayout.toolbarDeleteModel.setVisibility(View.GONE);
+                }
+
+                if (binding.itemsDetailsLayout != null) {
+                    binding.itemsDetailsLayout.toolbarDeleteModel.setVisibility(View.GONE);
+                }
+            }
+
+        });
+
         mvvm.getDeletedCategoryIds().observe(this, list -> {
             if (binding.categoryLayout != null) {
-                binding.categoryLayout.setDeleteCount(list.size()+"");
+                binding.categoryLayout.setDeleteCount(list.size() + "");
             }
 
             if (binding.categoryDetailsLayout != null) {
-                binding.categoryDetailsLayout.setDeleteCount(list.size()+"");
+                binding.categoryDetailsLayout.setDeleteCount(list.size() + "");
+            }
+        });
+
+        mvvm.getDeletedItemsIds().observe(this, list -> {
+            if (binding.itemsLayout != null) {
+                binding.itemsLayout.setDeleteCount(list.size() + "");
+            }
+
+            if (binding.itemsDetailsLayout != null) {
+                binding.itemsDetailsLayout.setDeleteCount(list.size() + "");
             }
         });
 
         mvvm.getIsCategoryLoading().observe(this, isLoading -> {
-            if (binding.categoryLayout != null) {
 
+            if (isLoading){
+                if (binding.categoryLayout != null) {
+                    binding.categoryLayout.loader.setVisibility(View.VISIBLE);
+                    binding.categoryLayout.llNoCategories.setVisibility(View.GONE);
+                }
+
+                if (binding.categoryDetailsLayout != null) {
+                    binding.categoryDetailsLayout.loader.setVisibility(View.VISIBLE);
+                    binding.categoryDetailsLayout.llNoCategories.setVisibility(View.GONE);
+
+                }
+            }else {
+                if (binding.categoryLayout != null) {
+                    binding.categoryLayout.loader.setVisibility(View.GONE);
+                    binding.categoryLayout.llNoCategories.setVisibility(View.GONE);
+
+                }
+
+                if (binding.categoryDetailsLayout != null) {
+                    binding.categoryDetailsLayout.loader.setVisibility(View.GONE);
+                    binding.categoryDetailsLayout.llNoCategories.setVisibility(View.GONE);
+
+                }
+            }
+        });
+
+        mvvm.getIsItemsLoading().observe(this, isLoading -> {
+            if (isLoading){
+                if (binding.itemsLayout != null) {
+                    binding.itemsLayout.loader.setVisibility(View.VISIBLE);
+                    binding.itemsLayout.llNoItems.setVisibility(View.GONE);
+
+                }
+
+                if (binding.itemsDetailsLayout != null) {
+                    Log.e("111","111");
+                    binding.itemsDetailsLayout.loader.setVisibility(View.VISIBLE);
+                    binding.itemsDetailsLayout.llNoItems.setVisibility(View.GONE);
+
+                }
+            }else {
+                Log.e("22","22");
+
+                if (binding.itemsLayout != null) {
+                    binding.itemsLayout.loader.setVisibility(View.GONE);
+                    binding.itemsLayout.llNoItems.setVisibility(View.GONE);
+
+                }
+
+                if (binding.itemsDetailsLayout != null) {
+                    binding.itemsDetailsLayout.loader.setVisibility(View.GONE);
+                    binding.itemsDetailsLayout.llNoItems.setVisibility(View.GONE);
+
+                }
             }
 
-            if (binding.categoryDetailsLayout != null) {
-
-            }
         });
 
         mvvm.getCategories().observe(this, categories -> {
@@ -136,7 +216,44 @@ public class ItemsActivity extends DrawerBaseActivity {
         });
 
 
+        mvvm.getSelectedItemCategory().observe(this, categoryModel -> {
+            if (binding.itemsLayout != null) {
+                binding.itemsLayout.setTitle(categoryModel.getName());
+            }
+        });
+        mvvm.getOnError().observe(this,error-> Toast.makeText(this,error, Toast.LENGTH_SHORT).show());
+
+        mvvm.getItems().observe(this, items -> {
+            if (itemAdapter != null) {
+                itemAdapter.updateList(items);
+            }
+            if (binding.itemsLayout != null) {
+                if (items.size() > 0) {
+
+                    binding.itemsLayout.llNoItems.setVisibility(View.GONE);
+
+                } else {
+                    binding.itemsLayout.llNoItems.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            if (binding.itemsDetailsLayout != null) {
+                if (items.size() > 0) {
+
+                    binding.itemsDetailsLayout.llNoItems.setVisibility(View.GONE);
+
+                } else {
+                    binding.itemsDetailsLayout.llNoItems.setVisibility(View.VISIBLE);
+
+                }
+
+            }
+        });
+
         categoryAdapter = new CategoryAdapter(this);
+
+        itemAdapter = new ItemAdapter(this);
 
         if (binding.categoryLayout != null) {
             binding.categoryLayout.recView.setLayoutManager(new LinearLayoutManager(this));
@@ -146,10 +263,9 @@ public class ItemsActivity extends DrawerBaseActivity {
 
             binding.categoryLayout.recView.setAdapter(categoryAdapter);
 
-            binding.categoryLayout.imageNormalMode.setOnClickListener(v -> {
-                mvvm.clearDeletedCategoryIds();
-            });
+            binding.categoryLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedCategoryIds());
         }
+
 
         if (binding.categoryDetailsLayout != null) {
             binding.categoryDetailsLayout.recView.setLayoutManager(new LinearLayoutManager(this));
@@ -159,9 +275,30 @@ public class ItemsActivity extends DrawerBaseActivity {
 
             binding.categoryDetailsLayout.recView.setAdapter(categoryAdapter);
 
-            binding.categoryDetailsLayout.imageNormalMode.setOnClickListener(v -> {
-                mvvm.clearDeletedCategoryIds();
-            });
+            binding.categoryDetailsLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedCategoryIds());
+        }
+
+
+        if (binding.itemsLayout != null) {
+            binding.itemsLayout.recViewItems.setLayoutManager(new LinearLayoutManager(this));
+            binding.itemsLayout.recViewItems.setDrawingCacheEnabled(true);
+            binding.itemsLayout.recViewItems.setItemViewCacheSize(20);
+            binding.itemsLayout.recViewItems.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+            binding.itemsLayout.recViewItems.setAdapter(itemAdapter);
+
+            binding.itemsLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedItemsIds());
+        }
+
+        if (binding.itemsDetailsLayout != null) {
+            binding.itemsDetailsLayout.recViewItems.setLayoutManager(new LinearLayoutManager(this));
+            binding.itemsDetailsLayout.recViewItems.setDrawingCacheEnabled(true);
+            binding.itemsDetailsLayout.recViewItems.setItemViewCacheSize(20);
+            binding.itemsDetailsLayout.recViewItems.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+            binding.itemsDetailsLayout.recViewItems.setAdapter(itemAdapter);
+
+            binding.itemsDetailsLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedItemsIds());
         }
 
 
@@ -411,15 +548,16 @@ public class ItemsActivity extends DrawerBaseActivity {
         }
 
         if (binding.categoryLayout != null) {
-            binding.categoryLayout.categoryFab.setOnClickListener(v -> {
-                navigateToAddCategoryActivity();
-            });
+            binding.categoryLayout.categoryFab.setOnClickListener(v -> navigateToAddCategoryActivity());
+            binding.categoryLayout.imageDelete.setOnClickListener(v -> mvvm.deleteCategories(this));
         }
 
         if (binding.categoryDetailsLayout != null) {
             binding.categoryDetailsLayout.categoryFab.setOnClickListener(v -> {
                 navigateToAddCategoryActivity();
             });
+            binding.categoryDetailsLayout.imageDelete.setOnClickListener(v -> mvvm.deleteCategories(this));
+
         }
 
 
@@ -438,22 +576,32 @@ public class ItemsActivity extends DrawerBaseActivity {
             updateSelections(2);
         });
 
-        if (binding.itemsLayout!=null){
+        if (binding.itemsLayout != null) {
             binding.itemsLayout.fabAddItem.setOnClickListener(v -> {
                 Intent intent = new Intent(this, AddItemActivity.class);
                 startActivity(intent);
-                overridePendingTransition(0,0);
+                overridePendingTransition(0, 0);
             });
+            binding.itemsLayout.imageDelete.setOnClickListener(v -> mvvm.deleteItems(this));
+
+
         }
 
-        if (binding.itemsDetailsLayout!=null){
+        if (binding.itemsDetailsLayout != null) {
             binding.itemsDetailsLayout.fabAddItem.setOnClickListener(v -> {
                 Intent intent = new Intent(this, AddItemActivity.class);
                 startActivity(intent);
-                overridePendingTransition(0,0);
+                overridePendingTransition(0, 0);
             });
+
+            binding.itemsDetailsLayout.imageDelete.setOnClickListener(v -> mvvm.deleteItems(this));
+
+
         }
 
+        if (binding.itemsLayout != null) {
+            binding.itemsLayout.llSpinner.setOnClickListener(this::createFilterPopupMenu);
+        }
 
 
     }
@@ -462,6 +610,29 @@ public class ItemsActivity extends DrawerBaseActivity {
         Intent intent = new Intent(this, AddCategoryActivity.class);
         startActivity(intent);
         overridePendingTransition(0, 0);
+
+    }
+
+    private void createFilterPopupMenu(View view) {
+        if (mvvm.getItemCategories().getValue() != null) {
+            int pos = 0;
+            PopupMenu popupMenu = new PopupMenu(this, view);
+
+            for (CategoryModel categoryModel : Objects.requireNonNull(mvvm.getItemCategories().getValue())) {
+                popupMenu.getMenu().add(1, pos, 1, categoryModel.getName());
+                pos += 1;
+            }
+
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                mvvm.getSelectedItemCategory().setValue(Objects.requireNonNull(mvvm.getItemCategories().getValue()).get(item.getItemId()));
+
+                mvvm.searchItems(mvvm.getQueryItems().getValue());
+                return true;
+            });
+
+            popupMenu.show();
+        }
 
     }
 
@@ -609,7 +780,8 @@ public class ItemsActivity extends DrawerBaseActivity {
                     }
 
 
-                }).debounce(500, TimeUnit.MILLISECONDS)
+                })
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((query) -> mvvm.searchDiscount(query));
@@ -718,7 +890,7 @@ public class ItemsActivity extends DrawerBaseActivity {
     }
 
     public void updateDeleteModel(int adapterPosition) {
-        if (mvvm.getDeletedCategoryIds().getValue()!=null&&mvvm.getDeletedCategoryIds().getValue().size()==0){
+        if (mvvm.getDeletedCategoryIds().getValue() != null && mvvm.getDeletedCategoryIds().getValue().size() == 0) {
             mvvm.getIsDeleteMode().setValue(true);
             mvvm.addCategoryIdsToDelete(adapterPosition);
             categoryAdapter.notifyItemChanged(adapterPosition);
@@ -728,20 +900,53 @@ public class ItemsActivity extends DrawerBaseActivity {
 
     }
 
-    public void selectDeleteCategory(int adapterPosition,CategoryModel categoryModel) {
-        if (mvvm.getIsDeleteMode().getValue()!=null&&mvvm.getIsDeleteMode().getValue()){
-            if (categoryModel.isSelected()){
+    public void updateItemDeleteModel(int adapterPosition) {
+        if (mvvm.getDeletedItemsIds().getValue() != null && mvvm.getDeletedItemsIds().getValue().size() == 0) {
+            mvvm.getIsItemsDeleteMode().setValue(true);
+            mvvm.addItemsIdsToDelete(adapterPosition);
+            itemAdapter.notifyItemChanged(adapterPosition);
+
+        }
+
+
+    }
+
+    public void selectDeleteCategory(int adapterPosition, CategoryModel categoryModel) {
+        if (mvvm.getIsDeleteMode().getValue() != null && mvvm.getIsDeleteMode().getValue()) {
+            if (categoryModel.isSelected()) {
                 categoryModel.setSelected(false);
                 mvvm.removeCategoryIdFromDeletedList(adapterPosition);
-            }else {
+            } else {
                 mvvm.addCategoryIdsToDelete(adapterPosition);
 
             }
             categoryAdapter.notifyItemChanged(adapterPosition);
+        }else {
+            Intent intent = new Intent(this,AddCategoryActivity.class);
+            intent.putExtra("data",categoryModel);
+            startActivity(intent);
+            overridePendingTransition(0,0);
         }
 
 
+    }
 
+    public void selectDeleteItem(int adapterPosition, ItemModel itemModel) {
+        if (mvvm.getIsItemsDeleteMode().getValue() != null && mvvm.getIsItemsDeleteMode().getValue()) {
+            if (itemModel.isSelected()) {
+                itemModel.setSelected(false);
+                mvvm.removeItemIdFromDeletedList(adapterPosition);
+            } else {
+                mvvm.addItemsIdsToDelete(adapterPosition);
+
+            }
+            itemAdapter.notifyItemChanged(adapterPosition);
+        }else {
+            Intent intent = new Intent(this,AddItemActivity.class);
+            intent.putExtra("data",itemModel);
+            startActivity(intent);
+            overridePendingTransition(0,0);
+        }
     }
 
     @Override
@@ -764,5 +969,13 @@ public class ItemsActivity extends DrawerBaseActivity {
 
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mvvm.getItemsData();
+        mvvm.getCategoriesData(getUserModel().getData().getSelectedUser().getId());
+    }
+
 
 }

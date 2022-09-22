@@ -2,6 +2,8 @@ package com.midad_pos.services;
 
 import com.midad_pos.model.CategoryDataModel;
 import com.midad_pos.model.HomeIndexModel;
+import com.midad_pos.model.ItemsDataModel;
+import com.midad_pos.model.SingleCategoryData;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 
@@ -28,10 +30,23 @@ public interface Service {
 
     @FormUrlEncoded
     @POST("api/items/storeCategory")
-    Single<Response<StatusResponse>> addCategory(@Field("user_id") String user_id,
-                                                 @Field("name") String name,
-                                                 @Field("color") String color
+    Single<Response<SingleCategoryData>> addCategory(@Field("user_id") String user_id,
+                                                     @Field("name") String name,
+                                                     @Field("color") String color
     );
+
+    @FormUrlEncoded
+    @POST("api/items/deleteCategories")
+    Single<Response<StatusResponse>> deleteCategories(@Field("user_id") String user_id,
+                                                      @Field("category_ids[]") List<Integer> ids);
+
+    @FormUrlEncoded
+    @POST("api/items/updateCategory")
+    Single<Response<StatusResponse>> updateCategory(@Field("category_id") String category_id,
+                                                    @Field("user_id") String user_id,
+                                                    @Field("name") String name,
+                                                    @Field("color") String color);
+
 
     @GET("api/home/categories")
     Single<Response<CategoryDataModel>> categories(@Query("user_id") String user_id);
@@ -56,4 +71,21 @@ public interface Service {
                                              @Part("modifier_ids[]") List<RequestBody> modifiers,
                                              @Part List<MultipartBody.Part> images
     );
+
+    @GET("api/home/items")
+    Single<Response<ItemsDataModel>> items(@Query("user_id") String user_id,
+                                           @Query("warehouse_id") String warehouse_id);
+
+    @FormUrlEncoded
+    @POST("api/items/deleteItems")
+    Single<Response<StatusResponse>> deleteItems(@Field("user_id") String user_id,
+                                                 @Field("item_ids[]") List<Integer> ids);
+
+    @FormUrlEncoded
+    @POST("api/items/assignItemsToCategory")
+    Single<Response<StatusResponse>> assignItems(@Field("user_id") String user_id,
+                                                 @Field("category_id") String category_id,
+                                                 @Field("products_id[]") List<String> ids);
+
+
 }
