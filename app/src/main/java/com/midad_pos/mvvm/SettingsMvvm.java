@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 public class SettingsMvvm extends AndroidViewModel {
     private MutableLiveData<Integer> positions;
-
+    private MutableLiveData<Boolean> isDialogTypeVisible;
 
     public SettingsMvvm(@NonNull Application application) {
         super(application);
@@ -21,6 +21,14 @@ public class SettingsMvvm extends AndroidViewModel {
         }
 
         return positions;
+    }
+
+    public MutableLiveData<Boolean> getIsDialogTypeVisible() {
+        if (isDialogTypeVisible == null) {
+            isDialogTypeVisible = new MutableLiveData<>();
+        }
+
+        return isDialogTypeVisible;
     }
 
 

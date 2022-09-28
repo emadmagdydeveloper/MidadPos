@@ -187,6 +187,27 @@ public class GeneralMethod {
         }
 
     }
+
+    @BindingAdapter({"numberFormat","type"})
+    public static void numFormat(TextView view,String num,String type) {
+        if (num != null) {
+            if (type!=null){
+                String newFormat;
+                if (type.equals("per")){
+                    newFormat = num + "%";
+                }else {
+                    newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(num));
+                }
+                view.setText(newFormat);
+            }else {
+                String newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(num));
+
+                view.setText(newFormat);
+            }
+
+        }
+
+    }
 }
 
 

@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
 import com.midad_pos.databinding.ItemBinding;
+import com.midad_pos.databinding.ItemHomeBinding;
 import com.midad_pos.databinding.ItemHomeImageRowBinding;
 import com.midad_pos.databinding.ItemHomeShapeRowBinding;
 import com.midad_pos.model.ItemModel;
+import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
 
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ItemModel> list;
     private Context context;
+    private int type = 1;
 
     public HomeItemAdapter(Context context) {
         this.context = context;
@@ -31,9 +34,12 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (viewType==1){
             ItemHomeShapeRowBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_home_shape_row, parent, false);
             return new HolderColor(binding);
-        }else {
+        }else if (viewType ==2){
             ItemHomeImageRowBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_home_image_row, parent, false);
             return new HolderImage(binding);
+        }else {
+            ItemHomeBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_home, parent, false);
+            return new Holder(binding);
         }
 
     }
@@ -43,11 +49,27 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (holder instanceof HolderColor){
             HolderColor holderColor = (HolderColor) holder;
             holderColor.binding.setModel(list.get(holderColor.getAdapterPosition()));
+            holderColor.itemView.setOnClickListener(v -> {
+                HomeActivity activity = (HomeActivity) context;
+                activity.setItemData(list.get(holderColor.getAdapterPosition()));
+            });
 
         }else if (holder instanceof HolderImage){
             HolderImage holderImage = (HolderImage) holder;
             holderImage.binding.setModel(list.get(holderImage.getAdapterPosition()));
 
+            holderImage.itemView.setOnClickListener(v -> {
+                HomeActivity activity = (HomeActivity) context;
+                activity.setItemData(list.get(holderImage.getAdapterPosition()));
+            });
+        }else if (holder instanceof Holder){
+            Holder holderItem = (Holder) holder;
+            holderItem.binding.setModel(list.get(holderItem.getAdapterPosition()));
+
+            holderItem.itemView.setOnClickListener(v -> {
+                HomeActivity activity = (HomeActivity) context;
+                activity.setItemData(list.get(holderItem.getAdapterPosition()));
+            });
         }
 
     }
@@ -76,17 +98,36 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    public static class Holder extends RecyclerView.ViewHolder {
+        private ItemHomeBinding binding;
+
+        public Holder(@NonNull ItemHomeBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+    }
+
     public void updateList(List<ItemModel> list){
         this.list = list;
         notifyDataSetChanged();
     }
 
+    public void updateType(int type){
+        this.type = type;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemViewType(int position) {
-        if (list.get(position).getImage_type().equals("color")){
-            return 1;
+        if (type==1){
+            if (list.get(position).getImage_type().equals("color")){
+                return 1;
+            }else {
+                return 2;
+            }
         }else {
-            return 2;
+            return 3;
         }
+
     }
 }

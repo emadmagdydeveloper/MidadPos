@@ -12,6 +12,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.midad_pos.R;
 import com.midad_pos.model.CategoryDataModel;
 import com.midad_pos.model.CategoryModel;
+import com.midad_pos.model.DiscountDataModel;
+import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ItemsDataModel;
 import com.midad_pos.model.StatusResponse;
@@ -55,6 +57,14 @@ public class ItemsMvvm extends AndroidViewModel {
     private MutableLiveData<List<CategoryModel>> itemCategories;
 
     private MutableLiveData<CategoryModel> selectedItemCategory;
+
+    ////////////////////////////////////////////////////////////////
+    private MutableLiveData<Boolean> isDiscountLoading;
+    private List<DiscountModel> mainDiscountsList = new ArrayList<>();
+    private MutableLiveData<List<DiscountModel>> discounts;
+    private MutableLiveData<Boolean> isDiscountDeleteMode;
+    private MutableLiveData<List<Integer>> deletedDiscountIds;
+
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
@@ -131,6 +141,15 @@ public class ItemsMvvm extends AndroidViewModel {
         return itemCategories;
     }
 
+    public MutableLiveData<List<DiscountModel>> getDiscounts() {
+        if (discounts == null) {
+            discounts = new MutableLiveData<>();
+        }
+
+        return discounts;
+    }
+
+
     public MutableLiveData<Boolean> getIsCategoryLoading() {
         if (isCategoryLoading == null) {
             isCategoryLoading = new MutableLiveData<>();
@@ -155,6 +174,14 @@ public class ItemsMvvm extends AndroidViewModel {
         return isItemsDeleteMode;
     }
 
+    public MutableLiveData<Boolean> getIsDiscountDeleteMode() {
+        if (isDiscountDeleteMode == null) {
+            isDiscountDeleteMode = new MutableLiveData<>();
+        }
+
+        return isDiscountDeleteMode;
+    }
+
     public MutableLiveData<Boolean> getIsItemsLoading() {
         if (isItemsLoading == null) {
             isItemsLoading = new MutableLiveData<>();
@@ -162,6 +189,15 @@ public class ItemsMvvm extends AndroidViewModel {
 
         return isItemsLoading;
     }
+
+    public MutableLiveData<Boolean> getIsDiscountLoading() {
+        if (isDiscountLoading == null) {
+            isDiscountLoading = new MutableLiveData<>();
+        }
+
+        return isDiscountLoading;
+    }
+
 
     public MutableLiveData<List<ItemModel>> getItems() {
         if (items == null) {
@@ -204,6 +240,15 @@ public class ItemsMvvm extends AndroidViewModel {
         }
 
         return deletedItemsIds;
+    }
+
+    public MutableLiveData<List<Integer>> getDeletedDiscountIds() {
+        if (deletedDiscountIds == null) {
+            deletedDiscountIds = new MutableLiveData<>();
+            deletedDiscountIds.setValue(new ArrayList<>());
+        }
+
+        return deletedDiscountIds;
     }
 
 
@@ -287,15 +332,86 @@ public class ItemsMvvm extends AndroidViewModel {
     }
 
     public void searchDiscount(String query) {
-
         getQueryDiscounts().setValue(query);
+        if (query.isEmpty()) {
+            getDiscounts().setValue(mainDiscountsList);
+        } else {
+            List<DiscountModel> list = new ArrayList<>();
+            for (DiscountModel discountModel : mainDiscountsList) {
+                if (discountModel.getTitle().startsWith(query)) {
+                    list.add(discountModel);
+                }
+            }
+
+            getDiscounts().setValue(list);
+        }
+    }
+
+
+    public void getDiscountsData() {
+        if (mainDiscountsList.size() == 0) {
+            getIsDiscountLoading().setValue(true);
+        }
+        Api.getService(Tags.base_url)
+                .discount(userModel.getData().getSelectedUser() != null ? userModel.getData().getSelectedUser().getId() : userModel.getData().getUser().getId(), userModel.getData().getSelectedWereHouse().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<DiscountDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<DiscountDataModel> response) {
+                        getIsDiscountLoading().setValue(false);
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    mainDiscountsList.clear();
+                                    mainDiscountsList.addAll(response.body().getData());
+                                    searchDiscount(getQueryDiscounts().getValue());
+                                } else {
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        getIsDiscountLoading().setValue(false);
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
     }
 
     public void getCategoriesData(String user_id) {
-        if (categoriesList.size()>0){
+        if (categoriesList.size() > 0) {
             getIsCategoryLoading().setValue(false);
 
-        }else {
+        } else {
             getIsCategoryLoading().setValue(true);
 
         }
@@ -417,12 +533,24 @@ public class ItemsMvvm extends AndroidViewModel {
 
     }
 
+
     public void addItemsIdsToDelete(int pos) {
         if (getDeletedItemsIds().getValue() != null && getItems().getValue() != null) {
             getDeletedItemsIds().getValue().add(Integer.parseInt(getItems().getValue().get(pos).getId()));
             getDeletedItemsIds().setValue(getDeletedItemsIds().getValue());
             ItemModel itemModel = getItems().getValue().get(pos);
             itemModel.setSelected(true);
+
+        }
+
+    }
+
+    public void addDiscountIdsToDelete(int pos) {
+        if (getDeletedDiscountIds().getValue() != null && getDiscounts().getValue() != null) {
+            getDeletedDiscountIds().getValue().add(Integer.parseInt(getDiscounts().getValue().get(pos).getId()));
+            getDeletedDiscountIds().setValue(getDeletedDiscountIds().getValue());
+            DiscountModel discountModel = getDiscounts().getValue().get(pos);
+            discountModel.setSelected(true);
 
         }
 
@@ -466,6 +594,26 @@ public class ItemsMvvm extends AndroidViewModel {
 
     }
 
+    public void removeDiscountIdFromDeletedList(int pos) {
+        if (getDeletedDiscountIds().getValue() != null && getDiscounts().getValue() != null) {
+            if (getDeletedDiscountIds().getValue().size() > 0) {
+                DiscountModel discountModel = getDiscounts().getValue().get(pos);
+                int index = getDeletedDiscountPos(Integer.parseInt(discountModel.getId()));
+                if (index != -1) {
+                    getDeletedDiscountIds().getValue().remove(index);
+                    getDeletedDiscountIds().setValue(getDeletedDiscountIds().getValue());
+
+                }
+                if (getDeletedDiscountIds().getValue().size() == 0) {
+                    getIsDiscountDeleteMode().setValue(false);
+                }
+            }
+        }
+
+
+    }
+
+
     private int getDeletedCategoryPos(int id) {
         if (getDeletedCategoryIds().getValue() != null) {
             for (int index = 0; index < getDeletedCategoryIds().getValue().size(); index++) {
@@ -481,6 +629,17 @@ public class ItemsMvvm extends AndroidViewModel {
         if (getDeletedItemsIds().getValue() != null) {
             for (int index = 0; index < getDeletedItemsIds().getValue().size(); index++) {
                 if (getDeletedItemsIds().getValue().get(index) == id) {
+                    return index;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private int getDeletedDiscountPos(int id) {
+        if (getDeletedDiscountIds().getValue() != null) {
+            for (int index = 0; index < getDeletedDiscountIds().getValue().size(); index++) {
+                if (getDeletedDiscountIds().getValue().get(index) == id) {
                     return index;
                 }
             }
@@ -506,12 +665,30 @@ public class ItemsMvvm extends AndroidViewModel {
         }
     }
 
+    public void clearDeletedDiscountIds() {
+        if (getDeletedDiscountIds().getValue() != null) {
+            getDeletedDiscountIds().getValue().clear();
+            getDeletedDiscountIds().setValue(getDeletedDiscountIds().getValue());
+            getIsDiscountDeleteMode().setValue(false);
+            if (getDiscounts().getValue() != null) {
+                for (DiscountModel discountModel : getDiscounts().getValue()) {
+                    if (discountModel.isSelected()) {
+                        discountModel.setSelected(false);
+                    }
+                }
+
+                getDiscounts().setValue(getDiscounts().getValue());
+            }
+
+        }
+    }
+
 
     public void getItemsData() {
-        if (getMainItemsList().getValue()!=null&&getMainItemsList().getValue().size()>0){
+        if (getMainItemsList().getValue() != null && getMainItemsList().getValue().size() > 0) {
             getIsItemsLoading().setValue(false);
 
-        }else {
+        } else {
             getIsItemsLoading().setValue(true);
 
         }
@@ -602,7 +779,9 @@ public class ItemsMvvm extends AndroidViewModel {
                                             }
                                         }
                                         getDeletedCategoryIds().getValue().clear();
-                                        getCategories().setValue(categories);
+                                        categoriesList.clear();
+                                        categoriesList.addAll(categories);
+                                        searchCategories(getQueryCategory().getValue());
                                         getIsDeleteMode().setValue(false);
                                     }
 
@@ -647,7 +826,6 @@ public class ItemsMvvm extends AndroidViewModel {
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        Log.e("size",getDeletedItemsIds().getValue().size()+"");
         Api.getService(Tags.base_url)
                 .deleteItems(userModel.getData().getSelectedUser().getId(), getDeletedItemsIds().getValue())
                 .subscribeOn(Schedulers.io())
@@ -713,6 +891,80 @@ public class ItemsMvvm extends AndroidViewModel {
                     }
                 });
     }
+
+    public void deleteDiscounts(Context context) {
+        ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.deleting));
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        Api.getService(Tags.base_url)
+                .deleteDiscounts(userModel.getData().getSelectedUser().getId(), getDeletedDiscountIds().getValue())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<StatusResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<StatusResponse> response) {
+                        dialog.dismiss();
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    if (getDiscounts().getValue() != null && getDeletedDiscountIds().getValue() != null) {
+                                        List<DiscountModel> discounts = new ArrayList<>();
+                                        for (int index = 0; index < getDiscounts().getValue().size(); index++) {
+                                            DiscountModel discountModel = getDiscounts().getValue().get(index);
+                                            int pos = getDeletedDiscountPos(Integer.parseInt(discountModel.getId()));
+                                            if (pos == -1) {
+                                                discounts.add(discountModel);
+                                            }
+                                        }
+                                        getDeletedDiscountIds().getValue().clear();
+                                        mainDiscountsList.clear();
+                                        mainDiscountsList.addAll(discounts);
+                                        searchCategories(getQueryCategory().getValue());
+                                        getIsDiscountDeleteMode().setValue(false);
+                                    }
+
+                                } else {
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dialog.dismiss();
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
+    }
+
 
     @Override
     protected void onCleared() {

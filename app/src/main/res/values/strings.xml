@@ -184,6 +184,9 @@
     <string name="updating">Updating...</string>
     <string name="no_existing_items">No existing items found</string>
     <string name="assigning_items">Assigning items...</string>
+    <string name="ok">OK</string>
+    <string name="discount2">Discount</string>
+    <string name="discounts2">Discounts</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

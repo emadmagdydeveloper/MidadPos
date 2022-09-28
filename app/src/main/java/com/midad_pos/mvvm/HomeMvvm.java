@@ -13,6 +13,8 @@ import com.midad_pos.model.AddCustomerModel;
 import com.midad_pos.model.CategoryDataModel;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
+import com.midad_pos.model.DiscountDataModel;
+import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ItemsDataModel;
 import com.midad_pos.model.UserModel;
@@ -21,10 +23,14 @@ import com.midad_pos.remote.Api;
 import com.midad_pos.tags.Tags;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -50,10 +56,15 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<Integer> camera;
     private MutableLiveData<String> onError;
     private List<ItemModel> mainItemList = new ArrayList<>();
+    private List<DiscountModel> mainDiscountList = new ArrayList<>();
     private MutableLiveData<Boolean> isLoading;
     private MutableLiveData<List<ItemModel>> items;
     private CompositeDisposable disposable = new CompositeDisposable();
     private UserModel userModel;
+    private MutableLiveData<String> price;
+    private MutableLiveData<Boolean> isDialogPriceOpened;
+    private MutableLiveData<ItemModel> itemForPrice;
+    private MutableLiveData<List<DiscountModel>> discounts;
 
 
     public HomeMvvm(@NonNull Application application) {
@@ -76,7 +87,7 @@ public class HomeMvvm extends AndroidViewModel {
     public MutableLiveData<CategoryModel> getSelectedCategory() {
         if (selectedCategory == null) {
             selectedCategory = new MutableLiveData<>();
-            selectedCategory.setValue(new CategoryModel(-1,getApplication().getApplicationContext().getString(R.string.all_items)));
+            selectedCategory.setValue(new CategoryModel(-1, getApplication().getApplicationContext().getString(R.string.all_items)));
 
         }
         return selectedCategory;
@@ -95,6 +106,14 @@ public class HomeMvvm extends AndroidViewModel {
             isOpenedCustomerDialog = new MutableLiveData<>();
         }
         return isOpenedCustomerDialog;
+    }
+
+    public MutableLiveData<String> getPrice() {
+        if (price == null) {
+            price = new MutableLiveData<>();
+            price.setValue("0.00");
+        }
+        return price;
     }
 
     public MutableLiveData<Boolean> getIsAddCustomerDialogShow() {
@@ -116,6 +135,13 @@ public class HomeMvvm extends AndroidViewModel {
             items = new MutableLiveData<>();
         }
         return items;
+    }
+
+    public MutableLiveData<List<DiscountModel>> getDiscounts() {
+        if (discounts == null) {
+            discounts = new MutableLiveData<>();
+        }
+        return discounts;
     }
 
 
@@ -166,6 +192,21 @@ public class HomeMvvm extends AndroidViewModel {
 
         }
         return onError;
+    }
+
+    public MutableLiveData<Boolean> getIsDialogPriceOpened() {
+        if (isDialogPriceOpened == null) {
+            isDialogPriceOpened = new MutableLiveData<>();
+            isDialogPriceOpened.setValue(false);
+        }
+        return isDialogPriceOpened;
+    }
+
+    public MutableLiveData<ItemModel> getItemForPrice() {
+        if (itemForPrice == null) {
+            itemForPrice = new MutableLiveData<>();
+        }
+        return itemForPrice;
     }
 
     public void searchCustomer(String query) {
@@ -264,6 +305,7 @@ public class HomeMvvm extends AndroidViewModel {
                     getItems().setValue(mainItemList);
 
                 } else if (getSelectedCategory().getValue().getId() == -2) {
+                    getDiscounts().setValue(mainDiscountList);
 
                 } else {
 
@@ -287,29 +329,44 @@ public class HomeMvvm extends AndroidViewModel {
                 }
             }
         } else {
-            if (mainItemList != null) {
-                List<ItemModel> list = new ArrayList<>();
-                for (ItemModel itemModel : mainItemList) {
-                    if (itemModel.getCategory() != null) {
-                        if (getSelectedCategory().getValue() != null && getSelectedCategory().getValue().getId() == -1) {
-                            if (itemModel.getName().startsWith(query)) {
-                                list.add(itemModel);
+            if (getSelectedCategory().getValue()!=null){
+                if (getSelectedCategory().getValue().getId()==-2){
+                    if (mainDiscountList!=null){
+                        List<DiscountModel> list = new ArrayList<>();
+                        for (DiscountModel discountModel:mainDiscountList){
+                            if (discountModel.getTitle().startsWith(query)){
+                                list.add(discountModel);
                             }
-                        } else if (getSelectedCategory().getValue() != null && getSelectedCategory().getValue().getId() == -2) {
+                        }
 
-                        } else {
-                            if (itemModel.getName().startsWith(query) && itemModel.getCategory().getId() == getSelectedCategory().getValue().getId()) {
-                                list.add(itemModel);
-                            }
-                        }
-                    } else {
-                        if (itemModel.getName().startsWith(query)) {
-                            list.add(itemModel);
-                        }
+                        Log.e("ssss",list.size()+"_");
+                        getDiscounts().setValue(list);
                     }
-                }
+                }else {
+                    if (mainItemList != null) {
+                        List<ItemModel> list = new ArrayList<>();
+                        for (ItemModel itemModel : mainItemList) {
+                            if (itemModel.getCategory() != null) {
+                                if (getSelectedCategory().getValue() != null && getSelectedCategory().getValue().getId() == -1) {
+                                    if (itemModel.getName().startsWith(query)) {
+                                        list.add(itemModel);
+                                    }
+                                } else {
+                                    if (itemModel.getName().startsWith(query) && itemModel.getCategory().getId() == getSelectedCategory().getValue().getId()) {
+                                        list.add(itemModel);
+                                    }
+                                }
+                            } else {
+                                if (itemModel.getName().startsWith(query)) {
+                                    list.add(itemModel);
+                                }
+                            }
+                        }
 
-                getItems().setValue(list);
+                        getItems().setValue(list);
+                    }
+
+                }
             }
 
         }
@@ -377,6 +434,115 @@ public class HomeMvvm extends AndroidViewModel {
                         }
                     }
                 });
+    }
+
+    public void getDiscountsData() {
+
+        Api.getService(Tags.base_url)
+                .discount(userModel.getData().getSelectedUser() != null ? userModel.getData().getSelectedUser().getId() : userModel.getData().getUser().getId(), userModel.getData().getSelectedWereHouse().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<DiscountDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<DiscountDataModel> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    mainDiscountList.clear();
+                                    mainDiscountList.addAll(response.body().getData());
+                                    search(getSearchQuery().getValue());
+                                } else {
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
+    }
+
+    public void updatePrice(String p) {
+        String price = getPrice().getValue();
+        if (price != null) {
+            if (price.equals("0.00") && p.equals("00")) {
+                getPrice().setValue("0.00");
+
+            } else if (price.isEmpty()) {
+                getPrice().setValue("0.00");
+
+            } else if (price.length() == 9) {
+                getPrice().setValue("999,999.99");
+            } else if (price.length() < 9) {
+                price = price.replace(".", "");
+                price = price.replace(",", "");
+                price += p;
+                price = String.valueOf(Integer.parseInt(price));
+
+                BigDecimal bigDecimal = new BigDecimal(price).divide(BigDecimal.valueOf(100.00));
+                DecimalFormat format = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+                format.applyPattern("###,###.##");
+                price = format.format(bigDecimal);
+                if (!price.contains(".")){
+                    price += ".00";
+                }
+
+                getPrice().setValue(price);
+            }
+
+
+        }
+    }
+
+    public void removeLastPriceIndex() {
+        String price = getPrice().getValue();
+        if (price != null) {
+            if (!price.equals("0.00")) {
+
+                price = price.replace(".", "").replace(",", "");
+
+                price = price.substring(0, price.length() - 1);
+
+                BigDecimal bigDecimal = new BigDecimal(price).divide(BigDecimal.valueOf(100.0));
+                DecimalFormat format = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+                format.applyPattern("###,###.##");
+                String newPrice = format.format(bigDecimal);
+                if (newPrice.equals("0")) {
+                    newPrice = "0.00";
+                }
+                getPrice().setValue(newPrice);
+
+            }
+        }
     }
 
 }

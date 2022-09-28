@@ -74,6 +74,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
     protected void onResume() {
         super.onResume();
         navigationViewHeaderBinding.setModel(getUserModel());
+        showPinCodeView();
 
 
     }

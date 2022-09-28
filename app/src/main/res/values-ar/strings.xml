@@ -184,6 +184,9 @@
     <string name="updating">جار التعديل...</string>
     <string name="no_existing_items">لم يتم إيجاد عناصر حالية</string>
     <string name="assigning_items">جار تعيين العناصر...</string>
+    <string name="ok">موافق</string>
+    <string name="discount2">خصم</string>
+    <string name="discounts2">خصم</string>
 
 
     <string-array name="delivery_options">

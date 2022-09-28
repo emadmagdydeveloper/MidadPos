@@ -217,6 +217,7 @@ public class AddCategoryActivity extends BaseActivity {
         binding.card7.setOnClickListener(v -> {
             updateCategoryCheckedColor(6);
         });
+
         binding.card8.setOnClickListener(v -> {
             updateCategoryCheckedColor(7);
         });

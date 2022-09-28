@@ -46,6 +46,9 @@ public class Preferences {
         Gson gson = new Gson();
         String setting_data = preferences.getString("setting_data", "");
         AppSettingModel settingModel = gson.fromJson(setting_data, AppSettingModel.class);
+        if (settingModel==null){
+            settingModel = new AppSettingModel();
+        }
         return settingModel;
     }
 

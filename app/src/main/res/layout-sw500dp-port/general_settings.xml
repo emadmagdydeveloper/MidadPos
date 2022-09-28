@@ -7,6 +7,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="layout"
+            type="String" />
 
 
 
@@ -104,6 +107,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layoutType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -124,7 +128,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:textColor="@color/grey4"
-                    android:text="@string/grid"
+                    android:text="@{layout}"
                     android:textStyle="bold"
 
                     />

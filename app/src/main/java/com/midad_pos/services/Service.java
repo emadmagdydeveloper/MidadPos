@@ -1,6 +1,7 @@
 package com.midad_pos.services;
 
 import com.midad_pos.model.CategoryDataModel;
+import com.midad_pos.model.DiscountDataModel;
 import com.midad_pos.model.HomeIndexModel;
 import com.midad_pos.model.ItemsDataModel;
 import com.midad_pos.model.SingleCategoryData;
@@ -39,6 +40,11 @@ public interface Service {
     @POST("api/items/deleteCategories")
     Single<Response<StatusResponse>> deleteCategories(@Field("user_id") String user_id,
                                                       @Field("category_ids[]") List<Integer> ids);
+
+    @FormUrlEncoded
+    @POST("api/items/deleteDiscounts")
+    Single<Response<StatusResponse>> deleteDiscounts(@Field("user_id") String user_id,
+                                                     @Field("discount_ids[]") List<Integer> ids);
 
     @FormUrlEncoded
     @POST("api/items/updateCategory")
@@ -87,5 +93,8 @@ public interface Service {
                                                  @Field("category_id") String category_id,
                                                  @Field("products_id[]") List<String> ids);
 
+    @GET("api/home/discounts")
+    Single<Response<DiscountDataModel>> discount(@Query("user_id") String user_id,
+                                                 @Query("warehouse_id") String warehouse_id);
 
 }

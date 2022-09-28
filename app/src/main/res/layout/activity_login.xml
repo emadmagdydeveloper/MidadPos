@@ -70,16 +70,19 @@
                         app:passwordToggleTint="@color/grey4"
                         style="@style/text_input"
 
+
                         >
                         <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:lines="1"
-                            android:inputType="textEmailAddress"
+                            android:inputType="textPassword"
                             android:textColorHint="@color/grey4"
                             android:textColor="@color/black"
                             android:text="@={model.password}"
                             android:textSize="14sp"
+                            android:gravity="start"
+                            android:textAlignment="viewStart"
 
                             />
                     </com.google.android.material.textfield.TextInputLayout>

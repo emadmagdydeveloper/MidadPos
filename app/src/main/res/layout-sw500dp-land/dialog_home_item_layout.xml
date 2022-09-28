@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:text="@string/home_item_layout"
+            />
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            >
+            <ImageView
+                android:id="@+id/imgLand1"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/imgLand2"
+                app:layout_constraintEnd_toStartOf="@id/imgLand2"
+                app:layout_constraintBottom_toBottomOf="@id/imgLand2"
+
+                android:src="@drawable/tablet_unselected_grid"
+                android:layout_marginEnd="16dp"
+                />
+
+            <ImageView
+                android:id="@+id/imgLand2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toEndOf="@id/imgLand1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintDimensionRatio="1:.7"
+                android:src="@drawable/tablet_unselected_linear"
+                android:layout_marginStart="16dp"
+                />
+
+            <RadioButton
+                android:id="@+id/rbList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/imgLand2"
+                app:layout_constraintEnd_toEndOf="@id/imgLand2"
+                app:layout_constraintTop_toBottomOf="@id/imgLand2"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:text="@string/list"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                />
+
+            <RadioButton
+                android:id="@+id/rbGrid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/imgLand1"
+                app:layout_constraintEnd_toEndOf="@id/imgLand1"
+                app:layout_constraintTop_toBottomOf="@id/imgLand1"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:text="@string/grid"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_gravity="end"
+            android:layout_marginTop="16dp"
+            >
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@null"
+                android:background="@color/transparent"
+                android:textColor="@color/colorPrimary"
+                android:textSize="15sp"
+                android:text="@string/cancel"
+
+                />
+            <Button
+                android:id="@+id/ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@null"
+                android:background="@color/transparent"
+                android:textColor="@color/colorPrimary"
+                android:textSize="15sp"
+                android:text="@string/ok"
+
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+</layout>

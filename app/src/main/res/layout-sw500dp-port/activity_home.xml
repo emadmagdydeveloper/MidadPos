@@ -21,7 +21,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/grey1"
+            android:background="@color/grey15"
             android:orientation="vertical">
 
             <include
@@ -316,8 +316,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="170dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
+
                         />
 
                     <LinearLayout
@@ -411,6 +410,20 @@
             <include
                 android:id="@+id/addCustomerDialog"
                 layout="@layout/add_customer_dialog" />
+
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/flDialogAddPrice"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            >
+            <include
+                android:id="@+id/dialogAddPrice"
+                layout="@layout/dialog_add_price"
+                />
         </FrameLayout>
     </FrameLayout>
 </layout>

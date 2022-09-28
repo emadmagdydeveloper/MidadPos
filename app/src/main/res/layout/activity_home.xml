@@ -27,6 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fillViewport="true"
+                android:background="@color/grey15"
                 >
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -232,8 +233,7 @@
                                 android:id="@+id/recView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
-                                android:layout_marginEnd="16dp"
+
                                 />
                             <LinearLayout
                                 android:id="@+id/llNoItems"
@@ -305,6 +305,19 @@
                 layout="@layout/add_customer_dialog"
                 />
         </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/flDialogAddPrice"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            >
+            <include
+                android:id="@+id/dialogAddPrice"
+                layout="@layout/dialog_add_price"
+                />
+        </FrameLayout>
+
 
     </FrameLayout>
 </layout>

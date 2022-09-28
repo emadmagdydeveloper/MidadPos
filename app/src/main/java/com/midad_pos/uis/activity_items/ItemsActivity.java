@@ -16,9 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.midad_pos.R;
 import com.midad_pos.adapter.CategoryAdapter;
+import com.midad_pos.adapter.DiscountAdapter;
 import com.midad_pos.adapter.ItemAdapter;
 import com.midad_pos.databinding.ActivityItemsBinding;
 import com.midad_pos.model.CategoryModel;
+import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.mvvm.ItemsMvvm;
 import com.midad_pos.uis.activity_add_category.AddCategoryActivity;
@@ -40,6 +42,7 @@ public class ItemsActivity extends DrawerBaseActivity {
     private ActivityItemsBinding binding;
     private CategoryAdapter categoryAdapter;
     private ItemAdapter itemAdapter;
+    private DiscountAdapter discountAdapter;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -128,7 +131,7 @@ public class ItemsActivity extends DrawerBaseActivity {
 
         mvvm.getIsCategoryLoading().observe(this, isLoading -> {
 
-            if (isLoading){
+            if (isLoading) {
                 if (binding.categoryLayout != null) {
                     binding.categoryLayout.loader.setVisibility(View.VISIBLE);
                     binding.categoryLayout.llNoCategories.setVisibility(View.GONE);
@@ -139,7 +142,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                     binding.categoryDetailsLayout.llNoCategories.setVisibility(View.GONE);
 
                 }
-            }else {
+            } else {
                 if (binding.categoryLayout != null) {
                     binding.categoryLayout.loader.setVisibility(View.GONE);
                     binding.categoryLayout.llNoCategories.setVisibility(View.GONE);
@@ -155,7 +158,7 @@ public class ItemsActivity extends DrawerBaseActivity {
         });
 
         mvvm.getIsItemsLoading().observe(this, isLoading -> {
-            if (isLoading){
+            if (isLoading) {
                 if (binding.itemsLayout != null) {
                     binding.itemsLayout.loader.setVisibility(View.VISIBLE);
                     binding.itemsLayout.llNoItems.setVisibility(View.GONE);
@@ -163,13 +166,11 @@ public class ItemsActivity extends DrawerBaseActivity {
                 }
 
                 if (binding.itemsDetailsLayout != null) {
-                    Log.e("111","111");
                     binding.itemsDetailsLayout.loader.setVisibility(View.VISIBLE);
                     binding.itemsDetailsLayout.llNoItems.setVisibility(View.GONE);
 
                 }
-            }else {
-                Log.e("22","22");
+            } else {
 
                 if (binding.itemsLayout != null) {
                     binding.itemsLayout.loader.setVisibility(View.GONE);
@@ -215,13 +216,91 @@ public class ItemsActivity extends DrawerBaseActivity {
 
         });
 
+        mvvm.getIsDiscountLoading().observe(this, isLoading -> {
+
+            if (isLoading) {
+                if (binding.discountLayout != null) {
+                    binding.discountLayout.loader.setVisibility(View.VISIBLE);
+                    binding.discountLayout.llNoDiscounts.setVisibility(View.GONE);
+                }
+
+                if (binding.discountDetailsLayout != null) {
+                    binding.discountDetailsLayout.loader.setVisibility(View.VISIBLE);
+                    binding.discountDetailsLayout.llNoDiscounts.setVisibility(View.GONE);
+
+                }
+            } else {
+                if (binding.discountLayout != null) {
+                    binding.discountLayout.loader.setVisibility(View.GONE);
+                    binding.discountLayout.llNoDiscounts.setVisibility(View.GONE);
+
+                }
+
+                if (binding.discountDetailsLayout != null) {
+                    binding.discountDetailsLayout.loader.setVisibility(View.GONE);
+                    binding.discountDetailsLayout.llNoDiscounts.setVisibility(View.GONE);
+
+                }
+            }
+        });
+
+        mvvm.getDiscounts().observe(this, discounts -> {
+            if (discountAdapter != null) {
+                discountAdapter.updateList(discounts);
+            }
+            if (binding.discountLayout != null) {
+                if (discounts.size() > 0) {
+
+                    binding.discountLayout.llNoDiscounts.setVisibility(View.GONE);
+
+                } else {
+                    binding.discountLayout.llNoDiscounts.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            if (binding.discountDetailsLayout != null) {
+                if (discounts.size() > 0) {
+
+                    binding.discountDetailsLayout.llNoDiscounts.setVisibility(View.GONE);
+
+                } else {
+                    binding.discountDetailsLayout.llNoDiscounts.setVisibility(View.VISIBLE);
+
+                }
+
+            }
+
+        });
+
+        mvvm.getIsDiscountDeleteMode().observe(this, aBoolean -> {
+            if (aBoolean) {
+                if (binding.discountLayout != null) {
+                    binding.discountLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
+                }
+
+                if (binding.discountDetailsLayout != null) {
+                    binding.discountDetailsLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (binding.discountLayout != null) {
+                    binding.discountLayout.toolbarDeleteModel.setVisibility(View.GONE);
+                }
+
+                if (binding.itemsDetailsLayout != null) {
+                    binding.discountDetailsLayout.toolbarDeleteModel.setVisibility(View.GONE);
+                }
+            }
+
+        });
+
 
         mvvm.getSelectedItemCategory().observe(this, categoryModel -> {
             if (binding.itemsLayout != null) {
                 binding.itemsLayout.setTitle(categoryModel.getName());
             }
         });
-        mvvm.getOnError().observe(this,error-> Toast.makeText(this,error, Toast.LENGTH_SHORT).show());
+        mvvm.getOnError().observe(this, error -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show());
 
         mvvm.getItems().observe(this, items -> {
             if (itemAdapter != null) {
@@ -254,6 +333,8 @@ public class ItemsActivity extends DrawerBaseActivity {
         categoryAdapter = new CategoryAdapter(this);
 
         itemAdapter = new ItemAdapter(this);
+
+        discountAdapter = new DiscountAdapter(this);
 
         if (binding.categoryLayout != null) {
             binding.categoryLayout.recView.setLayoutManager(new LinearLayoutManager(this));
@@ -300,6 +381,32 @@ public class ItemsActivity extends DrawerBaseActivity {
 
             binding.itemsDetailsLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedItemsIds());
         }
+
+
+        if (binding.discountLayout != null) {
+            binding.discountLayout.recView.setLayoutManager(new LinearLayoutManager(this));
+            binding.discountLayout.recView.setDrawingCacheEnabled(true);
+            binding.discountLayout.recView.setItemViewCacheSize(20);
+            binding.discountLayout.recView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+            binding.discountLayout.recView.setAdapter(discountAdapter);
+
+            binding.discountLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedDiscountIds());
+        }
+
+
+        if (binding.discountDetailsLayout != null) {
+            binding.discountDetailsLayout.recView.setLayoutManager(new LinearLayoutManager(this));
+            binding.discountDetailsLayout.recView.setDrawingCacheEnabled(true);
+            binding.discountDetailsLayout.recView.setItemViewCacheSize(20);
+            binding.discountDetailsLayout.recView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+            binding.discountDetailsLayout.recView.setAdapter(discountAdapter);
+
+            binding.discountDetailsLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedDiscountIds());
+        }
+
+
 
 
         if (binding.flItemDetailsLand != null) {
@@ -550,6 +657,20 @@ public class ItemsActivity extends DrawerBaseActivity {
         if (binding.categoryLayout != null) {
             binding.categoryLayout.categoryFab.setOnClickListener(v -> navigateToAddCategoryActivity());
             binding.categoryLayout.imageDelete.setOnClickListener(v -> mvvm.deleteCategories(this));
+        }
+
+        if (binding.categoryDetailsLayout != null) {
+            binding.categoryDetailsLayout.categoryFab.setOnClickListener(v -> {
+                navigateToAddCategoryActivity();
+            });
+            binding.categoryDetailsLayout.imageDelete.setOnClickListener(v -> mvvm.deleteCategories(this));
+
+        }
+
+
+        if (binding.discountLayout != null) {
+            binding.discountLayout.fab.setOnClickListener(v -> {});
+            binding.discountLayout.imageDelete.setOnClickListener(v -> mvvm.deleteDiscounts(this));
         }
 
         if (binding.categoryDetailsLayout != null) {
@@ -900,6 +1021,17 @@ public class ItemsActivity extends DrawerBaseActivity {
 
     }
 
+    public void updateDiscountDeleteModel(int adapterPosition) {
+        if (mvvm.getDeletedDiscountIds().getValue() != null && mvvm.getDeletedDiscountIds().getValue().size() == 0) {
+            mvvm.getIsDiscountDeleteMode().setValue(true);
+            mvvm.addDiscountIdsToDelete(adapterPosition);
+            discountAdapter.notifyItemChanged(adapterPosition);
+
+        }
+
+
+    }
+
     public void updateItemDeleteModel(int adapterPosition) {
         if (mvvm.getDeletedItemsIds().getValue() != null && mvvm.getDeletedItemsIds().getValue().size() == 0) {
             mvvm.getIsItemsDeleteMode().setValue(true);
@@ -911,6 +1043,8 @@ public class ItemsActivity extends DrawerBaseActivity {
 
     }
 
+
+
     public void selectDeleteCategory(int adapterPosition, CategoryModel categoryModel) {
         if (mvvm.getIsDeleteMode().getValue() != null && mvvm.getIsDeleteMode().getValue()) {
             if (categoryModel.isSelected()) {
@@ -921,11 +1055,11 @@ public class ItemsActivity extends DrawerBaseActivity {
 
             }
             categoryAdapter.notifyItemChanged(adapterPosition);
-        }else {
-            Intent intent = new Intent(this,AddCategoryActivity.class);
-            intent.putExtra("data",categoryModel);
+        } else {
+            Intent intent = new Intent(this, AddCategoryActivity.class);
+            intent.putExtra("data", categoryModel);
             startActivity(intent);
-            overridePendingTransition(0,0);
+            overridePendingTransition(0, 0);
         }
 
 
@@ -941,12 +1075,32 @@ public class ItemsActivity extends DrawerBaseActivity {
 
             }
             itemAdapter.notifyItemChanged(adapterPosition);
-        }else {
-            Intent intent = new Intent(this,AddItemActivity.class);
-            intent.putExtra("data",itemModel);
+        } else {
+            Intent intent = new Intent(this, AddItemActivity.class);
+            intent.putExtra("data", itemModel);
             startActivity(intent);
-            overridePendingTransition(0,0);
+            overridePendingTransition(0, 0);
         }
+    }
+
+    public void selectDeleteDiscount(int adapterPosition, DiscountModel discountModel) {
+        if (mvvm.getIsDiscountDeleteMode().getValue() != null && mvvm.getIsDiscountDeleteMode().getValue()) {
+            if (discountModel.isSelected()) {
+                discountModel.setSelected(false);
+                mvvm.removeDiscountIdFromDeletedList(adapterPosition);
+            } else {
+                mvvm.addDiscountIdsToDelete(adapterPosition);
+
+            }
+            discountAdapter.notifyItemChanged(adapterPosition);
+        } else {
+            /*Intent intent = new Intent(this, AddCategoryActivity.class);
+            intent.putExtra("data", categoryModel);
+            startActivity(intent);
+            overridePendingTransition(0, 0);*/
+        }
+
+
     }
 
     @Override
@@ -975,6 +1129,7 @@ public class ItemsActivity extends DrawerBaseActivity {
         super.onResume();
         mvvm.getItemsData();
         mvvm.getCategoriesData(getUserModel().getData().getSelectedUser().getId());
+        mvvm.getDiscountsData();
     }
 
 

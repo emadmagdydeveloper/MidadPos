@@ -13,11 +13,15 @@ import android.view.View;
 
 import com.midad_pos.R;
 import com.midad_pos.databinding.ActivityLoginBinding;
+import com.midad_pos.model.POSModel;
 import com.midad_pos.model.UserModel;
+import com.midad_pos.model.WereHouse;
 import com.midad_pos.mvvm.LoginMvvm;
 import com.midad_pos.share.Common;
+import com.midad_pos.tags.Tags;
 import com.midad_pos.uis.activity_base.BaseActivity;
 import com.midad_pos.uis.activity_home.HomeActivity;
+import com.midad_pos.uis.activity_pos.PosActivity;
 import com.midad_pos.uis.activity_store.StoreActivity;
 
 public class LoginActivity extends BaseActivity {
@@ -77,14 +81,25 @@ public class LoginActivity extends BaseActivity {
                         navigateToWereHouses(userModel);
 
                     }else {
-
                     }
 
                 }else {
+                    WereHouse wereHouse = userModel.getData().getUser().getWarehouses().get(0);
+                    userModel.getData().setSelectedWereHouse(wereHouse);
+                    if (wereHouse.getPos().size()>1){
+                        navigateToPosActivity(userModel);
+                    }else {
+                        POSModel posModel = wereHouse.getPos().get(0);
+                        userModel.getData().setSelectedPos(posModel);
+                        navigateToHomeActivity(userModel);
+
+                    }
 
                 }
             }else {
+                String title = "<font color ='#000000'>"+getString(R.string.no_pos)+" "+"</font><a href='"+ Tags.base_url +"' color='9F56DB'>"+getString(R.string.back_office)+"</a>";
 
+                Common.createAlertDialog(this,title,true);
             }
         });
 
@@ -103,12 +118,20 @@ public class LoginActivity extends BaseActivity {
     }
 
 
-    private void navigateToHomeActivity() {
+    private void navigateToHomeActivity(UserModel userModel) {
 
+        setUserModel(userModel);
         Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
-        finish();
-        overridePendingTransition(0, 0);
+        finishAffinity();
+        overridePendingTransition(0,0);
+    }
+
+    private void navigateToPosActivity(UserModel userModel) {
+        Intent intent = new Intent(this, PosActivity.class);
+        intent.putExtra("data",userModel);
+        startActivity(intent);
+        overridePendingTransition(0,0);
     }
 
 
