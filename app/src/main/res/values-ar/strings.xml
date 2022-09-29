@@ -187,6 +187,10 @@
     <string name="ok">موافق</string>
     <string name="discount2">خصم</string>
     <string name="discounts2">خصم</string>
+    <string name="value">القيمة</string>
+    <string name="create_discount">إنشاء خصم</string>
+    <string name="edit_discount">تعديل الخصم</string>
+    <string name="delete_discount">حذف الخصم</string>
 
 
     <string-array name="delivery_options">

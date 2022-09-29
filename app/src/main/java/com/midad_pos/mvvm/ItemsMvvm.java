@@ -924,9 +924,8 @@ public class ItemsMvvm extends AndroidViewModel {
                                             }
                                         }
                                         getDeletedDiscountIds().getValue().clear();
-                                        mainDiscountsList.clear();
-                                        mainDiscountsList.addAll(discounts);
-                                        searchCategories(getQueryCategory().getValue());
+                                        mainDiscountsList = discounts;
+                                        searchDiscount(getQueryDiscounts().getValue());
                                         getIsDiscountDeleteMode().setValue(false);
                                     }
 

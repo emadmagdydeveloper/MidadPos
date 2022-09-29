@@ -24,6 +24,7 @@ import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.mvvm.ItemsMvvm;
 import com.midad_pos.uis.activity_add_category.AddCategoryActivity;
+import com.midad_pos.uis.activity_add_discount.AddDiscountActivity;
 import com.midad_pos.uis.activity_add_item.AddItemActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 
@@ -126,6 +127,16 @@ public class ItemsActivity extends DrawerBaseActivity {
 
             if (binding.itemsDetailsLayout != null) {
                 binding.itemsDetailsLayout.setDeleteCount(list.size() + "");
+            }
+        });
+
+        mvvm.getDeletedDiscountIds().observe(this, list -> {
+            if (binding.discountLayout != null) {
+                binding.discountLayout.setDeleteCount(list.size() + "");
+            }
+
+            if (binding.discountDetailsLayout != null) {
+                binding.discountDetailsLayout.setDeleteCount(list.size() + "");
             }
         });
 
@@ -287,7 +298,7 @@ public class ItemsActivity extends DrawerBaseActivity {
                     binding.discountLayout.toolbarDeleteModel.setVisibility(View.GONE);
                 }
 
-                if (binding.itemsDetailsLayout != null) {
+                if (binding.discountDetailsLayout != null) {
                     binding.discountDetailsLayout.toolbarDeleteModel.setVisibility(View.GONE);
                 }
             }
@@ -297,7 +308,12 @@ public class ItemsActivity extends DrawerBaseActivity {
 
         mvvm.getSelectedItemCategory().observe(this, categoryModel -> {
             if (binding.itemsLayout != null) {
+
                 binding.itemsLayout.setTitle(categoryModel.getName());
+            }
+
+            if (binding.itemsDetailsLayout!=null){
+                binding.itemsDetailsLayout.setTitle(categoryModel.getName());
             }
         });
         mvvm.getOnError().observe(this, error -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show());
@@ -669,15 +685,18 @@ public class ItemsActivity extends DrawerBaseActivity {
 
 
         if (binding.discountLayout != null) {
-            binding.discountLayout.fab.setOnClickListener(v -> {});
+            binding.discountLayout.fab.setOnClickListener(v -> {
+                navigateToAddDiscountActivity(null);
+            });
             binding.discountLayout.imageDelete.setOnClickListener(v -> mvvm.deleteDiscounts(this));
         }
 
-        if (binding.categoryDetailsLayout != null) {
-            binding.categoryDetailsLayout.categoryFab.setOnClickListener(v -> {
-                navigateToAddCategoryActivity();
+        if (binding.discountDetailsLayout != null) {
+            binding.discountDetailsLayout.fab.setOnClickListener(v -> {
+                navigateToAddDiscountActivity(null);
+
             });
-            binding.categoryDetailsLayout.imageDelete.setOnClickListener(v -> mvvm.deleteCategories(this));
+            binding.discountDetailsLayout.imageDelete.setOnClickListener(v -> mvvm.deleteDiscounts(this));
 
         }
 
@@ -723,8 +742,18 @@ public class ItemsActivity extends DrawerBaseActivity {
         if (binding.itemsLayout != null) {
             binding.itemsLayout.llSpinner.setOnClickListener(this::createFilterPopupMenu);
         }
+        if (binding.itemsDetailsLayout != null) {
+            binding.itemsDetailsLayout.llSpinner.setOnClickListener(this::createFilterPopupMenu);
+        }
 
 
+    }
+
+    private void navigateToAddDiscountActivity(DiscountModel discountModel) {
+        Intent intent = new Intent(this, AddDiscountActivity.class);
+        intent.putExtra("data",discountModel);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
     }
 
     private void navigateToAddCategoryActivity() {
@@ -1094,10 +1123,7 @@ public class ItemsActivity extends DrawerBaseActivity {
             }
             discountAdapter.notifyItemChanged(adapterPosition);
         } else {
-            /*Intent intent = new Intent(this, AddCategoryActivity.class);
-            intent.putExtra("data", categoryModel);
-            startActivity(intent);
-            overridePendingTransition(0, 0);*/
+            navigateToAddDiscountActivity(discountModel);
         }
 
 

@@ -187,6 +187,10 @@
     <string name="ok">OK</string>
     <string name="discount2">Discount</string>
     <string name="discounts2">Discounts</string>
+    <string name="value">Value</string>
+    <string name="create_discount">Create discount</string>
+    <string name="edit_discount">Edit discount</string>
+    <string name="delete_discount">Delete discount</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

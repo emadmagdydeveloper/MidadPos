@@ -572,6 +572,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
         codeScanner.startPreview();
 
+
     }
 
     private void createFilterPopupMenu(View view, List<CategoryModel> categories) {
@@ -914,6 +915,22 @@ public class HomeActivity extends DrawerBaseActivity {
         mvvm.getDiscountsData();
         mvvm.getItemsData();
 
+        Log.e("show",mvvm.showPin+"_");
+        if (mvvm.showPin){
+            showPinCodeView();
+
+        }else {
+            hidePinCodeView();
+        }
+
+
+
+    }
+
+    @Override
+    public void navigation(Class<?> activityClass) {
+        super.navigation(activityClass);
+        new Handler().postDelayed(()->mvvm.showPin = false,1500);
     }
 
     @Override
@@ -947,6 +964,15 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mvvm.showPin = true;
+
+
+    }
+
 
 
     @Override

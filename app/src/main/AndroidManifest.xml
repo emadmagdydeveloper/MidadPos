@@ -29,6 +29,9 @@
         tools:ignore="AllowBackup"
         tools:targetApi="q">
         <activity
+            android:name=".uis.activity_add_discount.AddDiscountActivity"
+            android:exported="false" />
+        <activity
             android:name=".uis.activity_add_item.AddItemActivity"
             android:exported="false" />
         <activity
@@ -57,6 +60,7 @@
             android:exported="false" />
         <activity
             android:name=".uis.activity_items.ItemsActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".uis.activity_refund.RefundActivity"
@@ -72,6 +76,7 @@
             android:exported="false" />
         <activity
             android:name=".uis.activity_home.HomeActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".uis.activity_sign_up_2.SignUp2Activity"
@@ -108,8 +113,6 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
-
-
     </application>
 
 </manifest>

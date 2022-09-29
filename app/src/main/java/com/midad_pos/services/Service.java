@@ -97,4 +97,24 @@ public interface Service {
     Single<Response<DiscountDataModel>> discount(@Query("user_id") String user_id,
                                                  @Query("warehouse_id") String warehouse_id);
 
+    @FormUrlEncoded
+    @POST("api/discount/storeDiscount")
+    Single<Response<StatusResponse>> addDiscount(@Field("user_id") String user_id,
+                                                 @Field("title") String title,
+                                                 @Field("type") String type,
+                                                 @Field("value") String value,
+                                                 @Field("for_all") String for_all
+    );
+
+    @FormUrlEncoded
+    @POST("api/discount/updateDiscount")
+    Single<Response<StatusResponse>> updateDiscount(@Field("user_id") String user_id,
+                                                    @Field("discount_id") String discount_id,
+                                                    @Field("title") String title,
+                                                    @Field("type") String type,
+                                                    @Field("value") String value,
+                                                    @Field("for_all") String for_all
+    );
+
+
 }

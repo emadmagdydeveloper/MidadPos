@@ -65,6 +65,7 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isDialogPriceOpened;
     private MutableLiveData<ItemModel> itemForPrice;
     private MutableLiveData<List<DiscountModel>> discounts;
+    public boolean showPin = true;
 
 
     public HomeMvvm(@NonNull Application application) {
@@ -75,6 +76,8 @@ public class HomeMvvm extends AndroidViewModel {
         getCountryPos().setValue(0);
         getAddCustomerModel();
     }
+
+
 
     public MutableLiveData<List<CategoryModel>> getCategories() {
         if (categories == null) {

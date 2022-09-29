@@ -35,6 +35,8 @@
             app:menu="@menu/home_menu"
             app:itemBackground="@drawable/nav_item_bg"
             app:itemIconSize="20dp"
+            app:itemIconTint="@color/grey4"
+            app:itemIconPadding="36dp"
 
             >
 

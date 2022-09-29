@@ -35,6 +35,7 @@ public class BaseActivity extends AppCompatActivity {
     public static final String WRITE_PERM = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     public static final String CAM_PERM = Manifest.permission.CAMERA;
     public static final String FINELOCPerm = Manifest.permission.ACCESS_FINE_LOCATION;
+    public boolean showPin = false;
 
 
     @Override
@@ -213,6 +214,7 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void hidePinCodeView(){
         if (binding!=null){
+            showPin =false;
             binding.pinContainer.setVisibility(View.GONE);
             binding.container.setVisibility(View.VISIBLE);
             updatePinView("");
@@ -275,6 +277,7 @@ public class BaseActivity extends AppCompatActivity {
             overridePendingTransition(0, 0);
         });
     }
+
 
 
 

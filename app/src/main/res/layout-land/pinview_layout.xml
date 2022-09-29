@@ -107,7 +107,8 @@
                            app:viewType="rectangle"
                            android:itemBackground="@drawable/circle_pin"
                            android:layout_gravity="center_horizontal"
-
+                           android:focusable="false"
+                           android:clickable="false"
                            />
                    </LinearLayout>
                     <Button

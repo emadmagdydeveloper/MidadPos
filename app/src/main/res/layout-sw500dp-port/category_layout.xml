@@ -70,7 +70,8 @@
                                 android:textColorHint="@color/white_disable"
                                 android:paddingStart="16dp"
                                 android:paddingEnd="16dp"
-
+                                android:lines="1"
+                                android:inputType="text"
 
                                 />
 

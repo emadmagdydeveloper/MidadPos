@@ -26,6 +26,7 @@ import com.midad_pos.databinding.NavigationViewHeaderBinding;
 import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.share.App;
 import com.midad_pos.uis.activity_base.BaseActivity;
+import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
 import com.midad_pos.uis.activity_receipts.ReceiptsActivity;
 import com.midad_pos.uis.activity_settings.SettingsActivity;
@@ -49,7 +50,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         super.setContentView(binding.getRoot());
         binding.navigationView.setNavigationItemSelectedListener(this);
         baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
-        baseMvvm.getOnUserRefreshed().observe(this,aBoolean -> {
+        baseMvvm.getOnUserRefreshed().observe(this, aBoolean -> {
             navigationViewHeaderBinding.setModel(getUserModel());
         });
 
@@ -66,7 +67,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         super.onCreate(savedInstanceState);
     }
 
-    protected BaseMvvm getBaseMvvm(){
+    protected BaseMvvm getBaseMvvm() {
         return baseMvvm;
     }
 
@@ -74,20 +75,19 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
     protected void onResume() {
         super.onResume();
         navigationViewHeaderBinding.setModel(getUserModel());
-        showPinCodeView();
 
 
     }
 
     protected void setUpDrawer(Toolbar toolbar, boolean isNormal) {
-        if (isNormal){
+        if (isNormal) {
             setSupportActionBar(toolbar);
             Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, toolbar, R.string.open, R.string.close);
             toggle.syncState();
             binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-        }else {
+        } else {
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, null, R.string.open, R.string.close);
             toggle.syncState();
             binding.navigationView.setVisibility(View.GONE);
@@ -101,49 +101,46 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         binding.drawerLayout.closeDrawer(GravityCompat.START);
 
-        itemId  = item.getItemId();
+        itemId = item.getItemId();
 
         if (item.getItemId() == R.id.sales) {
-            if (selectedPos!=0){
+            if (selectedPos != 0) {
                 App app = (App) getApplicationContext();
                 app.killAllActivities();
-                hidePinCodeView();
 
 
             }
-
-
 
 
         } else if (item.getItemId() == R.id.receipts) {
-            if (selectedPos!=1){
+            if (selectedPos != 1) {
                 navigation(ReceiptsActivity.class);
             }
 
-        }else if (item.getItemId() == R.id.shift) {
-            if (selectedPos!=2){
+        } else if (item.getItemId() == R.id.shift) {
+            if (selectedPos != 2) {
                 navigation(ShiftActivity.class);
             }
 
 
-        }else if (item.getItemId() == R.id.items) {
+        } else if (item.getItemId() == R.id.items) {
 
-            if (selectedPos!=3){
+            if (selectedPos != 3) {
                 navigation(ItemsActivity.class);
             }
 
 
-        }else if (item.getItemId() == R.id.settings) {
-            if (selectedPos!=4){
+        } else if (item.getItemId() == R.id.settings) {
+            if (selectedPos != 4) {
                 navigation(SettingsActivity.class);
             }
 
-        }else if (item.getItemId() == R.id.support) {
-            if (selectedPos!=6){
+        } else if (item.getItemId() == R.id.support) {
+            if (selectedPos != 6) {
                 navigation(SupportActivity.class);
             }
 
-        }else if (item.getItemId() == R.id.backOffice) {
+        } else if (item.getItemId() == R.id.backOffice) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://midad-pos.wem-tech.site/login"));
             startActivity(intent);
 
@@ -160,24 +157,31 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
     public void updateSelectedPos(int pos) {
         this.selectedPos = pos;
         binding.navigationView.getMenu().getItem(pos).setChecked(true);
+
     }
 
 
     @Override
     public void onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)){
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
-        }else {
+        } else {
             super.onBackPressed();
 
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        showPinCodeView();
+
+        super.onStop();
+
+
+
 
     }
+
 
     @Override
     protected void onDestroy() {
