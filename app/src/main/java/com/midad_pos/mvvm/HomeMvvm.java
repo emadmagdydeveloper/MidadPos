@@ -28,7 +28,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,7 +62,11 @@ public class HomeMvvm extends AndroidViewModel {
     private UserModel userModel;
     private MutableLiveData<String> price;
     private MutableLiveData<Boolean> isDialogPriceOpened;
+    private MutableLiveData<Boolean> isDialogExtrasOpened;
+
+    private MutableLiveData<Integer> itemForPricePos;
     private MutableLiveData<ItemModel> itemForPrice;
+
     private MutableLiveData<List<DiscountModel>> discounts;
     public boolean showPin = true;
 
@@ -205,6 +208,21 @@ public class HomeMvvm extends AndroidViewModel {
         return isDialogPriceOpened;
     }
 
+    public MutableLiveData<Boolean> getIsDialogExtrasOpened() {
+        if (isDialogExtrasOpened == null) {
+            isDialogExtrasOpened = new MutableLiveData<>();
+            isDialogExtrasOpened.setValue(false);
+        }
+        return isDialogExtrasOpened;
+    }
+
+    public MutableLiveData<Integer> getItemForPricePos() {
+        if (itemForPricePos == null) {
+            itemForPricePos = new MutableLiveData<>();
+        }
+        return itemForPricePos;
+    }
+
     public MutableLiveData<ItemModel> getItemForPrice() {
         if (itemForPrice == null) {
             itemForPrice = new MutableLiveData<>();
@@ -305,7 +323,11 @@ public class HomeMvvm extends AndroidViewModel {
         if (query.isEmpty()) {
             if (getSelectedCategory().getValue() != null) {
                 if (getSelectedCategory().getValue().getId() == -1) {
-                    getItems().setValue(mainItemList);
+                    List<ItemModel> items = new ArrayList<>(mainItemList);
+                    if (getItemForPrice().getValue()!=null&&getItemForPricePos()!=null&&getItemForPricePos().getValue()!=-1){
+                        items.set(getItemForPricePos().getValue(),getItemForPrice().getValue());
+                    }
+                    getItems().setValue(items);
 
                 } else if (getSelectedCategory().getValue().getId() == -2) {
                     getDiscounts().setValue(mainDiscountList);
@@ -317,7 +339,14 @@ public class HomeMvvm extends AndroidViewModel {
                         for (ItemModel itemModel : mainItemList) {
                             if (itemModel.getCategory() != null) {
                                 if (itemModel.getCategory().getId() == getSelectedCategory().getValue().getId()) {
-                                    list.add(itemModel);
+                                    if (getItemForPrice().getValue()!=null&&getItemForPrice().getValue().getId().equals(itemModel.getId())){
+                                        list.add(getItemForPrice().getValue());
+
+                                    }else {
+                                        list.add(itemModel);
+
+                                    }
+
 
                                 }
                             } else {
@@ -326,7 +355,9 @@ public class HomeMvvm extends AndroidViewModel {
                             }
                         }
 
-                        getItems().setValue(list);
+
+
+                            getItems().setValue(list);
                     }
 
                 }

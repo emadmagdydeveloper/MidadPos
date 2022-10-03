@@ -191,6 +191,8 @@
     <string name="create_discount">إنشاء خصم</string>
     <string name="edit_discount">تعديل الخصم</string>
     <string name="delete_discount">حذف الخصم</string>
+    <string name="amount2">الكمية</string>
+    <string name="enter_comment">Enter comment</string>
 
 
     <string-array name="delivery_options">

@@ -9,13 +9,11 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
-import com.midad_pos.databinding.ItemBinding;
 import com.midad_pos.databinding.ItemHomeBinding;
 import com.midad_pos.databinding.ItemHomeImageRowBinding;
 import com.midad_pos.databinding.ItemHomeShapeRowBinding;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.uis.activity_home.HomeActivity;
-import com.midad_pos.uis.activity_items.ItemsActivity;
 
 import java.util.List;
 
@@ -51,7 +49,7 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holderColor.binding.setModel(list.get(holderColor.getAdapterPosition()));
             holderColor.itemView.setOnClickListener(v -> {
                 HomeActivity activity = (HomeActivity) context;
-                activity.setItemData(list.get(holderColor.getAdapterPosition()));
+                activity.setItemData(list.get(holderColor.getAdapterPosition()),holderColor.getAdapterPosition());
             });
 
         }else if (holder instanceof HolderImage){
@@ -60,7 +58,7 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             holderImage.itemView.setOnClickListener(v -> {
                 HomeActivity activity = (HomeActivity) context;
-                activity.setItemData(list.get(holderImage.getAdapterPosition()));
+                activity.setItemData(list.get(holderImage.getAdapterPosition()), holderImage.getAdapterPosition());
             });
         }else if (holder instanceof Holder){
             Holder holderItem = (Holder) holder;
@@ -68,7 +66,7 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             holderItem.itemView.setOnClickListener(v -> {
                 HomeActivity activity = (HomeActivity) context;
-                activity.setItemData(list.get(holderItem.getAdapterPosition()));
+                activity.setItemData(list.get(holderItem.getAdapterPosition()), holderItem.getAdapterPosition());
             });
         }
 

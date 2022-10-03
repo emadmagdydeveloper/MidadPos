@@ -425,5 +425,17 @@
                 layout="@layout/dialog_add_price"
                 />
         </FrameLayout>
+        <FrameLayout
+            android:id="@+id/flDialogItemExtras"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            >
+            <include
+                android:id="@+id/dialogItemExtras"
+                layout="@layout/dialog_item_extras"
+                />
+        </FrameLayout>
+
     </FrameLayout>
 </layout>

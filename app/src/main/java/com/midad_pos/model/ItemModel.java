@@ -1,6 +1,7 @@
 package com.midad_pos.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemModel implements Serializable {
@@ -25,6 +26,13 @@ public class ItemModel implements Serializable {
     private List<ModifierModel> modifiers;
     private TaxModel tax;
     private boolean selected;
+
+    private double totalPrice = 0.0;
+    private VariantModel selectedVariant;
+    private ModifierModel selectedModifier;
+    private int amount = 1;
+    private List<DiscountModel> discounts = new ArrayList<>();
+
 
 
     public String getId() {
@@ -57,6 +65,10 @@ public class ItemModel implements Serializable {
 
     public String getPrice() {
         return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 
     public String getCost() {

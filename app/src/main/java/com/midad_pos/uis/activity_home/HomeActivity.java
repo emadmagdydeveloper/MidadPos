@@ -34,12 +34,13 @@ import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
 import com.midad_pos.adapter.HomeDiscountAdapter;
 import com.midad_pos.adapter.HomeItemAdapter;
+import com.midad_pos.adapter.ItemMainModifierAdapter;
 import com.midad_pos.adapter.SpinnerCountryAdapter;
 import com.midad_pos.databinding.ActivityHomeBinding;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
 import com.midad_pos.model.ItemModel;
-import com.midad_pos.mvvm.BaseMvvm;
+import com.midad_pos.model.ModifierModel;
 import com.midad_pos.mvvm.HomeMvvm;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
@@ -57,7 +58,6 @@ import io.reactivex.schedulers.Schedulers;
 
 public class HomeActivity extends DrawerBaseActivity {
     private HomeMvvm mvvm;
-    private BaseMvvm baseMvvm;
     private ActivityHomeBinding binding;
     private SpinnerCountryAdapter spinnerCountryAdapter;
     private final CompositeDisposable disposable = new CompositeDisposable();
@@ -65,6 +65,7 @@ public class HomeActivity extends DrawerBaseActivity {
     private ActivityResultLauncher<String> permissions;
     private HomeItemAdapter adapter;
     private HomeDiscountAdapter homeDiscountAdapter;
+    private ItemMainModifierAdapter itemMainModifierAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +97,6 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
     private void initView() {
-        baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         mvvm = ViewModelProviders.of(this).get(HomeMvvm.class);
         codeScanner = new CodeScanner(this, binding.scanCode);
 
@@ -220,6 +220,7 @@ public class HomeActivity extends DrawerBaseActivity {
         });
 
         mvvm.getItems().observe(this, items -> {
+
             if (adapter != null) {
                 adapter.updateList(items);
             }
@@ -257,24 +258,34 @@ public class HomeActivity extends DrawerBaseActivity {
 
         }
 
-        mvvm.getPrice().observe(this, price -> {
-            binding.dialogAddPrice.setPrice(price);
-        });
+        mvvm.getPrice().observe(this, price -> binding.dialogAddPrice.setPrice(price));
 
         mvvm.getIsDialogPriceOpened().observe(this, isOpened -> {
             if (isOpened) {
                 binding.flDialogAddPrice.setVisibility(View.VISIBLE);
             } else {
                 mvvm.getPrice().setValue("0.00");
-                mvvm.getItemForPrice().setValue(null);
                 binding.flDialogAddPrice.setVisibility(View.GONE);
 
             }
         });
 
-        mvvm.getItemForPrice().observe(this, itemModel -> {
-            if (itemModel != null) {
-                binding.dialogAddPrice.setItem(itemModel);
+
+
+        mvvm.getIsDialogExtrasOpened().observe(this, isOpened -> {
+            if (isOpened) {
+
+                binding.flDialogItemExtras.setVisibility(View.VISIBLE);
+
+            } else {
+                binding.flDialogItemExtras.setVisibility(View.GONE);
+
+            }
+        });
+
+        mvvm.getItemForPricePos().observe(this, pos -> {
+            if (pos != -1&&mvvm.getItems().getValue()!=null) {
+                binding.dialogAddPrice.setItem(mvvm.getItems().getValue().get(pos));
             }
         });
 
@@ -319,7 +330,6 @@ public class HomeActivity extends DrawerBaseActivity {
 
             });
         }
-
 
         if (binding.barcode != null) {
             if (getAppSetting() != null && getAppSetting().isScan()) {
@@ -410,6 +420,16 @@ public class HomeActivity extends DrawerBaseActivity {
             });
         }
 
+        itemMainModifierAdapter = new ItemMainModifierAdapter(this);
+        binding.dialogItemExtras.recViewModifier.setLayoutManager(new LinearLayoutManager(this));
+        binding.dialogItemExtras.recViewModifier.setHasFixedSize(true);
+        binding.dialogItemExtras.recViewModifier.setAdapter(itemMainModifierAdapter);
+        if (mvvm.getItemForPricePos().getValue()!=null&&mvvm.getItems().getValue()!=null&&mvvm.getItemForPricePos().getValue()!=-1){
+            Log.e("q","Q");
+            itemMainModifierAdapter.updateList(mvvm.getItems().getValue().get(mvvm.getItemForPricePos().getValue()).getModifiers());
+        }
+
+
         binding.addCustomerDialog.searchDialog.closeCustomerDialog.setOnClickListener(view -> {
             binding.dialogCustomer.setVisibility(View.GONE);
             mvvm.getIsOpenedCustomerDialog().setValue(false);
@@ -471,49 +491,53 @@ public class HomeActivity extends DrawerBaseActivity {
         binding.flDialogAddPrice.setVisibility(View.VISIBLE);
 
 
-        binding.dialogAddPrice.btn0.setOnClickListener(v -> {
-            mvvm.updatePrice("0");
-        });
-        binding.dialogAddPrice.btn1.setOnClickListener(v -> {
-            mvvm.updatePrice("1");
-        });
-        binding.dialogAddPrice.btn2.setOnClickListener(v -> {
-            mvvm.updatePrice("2");
-        });
-        binding.dialogAddPrice.btn3.setOnClickListener(v -> {
-            mvvm.updatePrice("3");
-        });
-        binding.dialogAddPrice.btn4.setOnClickListener(v -> {
-            mvvm.updatePrice("4");
-        });
-        binding.dialogAddPrice.btn5.setOnClickListener(v -> {
-            mvvm.updatePrice("5");
-        });
-        binding.dialogAddPrice.btn6.setOnClickListener(v -> {
-            mvvm.updatePrice("6");
-        });
-        binding.dialogAddPrice.btn7.setOnClickListener(v -> {
-            mvvm.updatePrice("7");
-        });
-        binding.dialogAddPrice.btn8.setOnClickListener(v -> {
-            mvvm.updatePrice("8");
-        });
-        binding.dialogAddPrice.btn9.setOnClickListener(v -> {
-            mvvm.updatePrice("9");
-        });
+        binding.dialogAddPrice.btn0.setOnClickListener(v -> mvvm.updatePrice("0"));
+        binding.dialogAddPrice.btn1.setOnClickListener(v -> mvvm.updatePrice("1"));
+        binding.dialogAddPrice.btn2.setOnClickListener(v -> mvvm.updatePrice("2"));
+        binding.dialogAddPrice.btn3.setOnClickListener(v -> mvvm.updatePrice("3"));
+        binding.dialogAddPrice.btn4.setOnClickListener(v -> mvvm.updatePrice("4"));
+        binding.dialogAddPrice.btn5.setOnClickListener(v -> mvvm.updatePrice("5"));
+        binding.dialogAddPrice.btn6.setOnClickListener(v -> mvvm.updatePrice("6"));
+        binding.dialogAddPrice.btn7.setOnClickListener(v -> mvvm.updatePrice("7"));
+        binding.dialogAddPrice.btn8.setOnClickListener(v -> mvvm.updatePrice("8"));
+        binding.dialogAddPrice.btn9.setOnClickListener(v -> mvvm.updatePrice("9"));
 
         if (binding.dialogAddPrice.btn00 != null) {
-            binding.dialogAddPrice.btn00.setOnClickListener(v -> {
-                mvvm.updatePrice("00");
-            });
+            binding.dialogAddPrice.btn00.setOnClickListener(v -> mvvm.updatePrice("00"));
         }
+
+        binding.dialogAddPrice.btnOk.setOnClickListener(v -> {
+            if (mvvm.getPrice().getValue()!=null){
+                if (!mvvm.getPrice().getValue().isEmpty()&&!mvvm.getPrice().getValue().equals("0")&&!mvvm.getPrice().getValue().equals("0.00")){
+                    if (mvvm.getItems().getValue()!=null&&mvvm.getItemForPricePos().getValue()!=null){
+                        ItemModel  itemModel = mvvm.getItems().getValue().get(mvvm.getItemForPricePos().getValue());
+                        itemModel.setPrice(mvvm.getPrice().getValue());
+                        adapter.notifyItemChanged(mvvm.getItemForPricePos().getValue());
+                        mvvm.getIsDialogPriceOpened().setValue(false);
+                        mvvm.getPrice().setValue("0.00");
+                        mvvm.getItemForPricePos().setValue(-1);
+                        if (itemModel.getModifiers().size()>0){
+                            mvvm.getIsDialogExtrasOpened().setValue(true);
+                            binding.dialogItemExtras.setItem(itemModel);
+
+                        }else {
+
+                        }
+
+                    }
+
+                }
+            }
+
+        });
 
         binding.dialogAddPrice.clear.setOnClickListener(v -> mvvm.removeLastPriceIndex());
 
-        binding.dialogAddPrice.close.setOnClickListener(v -> {
+        binding.dialogAddPrice.close.setOnClickListener(v ->{
+            mvvm.getItemForPricePos().setValue(-1);
             mvvm.getIsDialogPriceOpened().setValue(false);
-
-        });
+        } );
+        binding.dialogItemExtras.close.setOnClickListener(v -> mvvm.getIsDialogExtrasOpened().setValue(false));
 
 
     }
@@ -915,7 +939,6 @@ public class HomeActivity extends DrawerBaseActivity {
         mvvm.getDiscountsData();
         mvvm.getItemsData();
 
-        Log.e("show",mvvm.showPin+"_");
         if (mvvm.showPin){
             showPinCodeView();
 
@@ -948,6 +971,8 @@ public class HomeActivity extends DrawerBaseActivity {
         } else if (binding.flDialogAddPrice.getVisibility() == View.VISIBLE) {
 
             mvvm.getIsDialogPriceOpened().setValue(false);
+        }else if (binding.flDialogItemExtras.getVisibility() == View.VISIBLE) {
+            mvvm.getIsDialogExtrasOpened().setValue(false);
         } else {
             super.onBackPressed();
         }
@@ -982,11 +1007,28 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
 
-    public void setItemData(ItemModel itemModel) {
-        if (itemModel.getPrice().isEmpty() || itemModel.getPrice().equals("0")) {
+    public void setItemData(ItemModel itemModel, int adapterPosition) {
+        mvvm.getItemForPrice().setValue(itemModel);
+        mvvm.getItemForPricePos().setValue(adapterPosition);
+        if (itemModel.getPrice().isEmpty() || itemModel.getPrice().equals("0")||itemModel.getPrice().equals("0.00")) {
             mvvm.getIsDialogPriceOpened().setValue(true);
-            mvvm.getItemForPrice().setValue(itemModel);
 
+        }else if (itemModel.getModifiers().size()>0){
+            binding.dialogItemExtras.setItem(itemModel);
+            mvvm.getIsDialogExtrasOpened().setValue(true);
+            itemMainModifierAdapter.updateList(itemModel.getModifiers());
         }
+    }
+
+    public void setItemModifier(int mainPos, int adapterPosition, ModifierModel.Data model) {
+        if (mvvm.getItems().getValue()!=null&&mvvm.getItemForPricePos().getValue()!=null&&mvvm.getItemForPricePos().getValue()!=-1&&mvvm.getItemForPrice().getValue()!=null){
+            ItemModel itemModel = mvvm.getItemForPrice().getValue();
+            List<ModifierModel> modifiers = itemModel.getModifiers();
+            ModifierModel modifierModel = modifiers.get(mainPos);
+            List<ModifierModel.Data> modifiers_data = modifierModel.getModifiers_data();
+            modifiers_data.set(adapterPosition,model);
+            mvvm.getItemForPrice().setValue(itemModel);
+        }
+
     }
 }

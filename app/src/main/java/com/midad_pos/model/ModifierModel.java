@@ -21,12 +21,17 @@ public class ModifierModel implements Serializable {
         return modifiers_data;
     }
 
+    public void setModifiers_data(List<Data> modifiers_data) {
+        this.modifiers_data = modifiers_data;
+    }
+
     public static class Data implements Serializable {
         private String id;
         private String title;
         private String sort;
         private String cost;
         private String modifier_id;
+        private boolean isSelected;
 
         public String getId() {
             return id;
@@ -47,7 +52,17 @@ public class ModifierModel implements Serializable {
         public String getModifier_id() {
             return modifier_id;
         }
+
+        public boolean isSelected() {
+            return isSelected;
+        }
+
+        public void setSelected(boolean selected) {
+            isSelected = selected;
+        }
     }
+
+
 
     public boolean isChecked() {
         return isChecked;
