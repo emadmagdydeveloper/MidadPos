@@ -33,6 +33,19 @@ public class ModifierModel implements Serializable {
         private String modifier_id;
         private boolean isSelected;
 
+
+        public Data() {
+        }
+
+        public Data(String id, String title, String sort, String cost, String modifier_id, boolean isSelected) {
+            this.id = id;
+            this.title = title;
+            this.sort = sort;
+            this.cost = cost;
+            this.modifier_id = modifier_id;
+            this.isSelected = isSelected;
+        }
+
         public String getId() {
             return id;
         }

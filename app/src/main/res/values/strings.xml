@@ -193,6 +193,7 @@
     <string name="delete_discount">Delete discount</string>
     <string name="amount2">Quantity</string>
     <string name="enter_comment">Enter comment</string>
+    <string name="tax">Tax</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

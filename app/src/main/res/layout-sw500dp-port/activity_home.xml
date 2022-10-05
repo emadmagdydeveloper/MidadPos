@@ -12,6 +12,17 @@
         <variable
             name="deliveryOption"
             type="String" />
+
+        <variable
+            name="totalVat"
+            type="Double" />
+        <variable
+            name="totalDiscounts"
+            type="Double" />
+        <variable
+            name="total"
+            type="Double" />
+        <import type="android.view.View"/>
     </data>
 
     <FrameLayout
@@ -243,51 +254,144 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" />
 
+
                             <LinearLayout
-                                android:id="@+id/llTotalItemsLand"
                                 android:layout_width="match_parent"
-                                android:layout_height="48dp"
-                                android:layout_marginBottom="8dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal"
-                                android:paddingStart="16dp"
-                                android:paddingEnd="16dp"
-                                android:visibility="gone">
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
 
-                                <TextView
-                                    android:layout_width="wrap_content"
+                                >
+
+                                <!--<View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_margin="16dp"
+                                    android:background="@color/grey9"
+                                    android:visibility='@{totalVat>0?View.VISIBLE:(totalDiscounts>0?View.VISIBLE:View.GONE)}'
+                                    />-->
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:lines="1"
-                                    android:text="@string/total"
-                                    android:textColor="@color/black"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold" />
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:visibility="@{totalDiscounts>0?View.VISIBLE:View.GONE,default=gone}"
 
-                                <androidx.legacy.widget.Space
-                                    android:layout_width="0dp"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1" />
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/discounts"
 
-                                <androidx.legacy.widget.Space
-                                    android:layout_width="8dp"
-                                    android:layout_height="0dp" />
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
 
-                                <TextView
-                                    android:layout_width="wrap_content"
+                                        numberFormat="@{String.valueOf(totalDiscounts)}"
+                                        type="@{null}"
+
+                                        />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:lines="1"
-                                    android:text="00.00"
-                                    android:textColor="@color/black"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold" />
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:layout_marginTop="16dp"
+                                    android:visibility="@{totalVat>0?View.VISIBLE:View.GONE,default=gone}"
+
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/tax"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        numberFormat="@{String.valueOf(totalVat)}"
+                                        type="@{null}"
+
+                                        />
+                                </LinearLayout>
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_margin="16dp"
+                                    android:background="@color/grey9"
+                                    android:visibility='@{totalVat>0?View.VISIBLE:(totalDiscounts>0?View.VISIBLE:View.GONE)}'
+
+                                    />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:layout_marginBottom="16dp"
+                                    android:visibility="@{total>0?View.VISIBLE:View.GONE,default=gone}"
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/total"
+                                        android:textStyle="bold"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/black"
+                                        android:textStyle="bold"
+                                        numberFormat="@{String.valueOf(total)}"
+                                        type="@{null}"
+                                        />
+                                </LinearLayout>
+
+
+
                             </LinearLayout>
+
 
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="1px"
-                                android:background="@color/grey3" />
+                                android:background="@color/grey3"
+                                android:visibility="@{total>0?View.GONE:View.VISIBLE}"
+                                />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -297,6 +401,8 @@
                                 android:text="@string/blank_ticket"
                                 android:textColor="@color/black"
                                 android:textSize="15sp"
+                                android:visibility="@{total>0?View.GONE:View.VISIBLE}"
+
 
                                 />
 

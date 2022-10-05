@@ -1,99 +1,306 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="title"
             type="String" />
+        <variable
+            name="totalVat"
+            type="Double" />
+        <variable
+            name="totalDiscounts"
+            type="Double" />
+        <variable
+            name="total"
+            type="Double" />
+        <import type="android.view.View"/>
 
     </data>
+
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+
             >
+
             <include
                 android:id="@+id/toolBarHomeLayout"
-                layout="@layout/home_app_bar_layout"
-                />
+                layout="@layout/home_app_bar_layout" />
+
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/white"
                 android:fillViewport="true"
-                android:background="@color/grey15"
+
                 >
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
+
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/llCartList"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:fillViewport="true"
+                        android:visibility="gone"
+
+                        >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/white"
+                            android:orientation="vertical"
+
+                            >
+
+                            <LinearLayout
+                                android:id="@+id/llDelivery"
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
+                                android:gravity="center_vertical"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp">
+
+                                <TextView
+                                    android:id="@+id/tvDelivery"
+                                    android:layout_width="180dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@{deliveryOption}"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp" />
+
+                                <androidx.legacy.widget.Space
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1" />
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/ic_drop_down"
+                                    app:tint="@color/grey4" />
+
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/grey9" />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/recViewCart"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+
+                                >
+
+                               <!-- <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_margin="16dp"
+                                    android:background="@color/grey9"
+                                    android:visibility='@{totalVat>0?View.VISIBLE:(totalDiscounts>0?View.VISIBLE:View.GONE)}'
+                                    />-->
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:visibility="@{totalDiscounts>0?View.VISIBLE:View.GONE,default=gone}"
+
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/discounts"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+
+                                        numberFormat="@{String.valueOf(totalDiscounts)}"
+                                        type="@{null}"
+
+                                        />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:layout_marginTop="16dp"
+                                    android:visibility="@{totalVat>0?View.VISIBLE:View.GONE,default=gone}"
+
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/tax"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        numberFormat="@{String.valueOf(totalVat)}"
+                                        type="@{null}"
+
+                                        />
+                                </LinearLayout>
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_margin="16dp"
+                                    android:background="@color/grey9"
+                                    android:visibility='@{totalVat>0?View.VISIBLE:(totalDiscounts>0?View.VISIBLE:View.GONE)}'
+
+                                    />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:visibility="@{total>0?View.VISIBLE:View.GONE,default=gone}"
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/total"
+                                        android:textStyle="bold"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/black"
+                                        android:textStyle="bold"
+                                        numberFormat="@{String.valueOf(total)}"
+                                        type="@{null}"
+                                        />
+                                </LinearLayout>
+
+
+
+                            </LinearLayout>
+
+
+
+
+                        </LinearLayout>
+
+                    </androidx.core.widget.NestedScrollView>
+
+
                     <FrameLayout
                         android:id="@+id/flScanCode"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:visibility="gone"
-                        >
+                        android:visibility="gone">
+
                         <com.budiyev.android.codescanner.CodeScannerView
                             android:id="@+id/scanCode"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:autoFocusButtonVisible="false"
-                            app:flashButtonVisible="false"
-                            />
+                            app:flashButtonVisible="false" />
                     </FrameLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="75dp"
                         android:layout_margin="16dp"
                         android:background="@drawable/small_rounded_primary"
-                        android:orientation="horizontal"
-                        >
+                        android:orientation="horizontal">
+
                         <Button
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:gravity="center"
                             android:background="@color/transparent"
-                            android:textColor="@color/white"
-                            android:textSize="16sp"
+                            android:gravity="center"
                             android:text="@string/save"
-                            />
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
                         <View
                             android:layout_width="1px"
                             android:layout_height="match_parent"
-                            android:background="@color/white_trans2"
-                            />
+                            android:background="@color/white_trans2" />
+
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:orientation="vertical"
-                            >
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:textColor="@color/white"
-                                android:text="@string/charge"
-                                android:textAllCaps="true"
-                                />
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="14sp"
+                                android:text="@string/charge"
+                                android:textAllCaps="true"
                                 android:textColor="@color/white"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:text="00.00"
-                                />
+                                android:textColor="@color/white"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -103,48 +310,48 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:visibility="visible"
-                        >
+                        android:visibility="visible">
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="@color/grey9"
-                            />
+                            android:background="@color/grey9" />
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="48dp"
-                            android:orientation="horizontal"
                             android:background="@color/white"
-                            >
+                            android:orientation="horizontal">
+
                             <LinearLayout
                                 android:id="@+id/llSearch"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:visibility="gone"
-                                >
+                                android:visibility="gone">
+
                                 <EditText
                                     android:id="@+id/edtSearch"
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="match_parent"
-                                    android:lines="1"
+                                    android:layout_weight="1"
                                     android:background="@color/transparent"
+                                    android:hint="@string/search"
+                                    android:lines="1"
                                     android:paddingStart="16dp"
                                     android:paddingEnd="16dp"
-                                    android:textColorHint="@color/grey4"
-                                    android:textSize="14sp"
-                                    android:hint="@string/search"
                                     android:textColor="@color/black"
-                                    />
+                                    android:textColorHint="@color/grey4"
+                                    android:textSize="14sp" />
+
                                 <ImageView
                                     android:id="@+id/closeSearch"
                                     android:layout_width="48dp"
                                     android:layout_height="48dp"
-                                    android:src="@drawable/ic_close"
                                     android:padding="16dp"
-                                    app:tint="@color/grey4"
-                                    />
+                                    android:src="@drawable/ic_close"
+                                    app:tint="@color/grey4" />
                             </LinearLayout>
+
                             <LinearLayout
                                 android:id="@+id/llSpinnerFilter"
                                 android:layout_width="0dp"
@@ -152,139 +359,137 @@
                                 android:layout_weight="1"
                                 android:orientation="horizontal"
                                 android:paddingStart="16dp"
-                                android:paddingEnd="16dp"
-                                >
+                                android:paddingEnd="16dp">
+
                                 <LinearLayout
                                     android:id="@+id/llSpinner"
                                     android:layout_width="180dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_gravity="center_vertical"
-                                    >
+                                    android:layout_gravity="center_vertical">
+
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:textSize="14sp"
-                                        android:textStyle="bold"
-                                        android:textColor="@color/black"
-                                        android:text="@{title}"
-                                        android:maxEms="7"
                                         android:ellipsize="end"
                                         android:lines="1"
-                                        />
+                                        android:maxEms="7"
+                                        android:text="@{title}"
+                                        android:textColor="@color/black"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
 
                                 </LinearLayout>
+
                                 <androidx.legacy.widget.Space
                                     android:layout_width="0dp"
                                     android:layout_height="0dp"
-                                    android:layout_weight="1"
-                                    />
+                                    android:layout_weight="1" />
+
                                 <ImageView
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
-                                    android:src="@drawable/ic_drop_down"
-                                    app:tint="@color/black"
+                                    android:layout_gravity="center_vertical"
                                     android:layout_marginStart="8dp"
                                     android:layout_marginEnd="8dp"
-                                    android:layout_gravity="center_vertical"
                                     android:padding="3dp"
-                                    />
+                                    android:src="@drawable/ic_drop_down"
+                                    app:tint="@color/black" />
 
                             </LinearLayout>
+
                             <View
                                 android:layout_width="1dp"
                                 android:layout_height="match_parent"
-                                android:background="@color/grey9"
-                                />
+                                android:background="@color/grey9" />
+
                             <ImageView
                                 android:id="@+id/barcode"
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
-                                android:src="@drawable/ic_scan_barcode"
                                 android:padding="12dp"
-                                android:tint="@color/grey4"
-                                />
+                                android:src="@drawable/ic_scan_barcode"
+                                android:tint="@color/grey4" />
 
                             <ImageView
                                 android:id="@+id/openSearch"
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
-                                android:src="@drawable/ic_search"
                                 android:padding="12dp"
-                                android:tint="@color/grey4"
-                                />
+                                android:src="@drawable/ic_search"
+                                android:tint="@color/grey4" />
                         </LinearLayout>
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="@color/grey9"
-                            />
+                            android:background="@color/grey9" />
+
                         <androidx.cardview.widget.CardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:cardBackgroundColor="@color/white"
-                            >
+                            app:cardBackgroundColor="@color/white">
 
                         </androidx.cardview.widget.CardView>
+
                         <FrameLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            >
+                            android:layout_height="match_parent">
+
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/recView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
 
                                 />
+
                             <LinearLayout
                                 android:id="@+id/llNoItems"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
                                 android:layout_gravity="center"
                                 android:layout_marginBottom="50dp"
                                 android:gravity="center"
-                                android:visibility="gone"
-                                >
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/grey4"
                                     android:text="@string/you_have_no_items"
-                                    />
+                                    android:textColor="@color/grey4"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="16sp"
-                                    android:textColor="@color/grey4"
-                                    android:text="@string/go_to_items"
                                     android:layout_marginTop="8dp"
                                     android:gravity="center"
-                                    />
+                                    android:text="@string/go_to_items"
+                                    android:textColor="@color/grey4"
+                                    android:textSize="16sp" />
+
                                 <Button
                                     android:id="@+id/btnGoToItems"
                                     android:layout_width="wrap_content"
                                     android:layout_height="56dp"
                                     android:layout_marginTop="16dp"
-                                    android:textColor="@color/white"
-                                    android:textSize="16sp"
-                                    android:text="@string/go_to_items2"
                                     android:paddingStart="8dp"
                                     android:paddingEnd="8dp"
-                                    />
+                                    android:text="@string/go_to_items2"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp" />
                             </LinearLayout>
+
                             <FrameLayout
                                 android:id="@+id/loader"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginBottom="50dp"
-                                android:visibility="gone"
-                                >
-                                <include
-                                    layout="@layout/loader"
-                                    />
+                                android:visibility="gone">
+
+                                <include layout="@layout/loader" />
                             </FrameLayout>
                         </FrameLayout>
                     </LinearLayout>
@@ -294,42 +499,39 @@
             </androidx.core.widget.NestedScrollView>
 
         </LinearLayout>
+
         <FrameLayout
             android:id="@+id/dialogCustomer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
+
             <include
                 android:id="@+id/addCustomerDialog"
-                layout="@layout/add_customer_dialog"
-                />
+                layout="@layout/add_customer_dialog" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/flDialogAddPrice"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
+
             <include
                 android:id="@+id/dialogAddPrice"
-                layout="@layout/dialog_add_price"
-                />
+                layout="@layout/dialog_add_price" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/flDialogItemExtras"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
+
             <include
                 android:id="@+id/dialogItemExtras"
-                layout="@layout/dialog_item_extras"
-                />
+                layout="@layout/dialog_item_extras" />
         </FrameLayout>
-
 
 
     </FrameLayout>

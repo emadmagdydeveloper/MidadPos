@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
 
@@ -204,6 +205,58 @@ public class GeneralMethod {
 
                 view.setText(newFormat);
             }
+
+        }
+
+    }
+
+    @BindingAdapter("discountTitle")
+    public static void discountTitle(TextView view, DiscountModel model) {
+        if (model != null) {
+            String type = model.getType();
+            if (type!=null){
+                String newFormat;
+                if (type.equals("per")){
+                    newFormat = model.getValue() + "%";
+                }else {
+                    newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(model.getValue()));
+                }
+                view.setText(newFormat);
+            }else {
+                String newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(model.getValue()));
+
+                view.setText(model.getTitle()+","+newFormat);
+            }
+
+        }
+
+    }
+
+    @BindingAdapter("itemTotal")
+    public static void itemTotal(TextView view,ItemModel model) {
+        if (model != null) {
+            String newFormat = String.format(Locale.US, "%.2f", model.getTotalPrice());
+
+            view.setText(model.getName()+" "+newFormat);
+
+        }
+
+    }
+
+    @BindingAdapter("cartItemExtra")
+    public static void cartItemTotal(TextView view,ItemModel model) {
+        if (model != null) {
+           StringBuilder builder = new StringBuilder();
+           for (ModifierModel.Data data : model.getSelectedModifiers()){
+               builder.append(data.getTitle());
+               builder.append(",");
+           }
+           String data = builder.toString();
+           if (data.endsWith(",")){
+               data = data.substring(0,data.lastIndexOf(","));
+           }
+
+           view.setText(data);
 
         }
 

@@ -25,19 +25,40 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 >
-                <ImageView
-                    android:id="@+id/arrowCloseScan"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_back_arrow"
-                    app:tint="@color/white"
-                    android:padding="3dp"
+                <FrameLayout
+                    android:id="@+id/flArrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    android:visibility="gone"
-                    android:rotation='@{lang.equals("ar")?180:0}'
-                    />
+                    >
+                    <ImageView
+                        android:id="@+id/arrowCloseScan"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_back_arrow"
+                        app:tint="@color/white"
+                        android:padding="3dp"
+                        android:visibility="gone"
+                        android:rotation='@{lang.equals("ar")?180:0}'
+                        />
+
+                    <ImageView
+                        android:id="@+id/arrowCloseTicket"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_back_arrow"
+                        app:tint="@color/white"
+                        android:padding="3dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:visibility="gone"
+                        android:rotation='@{lang.equals("ar")?180:0}'
+                        />
+                </FrameLayout>
+
                 <TextView
                     android:id="@+id/tv"
                     android:layout_width="wrap_content"
@@ -46,7 +67,7 @@
                     android:textSize="18sp"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/arrowCloseScan"
+                    app:layout_constraintStart_toEndOf="@+id/flArrow"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:text="@string/ticket"

@@ -9,6 +9,7 @@ public class VariantModel implements Serializable {
     private String price;
     private String code;
     private String qty;
+    private boolean isSelected;
 
     public String getId() {
         return id;
@@ -32,5 +33,13 @@ public class VariantModel implements Serializable {
 
     public String getQty() {
         return qty;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

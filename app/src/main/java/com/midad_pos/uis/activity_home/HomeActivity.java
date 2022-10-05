@@ -32,19 +32,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
+import com.midad_pos.adapter.CartAdapter;
 import com.midad_pos.adapter.HomeDiscountAdapter;
 import com.midad_pos.adapter.HomeItemAdapter;
+import com.midad_pos.adapter.ItemDiscountAdapter;
 import com.midad_pos.adapter.ItemMainModifierAdapter;
+import com.midad_pos.adapter.ItemVariantAdapter;
 import com.midad_pos.adapter.SpinnerCountryAdapter;
 import com.midad_pos.databinding.ActivityHomeBinding;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
+import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
+import com.midad_pos.model.VariantModel;
 import com.midad_pos.mvvm.HomeMvvm;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +72,9 @@ public class HomeActivity extends DrawerBaseActivity {
     private HomeItemAdapter adapter;
     private HomeDiscountAdapter homeDiscountAdapter;
     private ItemMainModifierAdapter itemMainModifierAdapter;
+    private ItemDiscountAdapter itemDiscountAdapter;
+    private ItemVariantAdapter itemVariantAdapter;
+    private CartAdapter cartAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +112,7 @@ public class HomeActivity extends DrawerBaseActivity {
         adapter = new HomeItemAdapter(this);
         adapter.updateType(1);
 
-        homeDiscountAdapter = new HomeDiscountAdapter(this,getLang());
+        homeDiscountAdapter = new HomeDiscountAdapter(this, getLang());
 
         permissions = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
             if (result) {
@@ -234,9 +243,24 @@ public class HomeActivity extends DrawerBaseActivity {
             }
         });
 
-        mvvm.getDiscounts().observe(this,discounts->{
-            if (homeDiscountAdapter!=null){
+        mvvm.getDiscounts().observe(this, discounts -> {
+            if (homeDiscountAdapter != null) {
                 homeDiscountAdapter.updateList(discounts);
+            }
+        });
+
+        mvvm.mainItemDiscountList.observe(this, discounts -> {
+            if (itemDiscountAdapter != null&&discounts!=null) {
+                List<DiscountModel> list = new ArrayList<>();
+
+                for (DiscountModel discountModel: discounts){
+                    discountModel.setSelected(false);
+                    list.add(discountModel);
+                }
+                itemDiscountAdapter.updateList(list);
+                if (list.size() == 0) {
+                    binding.dialogItemExtras.llDiscount.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -271,9 +295,33 @@ public class HomeActivity extends DrawerBaseActivity {
         });
 
 
-
         mvvm.getIsDialogExtrasOpened().observe(this, isOpened -> {
             if (isOpened) {
+                if (mvvm.getItemForPrice().getValue() != null) {
+                    binding.dialogItemExtras.setItem(mvvm.getItemForPrice().getValue());
+                    itemMainModifierAdapter.updateList(mvvm.getItemForPrice().getValue().getModifiers());
+                }
+                if (itemDiscountAdapter != null && mvvm.mainItemDiscountList.getValue() != null) {
+                    List<DiscountModel> list = new ArrayList<>(mvvm.mainItemDiscountList.getValue());
+                    itemDiscountAdapter.updateList(list);
+                    if (list.size() == 0) {
+                        binding.dialogItemExtras.llDiscount.setVisibility(View.GONE);
+                    } else {
+                        binding.dialogItemExtras.llDiscount.setVisibility(View.VISIBLE);
+
+                    }
+                }
+
+                if (itemVariantAdapter != null) {
+                    itemVariantAdapter.updateList(mvvm.getItemForPrice().getValue().getVariants());
+                }
+
+                if (mvvm.getItemForPrice().getValue().getVariants().size() == 0) {
+                    binding.dialogItemExtras.llVariants.setVisibility(View.GONE);
+                } else {
+                    binding.dialogItemExtras.llVariants.setVisibility(View.VISIBLE);
+
+                }
 
                 binding.flDialogItemExtras.setVisibility(View.VISIBLE);
 
@@ -284,7 +332,7 @@ public class HomeActivity extends DrawerBaseActivity {
         });
 
         mvvm.getItemForPricePos().observe(this, pos -> {
-            if (pos != -1&&mvvm.getItems().getValue()!=null) {
+            if (pos != -1 && mvvm.getItems().getValue() != null) {
                 binding.dialogAddPrice.setItem(mvvm.getItems().getValue().get(pos));
             }
         });
@@ -366,9 +414,8 @@ public class HomeActivity extends DrawerBaseActivity {
             binding.toolbarLandMenu.setOnClickListener(this::createTicketOptionPopupMenu);
         }
 
-        if (binding.llDelivery != null && binding.tvDelivery != null) {
-            binding.llDelivery.setOnClickListener(view -> createDeliveryOptionPopupMenu(binding.tvDelivery));
-        }
+        binding.llDelivery.setOnClickListener(view -> createDeliveryOptionPopupMenu(binding.tvDelivery));
+
 
         if (binding.llOpenDeliveryOptionPort != null && binding.llDeliveryPort != null && binding.arrowDownPort != null && binding.viewBg != null) {
             binding.llOpenDeliveryOptionPort.setOnClickListener(view -> {
@@ -406,7 +453,6 @@ public class HomeActivity extends DrawerBaseActivity {
                             emitter.onNext(editable.toString());
                         }
                     })).debounce(1, TimeUnit.SECONDS)
-                    .distinct()
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((query -> mvvm.search(query)));
@@ -421,11 +467,35 @@ public class HomeActivity extends DrawerBaseActivity {
         }
 
         itemMainModifierAdapter = new ItemMainModifierAdapter(this);
+        itemDiscountAdapter = new ItemDiscountAdapter(this);
+        itemVariantAdapter = new ItemVariantAdapter(this);
+
         binding.dialogItemExtras.recViewModifier.setLayoutManager(new LinearLayoutManager(this));
         binding.dialogItemExtras.recViewModifier.setHasFixedSize(true);
         binding.dialogItemExtras.recViewModifier.setAdapter(itemMainModifierAdapter);
-        if (mvvm.getItemForPricePos().getValue()!=null&&mvvm.getItems().getValue()!=null&&mvvm.getItemForPricePos().getValue()!=-1){
-            Log.e("q","Q");
+
+        if (binding.dialogItemExtras.recViewDiscounts != null) {
+            binding.dialogItemExtras.recViewDiscounts.setLayoutManager(new LinearLayoutManager(this));
+            binding.dialogItemExtras.recViewDiscounts.setHasFixedSize(true);
+            binding.dialogItemExtras.recViewDiscounts.setAdapter(itemDiscountAdapter);
+        } else if (binding.dialogItemExtras.recViewDiscountsLand != null) {
+            binding.dialogItemExtras.recViewDiscountsLand.setLayoutManager(new GridLayoutManager(this, 2));
+            binding.dialogItemExtras.recViewDiscountsLand.setHasFixedSize(true);
+            binding.dialogItemExtras.recViewDiscountsLand.setAdapter(itemDiscountAdapter);
+        }
+
+        if (binding.dialogItemExtras.recViewVariants != null) {
+            binding.dialogItemExtras.recViewVariants.setLayoutManager(new LinearLayoutManager(this));
+            binding.dialogItemExtras.recViewVariants.setHasFixedSize(true);
+            binding.dialogItemExtras.recViewVariants.setAdapter(itemVariantAdapter);
+        } else if (binding.dialogItemExtras.recViewVariantsLand != null) {
+            binding.dialogItemExtras.recViewVariantsLand.setLayoutManager(new GridLayoutManager(this, 2));
+            binding.dialogItemExtras.recViewVariantsLand.setHasFixedSize(true);
+            binding.dialogItemExtras.recViewVariantsLand.setAdapter(itemVariantAdapter);
+        }
+
+
+        if (mvvm.getItemForPricePos().getValue() != null && mvvm.getItems().getValue() != null && mvvm.getItemForPricePos().getValue() != -1) {
             itemMainModifierAdapter.updateList(mvvm.getItems().getValue().get(mvvm.getItemForPricePos().getValue()).getModifiers());
         }
 
@@ -506,23 +576,34 @@ public class HomeActivity extends DrawerBaseActivity {
             binding.dialogAddPrice.btn00.setOnClickListener(v -> mvvm.updatePrice("00"));
         }
 
+
         binding.dialogAddPrice.btnOk.setOnClickListener(v -> {
-            if (mvvm.getPrice().getValue()!=null){
-                if (!mvvm.getPrice().getValue().isEmpty()&&!mvvm.getPrice().getValue().equals("0")&&!mvvm.getPrice().getValue().equals("0.00")){
-                    if (mvvm.getItems().getValue()!=null&&mvvm.getItemForPricePos().getValue()!=null){
-                        ItemModel  itemModel = mvvm.getItems().getValue().get(mvvm.getItemForPricePos().getValue());
+            if (mvvm.getPrice().getValue() != null) {
+                if (!mvvm.getPrice().getValue().isEmpty() && !mvvm.getPrice().getValue().equals("0") && !mvvm.getPrice().getValue().equals("0.00")) {
+                    if (mvvm.getItems().getValue() != null && mvvm.getItemForPricePos().getValue() != null) {
+                        ItemModel itemModel = mvvm.getItems().getValue().get(mvvm.getItemForPricePos().getValue());
                         itemModel.setPrice(mvvm.getPrice().getValue());
+                        mvvm.getItemForPrice().setValue(itemModel);
                         adapter.notifyItemChanged(mvvm.getItemForPricePos().getValue());
                         mvvm.getIsDialogPriceOpened().setValue(false);
-                        mvvm.getPrice().setValue("0.00");
-                        mvvm.getItemForPricePos().setValue(-1);
-                        if (itemModel.getModifiers().size()>0){
+
+
+
+
+                        if (itemModel.getModifiers().size() > 0) {
                             mvvm.getIsDialogExtrasOpened().setValue(true);
                             binding.dialogItemExtras.setItem(itemModel);
 
-                        }else {
-
+                        } else if (itemModel.getVariants().size() > 0) {
+                            mvvm.getIsDialogExtrasOpened().setValue(true);
+                            binding.dialogItemExtras.setItem(itemModel);
+                        } else {
+                            mvvm.addCartItem();
+                            scrollToLastItemCart();
                         }
+
+                        mvvm.getPrice().setValue("0.00");
+                        mvvm.getItemForPricePos().setValue(-1);
 
                     }
 
@@ -533,12 +614,200 @@ public class HomeActivity extends DrawerBaseActivity {
 
         binding.dialogAddPrice.clear.setOnClickListener(v -> mvvm.removeLastPriceIndex());
 
-        binding.dialogAddPrice.close.setOnClickListener(v ->{
+        binding.dialogAddPrice.close.setOnClickListener(v -> {
             mvvm.getItemForPricePos().setValue(-1);
             mvvm.getIsDialogPriceOpened().setValue(false);
-        } );
-        binding.dialogItemExtras.close.setOnClickListener(v -> mvvm.getIsDialogExtrasOpened().setValue(false));
+        });
 
+        binding.dialogItemExtras.close.setOnClickListener(v -> {
+            mvvm.getIsDialogExtrasOpened().setValue(false);
+            mvvm.getItemForPricePos().setValue(-1);
+            mvvm.getItemForPrice().setValue(null);
+        });
+
+        binding.dialogItemExtras.increase.setOnClickListener(v -> {
+            ItemModel itemModel = mvvm.getItemForPrice().getValue();
+            if (itemModel != null) {
+                int amount = itemModel.getAmount();
+                amount++;
+                itemModel.setAmount(amount);
+                itemModel.calculateTotal();
+                mvvm.getItemForPrice().setValue(itemModel);
+                binding.dialogItemExtras.setItem(itemModel);
+
+            }
+        });
+
+        binding.dialogItemExtras.decrease.setOnClickListener(v -> {
+            ItemModel itemModel = mvvm.getItemForPrice().getValue();
+            if (itemModel != null) {
+                int amount = itemModel.getAmount();
+                if (amount > 0) {
+                    amount--;
+                    itemModel.setAmount(amount);
+                    itemModel.calculateTotal();
+                    mvvm.getItemForPrice().setValue(itemModel);
+                    binding.dialogItemExtras.setItem(itemModel);
+                }
+
+            }
+        });
+
+        binding.dialogItemExtras.edtAmount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                ItemModel itemModel = mvvm.getItemForPrice().getValue();
+
+                if (s.toString().isEmpty()) {
+                    if (itemModel != null) {
+                        itemModel.setAmount(0);
+                        mvvm.getItemForPrice().setValue(itemModel);
+                        binding.dialogItemExtras.setItem(itemModel);
+
+                    }
+                } else {
+                    if (itemModel != null) {
+                        try {
+                            itemModel.setAmount(Integer.parseInt(s.toString()));
+                            mvvm.getItemForPrice().setValue(itemModel);
+                            binding.dialogItemExtras.setItem(itemModel);
+                        } catch (NumberFormatException e) {
+                            itemModel.setAmount(0);
+                            mvvm.getItemForPrice().setValue(itemModel);
+                            binding.dialogItemExtras.setItem(itemModel);
+                        }
+                    }
+
+                }
+            }
+        });
+
+        if (binding.toolBarHomeLayout.tvTicketCount != null && binding.toolBarHomeLayout.tv != null && binding.toolBarHomeLayout.arrowCloseTicket != null) {
+
+            if (binding.llCartList != null && binding.llData != null) {
+                if (mvvm.getIsTicketModel().getValue() != null) {
+                    if (mvvm.getIsTicketModel().getValue()) {
+                        binding.llCartList.setVisibility(View.VISIBLE);
+                        binding.llData.setVisibility(View.GONE);
+                        binding.toolBarHomeLayout.arrowCloseTicket.setVisibility(View.VISIBLE);
+                        setUpDrawer(binding.toolBarHomeLayout.toolBarHome, false);
+                    } else {
+                        binding.llCartList.setVisibility(View.GONE);
+                        binding.llData.setVisibility(View.VISIBLE);
+                        binding.toolBarHomeLayout.arrowCloseTicket.setVisibility(View.GONE);
+
+                        setUpDrawer(binding.toolBarHomeLayout.toolBarHome, true);
+                    }
+                }
+
+
+            }
+        }
+
+        binding.recViewCart.setLayoutManager(new LinearLayoutManager(this));
+        binding.recViewCart.setHasFixedSize(true);
+        cartAdapter = new CartAdapter(this);
+        binding.recViewCart.setAdapter(cartAdapter);
+
+        mvvm.getCart().observe(this, cartList -> {
+            invalidateOptionsMenu();
+            binding.toolBarHomeLayout.setTicketCount(cartList.getItemCounts());
+            binding.setTotal(cartList.getTotalPrice());
+            binding.setTotalDiscounts(cartList.getTotalDiscountValue());
+            binding.setTotalVat(cartList.getTotal_tax());
+            if (cartAdapter!=null){
+                cartAdapter.updateList(cartList.getItems());
+            }
+
+
+        });
+
+        if (binding.toolBarHomeLayout.tvTicketCount != null && binding.toolBarHomeLayout.tv != null && binding.toolBarHomeLayout.arrowCloseTicket != null) {
+            binding.toolBarHomeLayout.tvTicketCount.setOnClickListener(v -> {
+                if (binding.llCartList != null && binding.llData != null) {
+                    if (binding.llCartList.getVisibility() == View.GONE && binding.llData.getVisibility() == View.VISIBLE) {
+                        binding.llCartList.setVisibility(View.VISIBLE);
+                        binding.llData.setVisibility(View.GONE);
+                        binding.toolBarHomeLayout.arrowCloseTicket.setVisibility(View.VISIBLE);
+                        setUpDrawer(binding.toolBarHomeLayout.toolBarHome, false);
+                        mvvm.getIsTicketModel().setValue(true);
+                    } else {
+                        binding.llCartList.setVisibility(View.GONE);
+                        binding.llData.setVisibility(View.VISIBLE);
+                        binding.toolBarHomeLayout.arrowCloseTicket.setVisibility(View.GONE);
+
+                        setUpDrawer(binding.toolBarHomeLayout.toolBarHome, true);
+                        mvvm.getIsTicketModel().setValue(false);
+
+                    }
+
+
+                }
+            });
+
+            binding.toolBarHomeLayout.tv.setOnClickListener(v -> {
+                if (binding.llCartList != null && binding.llData != null) {
+                    if (binding.llCartList.getVisibility() == View.GONE && binding.llData.getVisibility() == View.VISIBLE) {
+                        binding.llCartList.setVisibility(View.VISIBLE);
+                        binding.llData.setVisibility(View.GONE);
+                        binding.toolBarHomeLayout.arrowCloseTicket.setVisibility(View.VISIBLE);
+                        setUpDrawer(binding.toolBarHomeLayout.toolBarHome, false);
+                        mvvm.getIsTicketModel().setValue(true);
+                    } else {
+                        binding.llCartList.setVisibility(View.GONE);
+                        binding.llData.setVisibility(View.VISIBLE);
+                        binding.toolBarHomeLayout.arrowCloseTicket.setVisibility(View.GONE);
+
+                        setUpDrawer(binding.toolBarHomeLayout.toolBarHome, true);
+                        mvvm.getIsTicketModel().setValue(false);
+
+                    }
+
+
+                }
+            });
+
+            binding.toolBarHomeLayout.arrowCloseTicket.setOnClickListener(v -> {
+                if (binding.llCartList != null && binding.llData != null) {
+                    binding.llCartList.setVisibility(View.GONE);
+                    binding.llData.setVisibility(View.VISIBLE);
+                    binding.toolBarHomeLayout.arrowCloseTicket.setVisibility(View.GONE);
+
+                    setUpDrawer(binding.toolBarHomeLayout.toolBarHome, true);
+                    mvvm.getIsTicketModel().setValue(false);
+
+                }
+            });
+        }
+
+        binding.dialogItemExtras.save.setOnClickListener(v -> {
+            mvvm.getIsDialogExtrasOpened().setValue(false);
+
+            mvvm.getDiscounts().setValue(mvvm.mainItemDiscountList.getValue());
+            mvvm.addCartItem();
+            scrollToLastItemCart();
+        });
+
+
+    }
+
+    private void scrollToLastItemCart() {
+        if (binding.nestedScrollViewLand!=null){
+            binding.nestedScrollViewLand.getParent().requestChildFocus(binding.nestedScrollViewLand,binding.nestedScrollViewLand);
+            binding.nestedScrollViewLand.scrollTo(0,binding.nestedScrollViewLand.getBottom()+300);
+            binding.nestedScrollViewLand.fling(binding.nestedScrollViewLand.getBottom()+300);
+            binding.nestedScrollViewLand.fullScroll(View.FOCUS_DOWN);
+        }
 
     }
 
@@ -939,13 +1208,12 @@ public class HomeActivity extends DrawerBaseActivity {
         mvvm.getDiscountsData();
         mvvm.getItemsData();
 
-        if (mvvm.showPin){
+        if (mvvm.showPin) {
             showPinCodeView();
 
-        }else {
+        } else {
             hidePinCodeView();
         }
-
 
 
     }
@@ -953,7 +1221,7 @@ public class HomeActivity extends DrawerBaseActivity {
     @Override
     public void navigation(Class<?> activityClass) {
         super.navigation(activityClass);
-        new Handler().postDelayed(()->mvvm.showPin = false,1500);
+        new Handler().postDelayed(() -> mvvm.showPin = false, 1500);
     }
 
     @Override
@@ -971,7 +1239,7 @@ public class HomeActivity extends DrawerBaseActivity {
         } else if (binding.flDialogAddPrice.getVisibility() == View.VISIBLE) {
 
             mvvm.getIsDialogPriceOpened().setValue(false);
-        }else if (binding.flDialogItemExtras.getVisibility() == View.VISIBLE) {
+        } else if (binding.flDialogItemExtras.getVisibility() == View.VISIBLE) {
             mvvm.getIsDialogExtrasOpened().setValue(false);
         } else {
             super.onBackPressed();
@@ -999,7 +1267,6 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -1007,28 +1274,117 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
 
-    public void setItemData(ItemModel itemModel, int adapterPosition) {
-        mvvm.getItemForPrice().setValue(itemModel);
-        mvvm.getItemForPricePos().setValue(adapterPosition);
-        if (itemModel.getPrice().isEmpty() || itemModel.getPrice().equals("0")||itemModel.getPrice().equals("0.00")) {
+    public void setItemData(ItemModel model, int adapterPosition) {
+        List<VariantModel> variants = new ArrayList<>();
+        List<ModifierModel> modifierList = new ArrayList<>();
+        for (VariantModel variantModel : model.getVariants()) {
+            variantModel.setSelected(false);
+            variants.add(variantModel);
+        }
+        if (variants.size() > 0) {
+            variants.get(0).setSelected(true);
+
+        }
+        for (ModifierModel modifierModel : model.getModifiers()) {
+            List<ModifierModel.Data> dataa = new ArrayList<>();
+            for (ModifierModel.Data data : modifierModel.getModifiers_data()) {
+                data.setSelected(false);
+                dataa.add(data);
+            }
+            modifierModel.setModifiers_data(dataa);
+            modifierList.add(modifierModel);
+        }
+        ItemModel itemModel = new ItemModel(model.getId(), model.getType(), model.getName(), model.getImage(), model.getImage_type(), model.getColor(), model.getShape(), model.getPrice(), model.getCost(), model.getCode(), model.getBarcode_symbology(), model.getBrand_id(), model.getBrand(), model.getCategory_id(), model.getCategory(), model.isIs_variant(), model.getQty(), variants, modifierList, model.getTax(), model.isSelected(), 0.0, null, new ArrayList<>(), 1, new ArrayList<>());
+        if (variants.size() > 0) {
+            itemModel.setSelectedVariant(variants.get(0));
+        }
+
+        if (itemModel.getVariants().size() > 0) {
+            itemModel.calculateTotal();
+            mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
+            mvvm.getItemForPrice().setValue(itemModel);
+            mvvm.getItemForPricePos().setValue(adapterPosition);
+            mvvm.getIsDialogExtrasOpened().setValue(true);
+
+        } else if (itemModel.getModifiers().size() > 0) {
+            if (itemModel.getPrice().isEmpty() || itemModel.getPrice().equals("0") || itemModel.getPrice().equals("0.00")) {
+                itemModel.calculateTotal();
+                mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
+                mvvm.getItemForPrice().setValue(itemModel);
+                mvvm.getItemForPricePos().setValue(adapterPosition);
+
+                mvvm.getIsDialogPriceOpened().setValue(true);
+
+            } else {
+                itemModel.calculateTotal();
+                mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
+                mvvm.getItemForPrice().setValue(itemModel);
+                mvvm.getItemForPricePos().setValue(adapterPosition);
+                mvvm.getIsDialogExtrasOpened().setValue(true);
+
+            }
+        } else if (itemModel.getPrice().isEmpty() || itemModel.getPrice().equals("0") || itemModel.getPrice().equals("0.00")) {
+            itemModel.calculateTotal();
+            mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
+            mvvm.getItemForPrice().setValue(itemModel);
+            mvvm.getItemForPricePos().setValue(adapterPosition);
             mvvm.getIsDialogPriceOpened().setValue(true);
 
-        }else if (itemModel.getModifiers().size()>0){
+        } else {
+
+            mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
+            itemModel.calculateTotal();
+            mvvm.getItemForPrice().setValue(itemModel);
+            mvvm.getItemForPricePos().setValue(adapterPosition);
+            mvvm.addCartItem();
+            scrollToLastItemCart();
+        }
+
+
+
+
+
+
+    }
+
+    public void setItemModifier(int mainPos, int adapterPosition, ModifierModel.Data data) {
+        ItemModel itemModel = mvvm.getItemForPrice().getValue();
+        if (itemModel != null) {
+            List<ModifierModel> modifiers = itemModel.getModifiers();
+            List<ModifierModel.Data> modifiers_data = modifiers.get(mainPos).getModifiers_data();
+            modifiers_data.set(adapterPosition, data);
+            itemModel.setModifiers(modifiers);
+
+
+            if (data.isSelected()) {
+                itemModel.addModifier(data);
+            } else {
+                itemModel.removeModifier(data);
+            }
             binding.dialogItemExtras.setItem(itemModel);
-            mvvm.getIsDialogExtrasOpened().setValue(true);
-            itemMainModifierAdapter.updateList(itemModel.getModifiers());
+            mvvm.getItemForPrice().setValue(itemModel);
+
+
+        }
+
+    }
+
+    public void setItemVariant(int adapterPosition, VariantModel model) {
+        ItemModel itemModel = mvvm.getItemForPrice().getValue();
+        if (itemModel != null) {
+            itemModel.setSelectedVariant(model);
+            itemModel.setPrice(model.getPrice());
+            itemModel.calculateTotal();
+            mvvm.getItemForPrice().setValue(itemModel);
+            binding.dialogItemExtras.setItem(mvvm.getItemForPrice().getValue());
         }
     }
 
-    public void setItemModifier(int mainPos, int adapterPosition, ModifierModel.Data model) {
-        if (mvvm.getItems().getValue()!=null&&mvvm.getItemForPricePos().getValue()!=null&&mvvm.getItemForPricePos().getValue()!=-1&&mvvm.getItemForPrice().getValue()!=null){
-            ItemModel itemModel = mvvm.getItemForPrice().getValue();
-            List<ModifierModel> modifiers = itemModel.getModifiers();
-            ModifierModel modifierModel = modifiers.get(mainPos);
-            List<ModifierModel.Data> modifiers_data = modifierModel.getModifiers_data();
-            modifiers_data.set(adapterPosition,model);
-            mvvm.getItemForPrice().setValue(itemModel);
+    public void addDiscountToCart(DiscountModel model) {
+        ItemModel itemModel = mvvm.getItemForPrice().getValue();
+        if (itemModel!=null){
+            itemModel.addDiscount(model);
         }
-
+        mvvm.getItemForPrice().setValue(itemModel);
     }
 }

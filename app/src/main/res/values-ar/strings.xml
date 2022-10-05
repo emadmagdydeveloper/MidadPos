@@ -192,7 +192,8 @@
     <string name="edit_discount">تعديل الخصم</string>
     <string name="delete_discount">حذف الخصم</string>
     <string name="amount2">الكمية</string>
-    <string name="enter_comment">Enter comment</string>
+    <string name="enter_comment">أدخل تعليق</string>
+    <string name="tax">الضريبة</string>
 
 
     <string-array name="delivery_options">

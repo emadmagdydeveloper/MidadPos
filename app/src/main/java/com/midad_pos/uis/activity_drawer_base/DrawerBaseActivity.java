@@ -85,12 +85,16 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
             Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, toolbar, R.string.open, R.string.close);
             toggle.syncState();
+            toggle.setDrawerIndicatorEnabled(true);
             binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
         } else {
+            Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(false);
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, null, R.string.open, R.string.close);
             toggle.syncState();
+            toggle.setDrawerIndicatorEnabled(false);
             binding.navigationView.setVisibility(View.GONE);
+            toolbar.setNavigationIcon(null);
             binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         }
