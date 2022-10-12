@@ -194,6 +194,7 @@
     <string name="amount2">الكمية</string>
     <string name="enter_comment">أدخل تعليق</string>
     <string name="tax">الضريبة</string>
+    <string name="are_you_sure_you_want_to_clear_the_ticket">هل أنت متأكد من أنك ترغب في إزالة التذكرة ؟</string>
 
 
     <string-array name="delivery_options">

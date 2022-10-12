@@ -66,6 +66,7 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<String> price;
     private MutableLiveData<Boolean> isDialogPriceOpened;
     private MutableLiveData<Boolean> isDialogExtrasOpened;
+    private MutableLiveData<Boolean> isDialogDiscountsOpened;
 
     private MutableLiveData<Integer> itemForPricePos;
     private MutableLiveData<ItemModel> itemForPrice;
@@ -77,12 +78,13 @@ public class HomeMvvm extends AndroidViewModel {
     //////////////////////////////////////////////////////////////////////////
     private ManageCartModel manageCartModel;
     private MutableLiveData<CartList> cart;
-
+    public boolean isItemForUpdate = false;
+    private MutableLiveData<List<DiscountModel>> cartDiscounts;
+    private List<DiscountModel> deletedCartDiscounts = new ArrayList<>();
 
     public HomeMvvm(@NonNull Application application) {
         super(application);
         manageCartModel = ManageCartModel.newInstance();
-        manageCartModel.clearCart(application.getApplicationContext());
         getCart().setValue(manageCartModel.getCartModel(application.getApplicationContext()));
 
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
@@ -241,6 +243,15 @@ public class HomeMvvm extends AndroidViewModel {
         return isDialogExtrasOpened;
     }
 
+    public MutableLiveData<Boolean> getIsDialogDiscountsOpened() {
+        if (isDialogDiscountsOpened == null) {
+            isDialogDiscountsOpened = new MutableLiveData<>();
+            isDialogDiscountsOpened.setValue(false);
+        }
+        return isDialogDiscountsOpened;
+    }
+
+
     public MutableLiveData<Integer> getItemForPricePos() {
         if (itemForPricePos == null) {
             itemForPricePos = new MutableLiveData<>();
@@ -265,6 +276,30 @@ public class HomeMvvm extends AndroidViewModel {
             ticketCount.setValue(0);
         }
         return ticketCount;
+    }
+
+    public MutableLiveData<List<DiscountModel>>getCartDiscounts() {
+        if (cartDiscounts == null) {
+            cartDiscounts = new MutableLiveData<>();
+        }
+        return cartDiscounts;
+    }
+
+
+    public MutableLiveData<Boolean> getIsScanOpened() {
+        if (isScanOpened == null) {
+            isScanOpened = new MutableLiveData<>();
+            isScanOpened.setValue(false);
+        }
+        return isScanOpened;
+    }
+
+    public MutableLiveData<Integer> getCamera() {
+        if (camera == null) {
+            camera = new MutableLiveData<>();
+            camera.setValue(CodeScanner.CAMERA_BACK);
+        }
+        return camera;
     }
 
     public void getCategoryData(String user_id) {
@@ -327,22 +362,6 @@ public class HomeMvvm extends AndroidViewModel {
                 });
     }
 
-    public MutableLiveData<Boolean> getIsScanOpened() {
-        if (isScanOpened == null) {
-            isScanOpened = new MutableLiveData<>();
-            isScanOpened.setValue(false);
-        }
-        return isScanOpened;
-    }
-
-    public MutableLiveData<Integer> getCamera() {
-        if (camera == null) {
-            camera = new MutableLiveData<>();
-            camera.setValue(CodeScanner.CAMERA_BACK);
-        }
-        return camera;
-    }
-
     public void search(String query) {
         getSearchQuery().setValue(query);
         if (query.isEmpty()) {
@@ -351,7 +370,21 @@ public class HomeMvvm extends AndroidViewModel {
                     getItems().setValue(mainItemList);
 
                 } else if (getSelectedCategory().getValue().getId() == -2) {
-                    getDiscounts().setValue(mainDiscountList);
+                    List<DiscountModel> list = new ArrayList<>();
+                    for (DiscountModel discountModel : mainDiscountList) {
+
+
+                        if (isDiscountExist(discountModel)){
+                            discountModel.setSelected(true);
+
+                        }else {
+                            discountModel.setSelected(false);
+                        }
+
+                        list.add(discountModel);
+                    }
+
+                    getDiscounts().setValue(list);
 
                 } else {
 
@@ -384,6 +417,12 @@ public class HomeMvvm extends AndroidViewModel {
                         List<DiscountModel> list = new ArrayList<>();
                         for (DiscountModel discountModel : mainDiscountList) {
                             if (discountModel.getTitle().startsWith(query)) {
+                                if (isDiscountExist(discountModel)){
+                                    discountModel.setSelected(true);
+                                }else {
+                                    discountModel.setSelected(false);
+
+                                }
                                 list.add(discountModel);
                             }
                         }
@@ -564,7 +603,16 @@ public class HomeMvvm extends AndroidViewModel {
                 if (!price.contains(".")) {
                     price += ".00";
                 }
-                Log.e("priceeee", price);
+                if (price.contains(",")){
+                    price = price.replace(",","");
+                }
+                price = String.format(Locale.US,"%.2f",Double.parseDouble(price));
+
+                /*if (price.length()==7){
+                    price = new StringBuilder(price).insert(1,",").toString();
+                }*/
+
+                Log.e("priceeee", price+"leng"+price.length());
                 getPrice().setValue(price);
             }
 
@@ -594,7 +642,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
     }
 
-    public void addCartItem() {
+    public void addCartItem( int  add_update_type) {
         if (getItemForPrice().getValue() != null) {
             ItemModel itemModel = getItemForPrice().getValue();
             double total = 0.0;
@@ -606,9 +654,77 @@ public class HomeMvvm extends AndroidViewModel {
             }
 
             itemModel.setNetTotal(total);
-            manageCartModel.addItemToCart(getItemForPrice().getValue(), getApplication().getApplicationContext());
+            manageCartModel.addItemToCart(getItemForPrice().getValue(),add_update_type, getApplication().getApplicationContext());
             getCart().setValue(manageCartModel.getCartModel(getApplication().getApplicationContext()));
         }
+    }
+
+    private boolean isDiscountExist(DiscountModel discountModel){
+        for (DiscountModel model:manageCartModel.getCartModel(getApplication().getApplicationContext()).getDiscounts()){
+            if (model.getId().equals(discountModel.getId())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void clearCart(){
+        manageCartModel.clearCart(getApplication().getApplicationContext());
+        getCart().setValue(new CartList());
+    }
+    
+    public void removeItemFromCart(int pos){
+        if (getCart().getValue()!=null){
+            manageCartModel.deleteItemFromCart(getCart().getValue().getItems().get(pos),getApplication().getApplicationContext());
+            getCart().getValue().removeItem(pos);
+            if (getCart().getValue().getItems().size()==0){
+                manageCartModel.clearCart(getApplication().getApplicationContext());
+                getCart().setValue(new CartList());
+
+            }else {
+                getCart().setValue(getCart().getValue());
+
+            }
+
+        }
+    }
+
+    public void getCartDiscount(){
+        List<DiscountModel> discounts = getCartDiscounts().getValue();
+        if (discounts != null) {
+            discounts.clear();
+        }else {
+            discounts = new ArrayList<>();
+        }
+        deletedCartDiscounts = new ArrayList<>();
+
+        if (getCart().getValue()!=null&&getCart().getValue().getDiscounts().size()>0){
+            discounts.addAll(getCart().getValue().getDiscounts());
+        }
+
+        getCartDiscounts().setValue(discounts);
+    }
+
+    public void deleteCartDiscountItem(int pos){
+        if (getCartDiscounts().getValue()!=null){
+            deletedCartDiscounts.add(getCartDiscounts().getValue().get(pos));
+
+            getCartDiscounts().getValue().remove(pos);
+        }
+
+        getCartDiscounts().setValue(getCartDiscounts().getValue());
+
+    }
+
+    public void deleteGeneralDiscountFromCart(){
+        if (getCart().getValue()!=null){
+            manageCartModel.deleteGeneralCartDiscount(deletedCartDiscounts,getApplication().getApplicationContext());
+            getCart().getValue().removeGeneralDiscount(deletedCartDiscounts);
+            getCart().setValue(getCart().getValue());
+        }
+    }
+    public void addDiscountForAllTicket(DiscountModel discountModel){
+        manageCartModel.addDiscountForAllTicket(discountModel,getApplication().getApplicationContext());
     }
 
 }

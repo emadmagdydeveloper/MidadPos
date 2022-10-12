@@ -11,14 +11,17 @@ import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
@@ -33,6 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
 import com.midad_pos.adapter.CartAdapter;
+import com.midad_pos.adapter.CartDiscountAdapter;
 import com.midad_pos.adapter.HomeDiscountAdapter;
 import com.midad_pos.adapter.HomeItemAdapter;
 import com.midad_pos.adapter.ItemDiscountAdapter;
@@ -40,12 +44,15 @@ import com.midad_pos.adapter.ItemMainModifierAdapter;
 import com.midad_pos.adapter.ItemVariantAdapter;
 import com.midad_pos.adapter.SpinnerCountryAdapter;
 import com.midad_pos.databinding.ActivityHomeBinding;
+import com.midad_pos.databinding.DialogClearTicketLayoutBinding;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
 import com.midad_pos.model.VariantModel;
+import com.midad_pos.model.cart.CartList;
+import com.midad_pos.model.cart.ManageCartModel;
 import com.midad_pos.mvvm.HomeMvvm;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
@@ -75,15 +82,7 @@ public class HomeActivity extends DrawerBaseActivity {
     private ItemDiscountAdapter itemDiscountAdapter;
     private ItemVariantAdapter itemVariantAdapter;
     private CartAdapter cartAdapter;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_home, null, false);
-        setContentView(binding.getRoot());
-        setUpDrawer(binding.toolBarHomeLayout.toolBarHome, true);
-        initView();
-    }
+    private CartDiscountAdapter cartDiscountAdapter;
 
     @Override
     protected void onStart() {
@@ -103,6 +102,17 @@ public class HomeActivity extends DrawerBaseActivity {
         invalidateOptionsMenu();
 
     }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_home, null, false);
+        setContentView(binding.getRoot());
+        setUpDrawer(binding.toolBarHomeLayout.toolBarHome, true);
+        initView();
+    }
+
+
 
 
     private void initView() {
@@ -250,11 +260,24 @@ public class HomeActivity extends DrawerBaseActivity {
         });
 
         mvvm.mainItemDiscountList.observe(this, discounts -> {
-            if (itemDiscountAdapter != null&&discounts!=null) {
+            if (itemDiscountAdapter != null && discounts != null) {
                 List<DiscountModel> list = new ArrayList<>();
 
-                for (DiscountModel discountModel: discounts){
-                    discountModel.setSelected(false);
+                for (DiscountModel discountModel : discounts) {
+                    if (mvvm.getItemForPrice().getValue() != null) {
+                        for (DiscountModel model : mvvm.getItemForPrice().getValue().getDiscounts()) {
+                            if (discountModel.getId().equals(model.getId())) {
+                                discountModel.setSelected(true);
+                                break;
+                            } else {
+                                discountModel.setSelected(false);
+
+                            }
+                        }
+                    } else {
+                        discountModel.setSelected(false);
+
+                    }
                     list.add(discountModel);
                 }
                 itemDiscountAdapter.updateList(list);
@@ -294,12 +317,23 @@ public class HomeActivity extends DrawerBaseActivity {
             }
         });
 
+        mvvm.getIsDialogDiscountsOpened().observe(this, isOpened -> {
+            if (isOpened) {
+                binding.flDialogCartDiscount.setVisibility(View.VISIBLE);
+            } else {
+                binding.flDialogCartDiscount.setVisibility(View.GONE);
+
+            }
+        });
+
 
         mvvm.getIsDialogExtrasOpened().observe(this, isOpened -> {
             if (isOpened) {
                 if (mvvm.getItemForPrice().getValue() != null) {
                     binding.dialogItemExtras.setItem(mvvm.getItemForPrice().getValue());
                     itemMainModifierAdapter.updateList(mvvm.getItemForPrice().getValue().getModifiers());
+                    binding.dialogItemExtras.edtComment.setText(mvvm.getItemForPrice().getValue().getComment());
+
                 }
                 if (itemDiscountAdapter != null && mvvm.mainItemDiscountList.getValue() != null) {
                     List<DiscountModel> list = new ArrayList<>(mvvm.mainItemDiscountList.getValue());
@@ -588,8 +622,6 @@ public class HomeActivity extends DrawerBaseActivity {
                         mvvm.getIsDialogPriceOpened().setValue(false);
 
 
-
-
                         if (itemModel.getModifiers().size() > 0) {
                             mvvm.getIsDialogExtrasOpened().setValue(true);
                             binding.dialogItemExtras.setItem(itemModel);
@@ -598,7 +630,7 @@ public class HomeActivity extends DrawerBaseActivity {
                             mvvm.getIsDialogExtrasOpened().setValue(true);
                             binding.dialogItemExtras.setItem(itemModel);
                         } else {
-                            mvvm.addCartItem();
+                            mvvm.addCartItem(1);
                             scrollToLastItemCart();
                         }
 
@@ -715,22 +747,36 @@ public class HomeActivity extends DrawerBaseActivity {
         }
 
         binding.recViewCart.setLayoutManager(new LinearLayoutManager(this));
-        binding.recViewCart.setHasFixedSize(true);
         cartAdapter = new CartAdapter(this);
         binding.recViewCart.setAdapter(cartAdapter);
-
         mvvm.getCart().observe(this, cartList -> {
             invalidateOptionsMenu();
             binding.toolBarHomeLayout.setTicketCount(cartList.getItemCounts());
             binding.setTotal(cartList.getTotalPrice());
             binding.setTotalDiscounts(cartList.getTotalDiscountValue());
-            binding.setTotalVat(cartList.getTotal_tax());
-            if (cartAdapter!=null){
+            binding.setTotalVat(cartList.getTotalTaxPrice());
+            if (binding.tvTicketCountPort != null) {
+                binding.setTicketCount(cartList.getItemCounts());
+            }
+
+            if (cartAdapter != null) {
                 cartAdapter.updateList(cartList.getItems());
             }
 
 
         });
+
+        binding.dialogCartDiscount.recViewDiscounts.setLayoutManager(new LinearLayoutManager(this));
+        binding.dialogCartDiscount.recViewDiscounts.setHasFixedSize(true);
+        cartDiscountAdapter = new CartDiscountAdapter(this);
+        binding.dialogCartDiscount.recViewDiscounts.setAdapter(cartDiscountAdapter);
+
+        mvvm.getCartDiscounts().observe(this,discounts ->{
+            if (cartDiscountAdapter!=null){
+                cartDiscountAdapter.updateList(discounts);
+            }
+        } );
+
 
         if (binding.toolBarHomeLayout.tvTicketCount != null && binding.toolBarHomeLayout.tv != null && binding.toolBarHomeLayout.arrowCloseTicket != null) {
             binding.toolBarHomeLayout.tvTicketCount.setOnClickListener(v -> {
@@ -791,21 +837,60 @@ public class HomeActivity extends DrawerBaseActivity {
         }
 
         binding.dialogItemExtras.save.setOnClickListener(v -> {
+            String comment = binding.dialogItemExtras.edtComment.getText().toString().trim();
+
+            if (mvvm.getItemForPrice().getValue()!=null){
+                mvvm.getItemForPrice().getValue().setComment(comment);
+            }
+
             mvvm.getIsDialogExtrasOpened().setValue(false);
 
             mvvm.getDiscounts().setValue(mvvm.mainItemDiscountList.getValue());
-            mvvm.addCartItem();
+            mvvm.addCartItem(mvvm.isItemForUpdate ? 2 : 1);
             scrollToLastItemCart();
         });
+
+        binding.dialogItemExtras.llVat.setOnClickListener(v -> {
+            if (mvvm.getItemForPrice().getValue() != null) {
+                mvvm.getItemForPrice().getValue().getTax().setSingleChecked(!mvvm.getItemForPrice().getValue().getTax().isSingleChecked());
+                mvvm.getItemForPrice().setValue(mvvm.getItemForPrice().getValue());
+                binding.dialogItemExtras.setItem(mvvm.getItemForPrice().getValue());
+                if (mvvm.getCart().getValue() != null) {
+                    CartList cartList = mvvm.getCart().getValue();
+                    binding.toolBarHomeLayout.setTicketCount(cartList.getItemCounts());
+                    binding.setTotal(cartList.getTotalPrice());
+                    binding.setTotalDiscounts(cartList.getTotalDiscountValue());
+                    binding.setTotalVat(cartList.getTotalTaxPrice());
+                    if (binding.tvTicketCountPort != null) {
+                        binding.setTicketCount(cartList.getItemCounts());
+                    }
+                }
+
+            }
+        });
+
+        binding.llDiscount.setOnClickListener(v -> {
+            if (mvvm.getCart().getValue() != null && mvvm.getCart().getValue().getDiscounts().size() > 0) {
+                mvvm.getIsDialogDiscountsOpened().setValue(true);
+                mvvm.getCartDiscount();
+
+            }
+        });
+
+        binding.dialogCartDiscount.save.setOnClickListener(v -> {
+            mvvm.deleteGeneralDiscountFromCart();
+            mvvm.getIsDialogDiscountsOpened().setValue(false);
+        });
+        binding.dialogCartDiscount.close.setOnClickListener(v -> mvvm.getIsDialogDiscountsOpened().setValue(false));
 
 
     }
 
     private void scrollToLastItemCart() {
-        if (binding.nestedScrollViewLand!=null){
-            binding.nestedScrollViewLand.getParent().requestChildFocus(binding.nestedScrollViewLand,binding.nestedScrollViewLand);
-            binding.nestedScrollViewLand.scrollTo(0,binding.nestedScrollViewLand.getBottom()+300);
-            binding.nestedScrollViewLand.fling(binding.nestedScrollViewLand.getBottom()+300);
+        if (binding.nestedScrollViewLand != null) {
+            binding.nestedScrollViewLand.getParent().requestChildFocus(binding.nestedScrollViewLand, binding.nestedScrollViewLand);
+            binding.nestedScrollViewLand.scrollTo(0, binding.nestedScrollViewLand.getBottom() + 300);
+            binding.nestedScrollViewLand.fling(binding.nestedScrollViewLand.getBottom() + 300);
             binding.nestedScrollViewLand.fullScroll(View.FOCUS_DOWN);
         }
 
@@ -914,11 +999,24 @@ public class HomeActivity extends DrawerBaseActivity {
         menuHelper.setForceShowIcon(true);
         menuHelper.show();
 
-        popupMenu.getMenu().findItem(R.id.clear).setEnabled(false);
+        if (mvvm.getCart().getValue() != null && mvvm.getCart().getValue().getItems().size() > 0) {
+            popupMenu.getMenu().findItem(R.id.clear).setEnabled(true);
+
+        } else {
+            popupMenu.getMenu().findItem(R.id.clear).setEnabled(false);
+
+        }
         popupMenu.getMenu().findItem(R.id.edit).setEnabled(false);
         popupMenu.getMenu().findItem(R.id.assign).setEnabled(false);
         popupMenu.getMenu().findItem(R.id.merge).setEnabled(false);
         popupMenu.getMenu().findItem(R.id.split).setEnabled(false);
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.clear) {
+                showDialogClearCart();
+            }
+            return true;
+        });
 
 
     }
@@ -935,14 +1033,37 @@ public class HomeActivity extends DrawerBaseActivity {
         MenuItem menuItemMenu4 = menu.findItem(R.id.merge);
         MenuItem menuItemMenu5 = menu.findItem(R.id.split);
 
+        menuItemMenu2.setEnabled(false);
+        menuItemMenu3.setEnabled(false);
+        menuItemMenu4.setEnabled(false);
+        menuItemMenu5.setEnabled(false);
+
+        if (mvvm.getCart().getValue() != null && mvvm.getCart().getValue().getItems().size() > 0) {
+            menuItemMenu1.setEnabled(true);
+        } else {
+            menuItemMenu1.setEnabled(false);
+
+        }
+
 
         for (int index = 0; index < menu.size(); index++) {
             MenuItem item = menu.getItem(index);
             if (item.getItemId() != R.id.search && item.getItemId() != R.id.addUser && item.getItemId() != R.id.barcode && item.getItemId() != R.id.cameraSwitch) {
-                SpannableString spannable = new SpannableString(item.getTitle());
-                spannable.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.grey4)), 0, spannable.length(), 0);
-                item.setTitle(spannable);
-                item.getIcon().setColorFilter(getResources().getColor(R.color.grey4), PorterDuff.Mode.SRC_IN);
+
+                if (item.isEnabled()) {
+                    SpannableString spannable = new SpannableString(item.getTitle());
+                    spannable.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.black)), 0, spannable.length(), 0);
+                    item.setTitle(spannable);
+                    item.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+
+                } else {
+
+                    SpannableString spannable = new SpannableString(item.getTitle());
+                    spannable.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.grey4)), 0, spannable.length(), 0);
+                    item.setTitle(spannable);
+                    item.getIcon().setColorFilter(getResources().getColor(R.color.grey4), PorterDuff.Mode.SRC_IN);
+
+                }
 
             }
         }
@@ -951,7 +1072,6 @@ public class HomeActivity extends DrawerBaseActivity {
             MenuBuilder menuBuilder = (MenuBuilder) menu;
             menuBuilder.setOptionalIconsVisible(true);
         }
-
         MenuItem menuItemSearch = menu.findItem(R.id.search);
         MenuItem menuItemAddUser = menu.findItem(R.id.addUser);
         MenuItem menuItemBarCode = menu.findItem(R.id.barcode);
@@ -1127,6 +1247,8 @@ public class HomeActivity extends DrawerBaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.clear) {
+            showDialogClearCart();
+
             return true;
         } else if (item.getItemId() == R.id.addUser) {
             binding.dialogCustomer.setVisibility(View.VISIBLE);
@@ -1224,57 +1346,9 @@ public class HomeActivity extends DrawerBaseActivity {
         new Handler().postDelayed(() -> mvvm.showPin = false, 1500);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (binding.dialogCustomer.getVisibility() == View.VISIBLE) {
-            if (binding.addCustomerDialog.flAddCustomerLayout.getVisibility() == View.VISIBLE) {
-                binding.addCustomerDialog.flAddCustomerLayout.setVisibility(View.GONE);
-                mvvm.getIsAddCustomerDialogShow().setValue(false);
-            } else {
-                binding.dialogCustomer.setVisibility(View.GONE);
-                mvvm.getIsOpenedCustomerDialog().setValue(false);
-            }
-
-
-        } else if (binding.flDialogAddPrice.getVisibility() == View.VISIBLE) {
-
-            mvvm.getIsDialogPriceOpened().setValue(false);
-        } else if (binding.flDialogItemExtras.getVisibility() == View.VISIBLE) {
-            mvvm.getIsDialogExtrasOpened().setValue(false);
-        } else {
-            super.onBackPressed();
-        }
-
-    }
-
-    @Override
-    protected void onPause() {
-        if (codeScanner != null) {
-            codeScanner.releaseResources();
-        }
-
-        super.onPause();
-
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mvvm.showPin = true;
-
-
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposable.clear();
-    }
-
 
     public void setItemData(ItemModel model, int adapterPosition) {
+        mvvm.isItemForUpdate = false;
         List<VariantModel> variants = new ArrayList<>();
         List<ModifierModel> modifierList = new ArrayList<>();
         for (VariantModel variantModel : model.getVariants()) {
@@ -1336,13 +1410,9 @@ public class HomeActivity extends DrawerBaseActivity {
             itemModel.calculateTotal();
             mvvm.getItemForPrice().setValue(itemModel);
             mvvm.getItemForPricePos().setValue(adapterPosition);
-            mvvm.addCartItem();
+            mvvm.addCartItem(1);
             scrollToLastItemCart();
         }
-
-
-
-
 
 
     }
@@ -1369,7 +1439,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
     }
 
-    public void setItemVariant(int adapterPosition, VariantModel model) {
+    public void setItemVariant(VariantModel model) {
         ItemModel itemModel = mvvm.getItemForPrice().getValue();
         if (itemModel != null) {
             itemModel.setSelectedVariant(model);
@@ -1382,9 +1452,109 @@ public class HomeActivity extends DrawerBaseActivity {
 
     public void addDiscountToCart(DiscountModel model) {
         ItemModel itemModel = mvvm.getItemForPrice().getValue();
-        if (itemModel!=null){
+        if (itemModel != null) {
             itemModel.addDiscount(model);
         }
         mvvm.getItemForPrice().setValue(itemModel);
     }
+
+    public void deleteItemFromCart(int adapterPosition) {
+        mvvm.removeItemFromCart(adapterPosition);
+        cartAdapter.notifyItemRemoved(adapterPosition);
+        invalidateOptionsMenu();
+
+    }
+
+    public void addDiscountForAll(DiscountModel model, int pos) {
+        if (mvvm.getCart().getValue() != null) {
+            if (mvvm.getDiscounts().getValue() != null) {
+                mvvm.getDiscounts().getValue().get(pos).setSelected(model.isSelected());
+            }
+            CartList cartList = mvvm.getCart().getValue();
+            cartList.addDiscountForAll(model);
+
+            mvvm.addDiscountForAllTicket(model);
+            mvvm.getCart().setValue(cartList);
+        }
+    }
+
+    public void updateItemCart(ItemModel model) {
+        mvvm.getItemForPrice().setValue(model);
+        mvvm.getIsDialogExtrasOpened().setValue(true);
+        mvvm.isItemForUpdate = true;
+        mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
+
+
+    }
+
+    private void showDialogClearCart(){
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .create();
+        dialog.setCanceledOnTouchOutside(false);
+        DialogClearTicketLayoutBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),R.layout.dialog_clear_ticket_layout,null,false);
+        dialog.setView(dialogBinding.getRoot());
+        dialogBinding.cancel.setOnClickListener(v -> dialog.dismiss());
+        dialogBinding.clear.setOnClickListener(v -> {
+            mvvm.clearCart();
+            dialog.dismiss();
+        });
+        dialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (binding.dialogCustomer.getVisibility() == View.VISIBLE) {
+            if (binding.addCustomerDialog.flAddCustomerLayout.getVisibility() == View.VISIBLE) {
+                binding.addCustomerDialog.flAddCustomerLayout.setVisibility(View.GONE);
+                mvvm.getIsAddCustomerDialogShow().setValue(false);
+            } else {
+                binding.dialogCustomer.setVisibility(View.GONE);
+                mvvm.getIsOpenedCustomerDialog().setValue(false);
+            }
+
+
+        } else if (binding.flDialogAddPrice.getVisibility() == View.VISIBLE) {
+
+            mvvm.getIsDialogPriceOpened().setValue(false);
+        } else if (binding.flDialogItemExtras.getVisibility() == View.VISIBLE) {
+            mvvm.getIsDialogExtrasOpened().setValue(false);
+        } else if (binding.flDialogCartDiscount.getVisibility() == View.VISIBLE) {
+            mvvm.getIsDialogDiscountsOpened().setValue(false);
+        } else {
+            super.onBackPressed();
+        }
+
+    }
+
+    public void deleteCartDiscountItem(int adapterPosition) {
+        mvvm.deleteCartDiscountItem(adapterPosition);
+    }
+
+    @Override
+    protected void onPause() {
+        if (codeScanner != null) {
+            codeScanner.releaseResources();
+        }
+
+        super.onPause();
+
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mvvm.showPin = true;
+
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposable.clear();
+    }
+
+
 }

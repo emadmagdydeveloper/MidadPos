@@ -11,6 +11,7 @@ public class TaxModel implements Serializable {
     private String created_at;
     private String updated_at;
     private boolean isChecked;
+    private boolean singleChecked = true;
 
     public String getId() {
         return id;
@@ -46,5 +47,13 @@ public class TaxModel implements Serializable {
 
     public void setChecked(boolean checked) {
         isChecked = checked;
+    }
+
+    public boolean isSingleChecked() {
+        return singleChecked;
+    }
+
+    public void setSingleChecked(boolean singleChecked) {
+        this.singleChecked = singleChecked;
     }
 }

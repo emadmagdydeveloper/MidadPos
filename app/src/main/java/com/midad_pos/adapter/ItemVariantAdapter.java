@@ -64,7 +64,7 @@ public class ItemVariantAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 if (context instanceof HomeActivity){
                     HomeActivity activity = (HomeActivity) context;
-                    activity.setItemVariant(myHolder.getAdapterPosition(),model);
+                    activity.setItemVariant(model);
                 }
             }
 

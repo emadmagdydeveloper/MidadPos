@@ -16,7 +16,7 @@ public class CartList implements Serializable {
     private double total;
     private double total_discount;
     private double total_tax;
-    private List<DiscountModel> discounts;
+    private List<DiscountModel> discounts = new ArrayList<>();
     private List<ItemModel> items = new ArrayList<>();
 
     public double getNet_total() {
@@ -67,7 +67,7 @@ public class CartList implements Serializable {
         this.items = items;
     }
 
-    public void addItem(ItemModel model) {
+    public void addItem(ItemModel model,int isAddOrUpdate) {
         int itemIndex = getItemIndex(model);
         if (itemIndex == -1) {
             getItems().add(model);
@@ -77,11 +77,10 @@ public class CartList implements Serializable {
             } else {
 
                 ItemModel itemModel = getItems().get(itemIndex);
-                if (model.getSelectedVariant()!=null){
-                    if (model.getSelectedModifiers().size()>0){
-                        if (itemModel.getSelectedModifiers().size()>0){
-                            if (model.getSelectedModifiers().size()==itemModel.getSelectedModifiers().size())
-                            {
+                if (model.getSelectedVariant() != null) {
+                    if (model.getSelectedModifiers().size() > 0) {
+                        if (itemModel.getSelectedModifiers().size() > 0) {
+                            if (model.getSelectedModifiers().size() == itemModel.getSelectedModifiers().size()) {
                                 for (int index = 0; index < model.getSelectedModifiers().size(); index++) {
                                     ModifierModel.Data modifierModel = model.getSelectedModifiers().get(index);
                                     ModifierModel.Data modifierData = itemModel.getSelectedModifiers().get(index);
@@ -90,82 +89,139 @@ public class CartList implements Serializable {
                                         return;
                                     }
                                 }
-                                int amount = itemModel.getAmount();
-                                int newAmount = amount + model.getAmount();
-                                model.setAmount(newAmount);
-                                double netTotal = newAmount*Double.parseDouble(model.getSelectedVariant().getPrice());
-                                model.setNetTotal(netTotal);
+                                int amount;
+                                if (isAddOrUpdate==1){
+                                    amount = itemModel.getAmount();
+                                    int newAmount = amount + model.getAmount();
+                                    model.setAmount(newAmount);
+                                    double netTotal = newAmount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    model.setNetTotal(netTotal);
+                                }else {
+                                    amount = model.getAmount();
+                                    model.setAmount(amount);
+                                    double netTotal = amount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    model.setNetTotal(netTotal);
+                                }
                                 getItems().set(itemIndex, model);
 
-                            }else {
+
+                            } else {
                                 getItems().add(model);
                             }
-                        }else {
-                            if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())){
-                                int amount = itemModel.getAmount();
-                                int newAmount = model.getAmount()+amount;
-                                model.setAmount(newAmount);
-                                double netTotal = newAmount*Double.parseDouble(model.getSelectedVariant().getPrice());
-                                model.setNetTotal(netTotal);
-                                getItems().set(itemIndex,model);
-                            }else {
+                        } else {
+                            if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())) {
+
+                                int amount;
+                                if (isAddOrUpdate==1){
+                                    amount = itemModel.getAmount();
+                                    int newAmount = amount + model.getAmount();
+                                    model.setAmount(newAmount);
+                                    double netTotal = newAmount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    model.setNetTotal(netTotal);
+                                }else {
+                                    amount = model.getAmount();
+                                    model.setAmount(amount);
+                                    double netTotal = amount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    model.setNetTotal(netTotal);
+                                }
+                                getItems().set(itemIndex, model);
+
+
+
+                            } else {
                                 getItems().add(model);
                             }
                         }
-                    }else {
-                        if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())){
-                            int amount = itemModel.getAmount();
-                            int newAmount = model.getAmount()+amount;
-                            model.setAmount(newAmount);
-                            double netTotal = newAmount*Double.parseDouble(model.getSelectedVariant().getPrice());
-                            model.setNetTotal(netTotal);
-                            getItems().set(itemIndex,model);
-                        }else {
+                    } else {
+                        if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())) {
+                            int amount;
+                            if (isAddOrUpdate==1){
+                                amount = itemModel.getAmount();
+                                int newAmount = amount + model.getAmount();
+                                model.setAmount(newAmount);
+                                double netTotal = newAmount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                model.setNetTotal(netTotal);
+                            }else {
+                                amount = model.getAmount();
+                                model.setAmount(amount);
+                                double netTotal = amount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                model.setNetTotal(netTotal);
+                            }
+                            getItems().set(itemIndex, model);
+                        } else {
                             getItems().add(model);
                         }
                     }
-                }else {
+                } else {
 
-                    if (model.getSelectedModifiers().size()>0){
-                        if (itemModel.getSelectedModifiers().size()>0){
-                            if (model.getSelectedModifiers().size()==itemModel.getSelectedModifiers().size())
-                            {
-                                Log.e("ttt","fff");
+                    if (model.getSelectedModifiers().size() > 0) {
+                        if (itemModel.getSelectedModifiers().size() > 0) {
+                            if (model.getSelectedModifiers().size() == itemModel.getSelectedModifiers().size()) {
                                 for (int index = 0; index < model.getSelectedModifiers().size(); index++) {
                                     ModifierModel.Data modifierModel = model.getSelectedModifiers().get(index);
-                                    if (!extraDataFound(itemModel,modifierModel)){
+                                    if (!extraDataFound(itemModel, modifierModel)) {
                                         getItems().add(model);
                                         return;
                                     }
                                 }
-                                int amount = itemModel.getAmount();
-                                int newAmount = amount + model.getAmount();
-                                model.setAmount(newAmount);
+                                int amount;
+                                if (isAddOrUpdate==1){
+                                    amount = itemModel.getAmount();
+                                    int newAmount = amount + model.getAmount();
+                                    model.setAmount(newAmount);
+                                    double netTotal = newAmount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    model.setNetTotal(netTotal);
+                                }else {
+                                    amount = model.getAmount();
+                                    model.setAmount(amount);
+                                    double netTotal = amount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    model.setNetTotal(netTotal);
+                                }
                                 getItems().set(itemIndex, model);
 
-                            }else {
+                            } else {
                                 getItems().add(model);
                             }
-                        }else {
-                            if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())){
-                                int amount = itemModel.getAmount();
-                                int newAmount = model.getAmount()+amount;
-                                model.setAmount(newAmount);
-                                getItems().set(itemIndex,model);
-                            }else {
+                        } else {
+                            if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())) {
+                                int amount;
+                                if (isAddOrUpdate==1){
+                                    amount = itemModel.getAmount();
+                                    int newAmount = amount + model.getAmount();
+                                    model.setAmount(newAmount);
+                                    double netTotal = newAmount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    model.setNetTotal(netTotal);
+                                }else {
+                                    amount = model.getAmount();
+                                    model.setAmount(amount);
+                                    double netTotal = amount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    model.setNetTotal(netTotal);
+                                }
+                                getItems().set(itemIndex, model);
+                            } else {
                                 getItems().add(model);
                             }
                         }
-                    }else {
+                    } else {
 
-                        if (itemModel.getId().equals(model.getId())){
-                            int amount = itemModel.getAmount();
-                            amount++;
-                            model.setAmount(amount);
-                            double netTotal = amount*Double.parseDouble(model.getPrice());
-                            model.setNetTotal(netTotal);
-                            getItems().set(itemIndex,model);
-                        }else {
+                        if (itemModel.getId().equals(model.getId())) {
+                            int amount;
+                            if (isAddOrUpdate==1){
+                                amount = itemModel.getAmount();
+                                amount++;
+                                model.setAmount(amount);
+                                double netTotal = amount * Double.parseDouble(model.getPrice());
+                                model.setNetTotal(netTotal);
+                            }else {
+                                amount = model.getAmount();
+                                model.setAmount(amount);
+                                double netTotal = amount * Double.parseDouble(model.getPrice());
+                                model.setNetTotal(netTotal);
+                            }
+                            getItems().set(itemIndex, model);
+
+
+                        } else {
                             getItems().add(model);
 
                         }
@@ -218,21 +274,18 @@ public class CartList implements Serializable {
         for (ItemModel itemModel : getItems()) {
             double totalExtraPrice = 0.0;
             double itemTotalPrice = 0.0;
-            Log.e("data", itemModel.getName() + "__");
 
             if (itemModel.getSelectedVariant() != null) {
                 price = Double.parseDouble(itemModel.getSelectedVariant().getPrice());
             } else {
                 price = Double.parseDouble(itemModel.getPrice());
             }
-            Log.e("price", price + "");
 
             for (ModifierModel.Data data : itemModel.getSelectedModifiers()) {
                 totalExtraPrice += Double.parseDouble(data.getCost()) * itemModel.getAmount();
             }
 
             itemTotalPrice = (price * itemModel.getAmount()) + totalExtraPrice;
-            Log.e("totPrice1_", itemTotalPrice + "");
             for (DiscountModel discountModel : itemModel.getDiscounts()) {
                 double discount = 0.0;
                 if (discountModel.getType().equals("val")) {
@@ -240,32 +293,77 @@ public class CartList implements Serializable {
                 } else {
                     discount = (Double.parseDouble(discountModel.getValue()) / 100.0) * itemTotalPrice;
                 }
-                Log.e("disc", discount + "_");
                 itemTotalPrice -= discount;
             }
 
-            Log.e("totPrice2_", itemTotalPrice + "");
+            for (DiscountModel discountModel:getDiscounts()){
+                if (discountModel.getType().equals("val")){
+                    itemTotalPrice -=Double.parseDouble(discountModel.getValue());
+                }else {
+                    itemTotalPrice -=(Double.parseDouble(discountModel.getValue())/100.0)*itemTotalPrice;
+                }
+            }
+
+
+
 
             if (itemModel.getTax() != null) {
-                double tax = (Double.parseDouble(itemModel.getTax().getRate()) / 100.0) * itemTotalPrice;
-
-                itemTotalPrice = itemTotalPrice + tax;
-                Log.e("tax", tax + "");
-
-                Log.e("totPrice3_", itemTotalPrice + "");
+                if (itemModel.getTax().isSingleChecked()){
+                    double tax = (Double.parseDouble(itemModel.getTax().getRate()) / 100.0) * itemTotalPrice;
+                    itemTotalPrice += tax;
+                }
 
             }
 
             total += itemTotalPrice;
 
-            Log.e("finTot", total + "");
+
+        }
+
+
+        return total;
+    }
+
+    public double getTotalPriceAfterItemDiscount() {
+        double total = 0.0;
+        double price = 0.0;
+
+        for (ItemModel itemModel : getItems()) {
+            double totalExtraPrice = 0.0;
+            double itemTotalPrice = 0.0;
+
+            if (itemModel.getSelectedVariant() != null) {
+                price = Double.parseDouble(itemModel.getSelectedVariant().getPrice());
+            } else {
+                price = Double.parseDouble(itemModel.getPrice());
+            }
+
+            for (ModifierModel.Data data : itemModel.getSelectedModifiers()) {
+                totalExtraPrice += Double.parseDouble(data.getCost()) * itemModel.getAmount();
+            }
+
+            itemTotalPrice = (price * itemModel.getAmount()) + totalExtraPrice;
+            for (DiscountModel discountModel : itemModel.getDiscounts()) {
+                double discount = 0.0;
+                if (discountModel.getType().equals("val")) {
+                    discount = Double.parseDouble(discountModel.getValue());
+                } else {
+                    discount = (Double.parseDouble(discountModel.getValue()) / 100.0) * itemTotalPrice;
+                }
+                itemTotalPrice -= discount;
+            }
+
+            total += itemTotalPrice;
+
 
         }
 
         return total;
     }
 
-    public double getTotalDiscountValue() {
+
+    public double getTotalDiscountValue()
+    {
         double totalDiscount = 0.0;
         double price = 0.0;
 
@@ -295,13 +393,25 @@ public class CartList implements Serializable {
                 totalDiscount += discount;
             }
 
+
+
+
         }
+        for (DiscountModel discountModel:getDiscounts()){
+            if (discountModel.getType().equals("val")){
+                totalDiscount +=getTotalPriceAfterItemDiscount()+Double.parseDouble(discountModel.getValue());
+            }else {
+                totalDiscount += (Double.parseDouble(discountModel.getValue())/100.0)*getTotalPriceAfterItemDiscount();
+            }
+        }
+
         return totalDiscount;
     }
-
-    public double getTotalTaxPrice() {
-        double totalTaxPrice = 0.0;
+    public double getTotalTaxPrice()
+    {
         double price = 0.0;
+        double taxValue = 0.0;
+
 
         for (ItemModel itemModel : getItems()) {
             double totalExtraPrice = 0.0;
@@ -318,7 +428,6 @@ public class CartList implements Serializable {
             }
 
             itemTotalPrice = (price * itemModel.getAmount()) + totalExtraPrice;
-
             for (DiscountModel discountModel : itemModel.getDiscounts()) {
                 double discount = 0.0;
                 if (discountModel.getType().equals("val")) {
@@ -329,16 +438,51 @@ public class CartList implements Serializable {
                 itemTotalPrice -= discount;
             }
 
-            if (itemModel.getTax() != null) {
-                double tax = (Double.parseDouble(itemModel.getTax().getRate()) / 100.0) * itemTotalPrice;
-                totalTaxPrice += tax;
+            for (DiscountModel discountModel:getDiscounts()){
+                if (discountModel.getType().equals("val")){
+                    itemTotalPrice -=Double.parseDouble(discountModel.getValue());
+                }else {
+                    itemTotalPrice -=(Double.parseDouble(discountModel.getValue())/100.0)*itemTotalPrice;
+                }
             }
+
+
+
+
+            if (itemModel.getTax() != null) {
+                if (itemModel.getTax().isSingleChecked()){
+                    double tax = (Double.parseDouble(itemModel.getTax().getRate()) / 100.0) * itemTotalPrice;
+                    taxValue +=tax;
+                }
+
+            }
+
+
 
         }
 
-        return totalTaxPrice;
-    }
 
+
+
+
+
+
+        return taxValue;
+    }
+    public void addDiscountForAll(DiscountModel discountModel)
+    {
+        int index = isDiscountFound(discountModel);
+        if (index == -1) {
+            getDiscounts().add(discountModel);
+
+        } else {
+            getDiscounts().remove(index);
+        }
+
+        getTotalPrice();
+        getTotalDiscountValue();
+
+    }
 
     public int getItemIndex(ItemModel itemModel) {
         int index = 0;
@@ -351,10 +495,10 @@ public class CartList implements Serializable {
         return -1;
     }
 
-    private boolean extraDataFound(ItemModel itemModel,ModifierModel.Data item){
+    private boolean extraDataFound(ItemModel itemModel, ModifierModel.Data item) {
 
-        for (ModifierModel.Data data: itemModel.getSelectedModifiers()){
-            if (item.getId().equals(data.getId())){
+        for (ModifierModel.Data data : itemModel.getSelectedModifiers()) {
+            if (item.getId().equals(data.getId())) {
                 return true;
             }
         }
@@ -362,6 +506,51 @@ public class CartList implements Serializable {
         return false;
     }
 
+    private int isDiscountFound(DiscountModel discountModel) {
+        int index = 0;
+        for (DiscountModel disc : getDiscounts()) {
+            if (discountModel.getId().equals(disc.getId())) {
+                return index;
+            }
+            index++;
+        }
+
+        return -1;
+    }
+
+    public void removeItem(int pos){
+        getItems().remove(pos);
+        setItems(getItems());
+        getNetTotalPrice();
+        getTotalPrice();
+        getTotalDiscountValue();
+        getTotalTaxPrice();
+    }
+
+    public void removeGeneralDiscount(List<DiscountModel> deletedDiscounts){
+        List<DiscountModel> list = new ArrayList<>();
+        for (DiscountModel model: getDiscounts()){
+            if (!isDiscFounded(model,deletedDiscounts)){
+                list.add(model);
+            }
+        }
+        setDiscounts(list);
+        getNetTotalPrice();
+        getTotalPrice();
+        getTotalDiscountValue();
+        getTotalTaxPrice();
+
+    }
+
+    private boolean isDiscFounded(DiscountModel model,List<DiscountModel> discounts){
+
+        for (DiscountModel discountModel:discounts){
+            if (discountModel.getId().equals(model.getId())){
+                return true;
+            }
+        }
+        return false;
+    }
     public void clear() {
         getItems().clear();
     }

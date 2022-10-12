@@ -13,6 +13,7 @@ import com.midad_pos.databinding.CategoryItemBinding;
 import com.midad_pos.databinding.DiscountRowBinding;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.DiscountModel;
+import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
 
 import java.util.List;
@@ -39,6 +40,17 @@ public class HomeDiscountAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         Holder myHolder = (Holder) holder;
         myHolder.binding.setLang(lang);
         myHolder.binding.setModel(list.get(position));
+        myHolder.itemView.setOnClickListener(v -> {
+            DiscountModel model = list.get(myHolder.getAdapterPosition());
+            if (!model.isSelected()){
+                model.setSelected(true);
+                myHolder.binding.setModel(model);
+                list.set(myHolder.getAdapterPosition(),model);
+                HomeActivity activity = (HomeActivity) context;
+                activity.addDiscountForAll(model,myHolder.getAdapterPosition());
+            }
+
+        });
 
 
     }

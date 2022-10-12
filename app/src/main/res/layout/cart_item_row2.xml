@@ -55,12 +55,13 @@
             android:clickable="true"
             android:focusable="true"
             >
+
+
            <androidx.constraintlayout.widget.ConstraintLayout
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
                android:paddingStart="16dp"
                android:paddingEnd="16dp"
-               android:layout_gravity="center_vertical"
 
                >
                <View
@@ -129,6 +130,36 @@
                    app:layout_constraintTop_toTopOf="@id/tvName"
                    app:layout_constraintBottom_toBottomOf="@id/tvName"
                    />
+
+               <TextView
+                   android:id="@+id/tvVariant"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:ellipsize="end"
+                   android:lines="1"
+                   android:text='@{model.selectedVariant!=null?model.selectedVariant.name:""}'
+                   android:textColor="@color/grey4"
+                   android:textSize="14sp"
+                   android:visibility="@{model.selectedVariant!=null?View.VISIBLE:View.GONE}"
+                   android:layout_marginBottom="8dp"
+                   app:layout_constraintStart_toStartOf="@id/tvName"
+                   app:layout_constraintTop_toBottomOf="@id/tvName"
+                   />
+
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:ellipsize="end"
+                   android:lines="1"
+                   android:textColor="@color/grey4"
+                   android:textSize="14sp"
+                   android:visibility="@{model.selectedModifiers.size()>0?View.VISIBLE:View.GONE,default=gone}"
+                   android:layout_marginBottom="8dp"
+                   cartItemExtra="@{model}"
+                   app:layout_constraintStart_toStartOf="@id/tvName"
+                   app:layout_constraintTop_toBottomOf="@id/tvVariant"
+                   />
+
 
 
            </androidx.constraintlayout.widget.ConstraintLayout>

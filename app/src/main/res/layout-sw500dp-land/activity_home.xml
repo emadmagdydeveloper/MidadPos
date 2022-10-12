@@ -248,7 +248,9 @@
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/recViewCart"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -257,15 +259,18 @@
 
                                 >
 
-                                <!--  <View
+                                  <View
                                       android:layout_width="match_parent"
                                       android:layout_height="1dp"
-                                      android:layout_margin="16dp"
+                                      android:layout_marginStart="16dp"
+                                      android:layout_marginEnd="16dp"
+                                      android:layout_marginBottom="16dp"
                                       android:background="@color/grey9"
                                       android:visibility='@{totalVat>0?View.VISIBLE:(totalDiscounts>0?View.VISIBLE:View.GONE)}'
-                                      />-->
+                                      />
 
                                 <LinearLayout
+                                    android:id="@+id/llDiscount"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="horizontal"
@@ -457,6 +462,17 @@
                 android:id="@+id/dialogItemExtras"
                 layout="@layout/dialog_item_extras"
                 />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/flDialogCartDiscount"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/dialogCartDiscount"
+                layout="@layout/dialog_cart_discounts" />
         </FrameLayout>
     </FrameLayout>
 </layout>

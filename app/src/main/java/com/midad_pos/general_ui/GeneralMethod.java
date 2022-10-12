@@ -243,6 +243,18 @@ public class GeneralMethod {
 
     }
 
+    @BindingAdapter("iconTint")
+    public static void iconTint(ImageView view,boolean isSelected) {
+
+        if (isSelected){
+            view.setColorFilter(ContextCompat.getColor(view.getContext(),R.color.grey17));
+        }else {
+            view.setColorFilter(ContextCompat.getColor(view.getContext(),R.color.grey14));
+
+        }
+
+    }
+
     @BindingAdapter("cartItemExtra")
     public static void cartItemTotal(TextView view,ItemModel model) {
         if (model != null) {

@@ -2,6 +2,7 @@ package com.midad_pos.model.cart;
 
 import android.content.Context;
 
+import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.preferences.Preferences;
 
@@ -22,9 +23,17 @@ public class ManageCartModel implements Serializable {
         return instance;
     }
 
-    public void addItemToCart(ItemModel item, Context context) {
+    public void addItemToCart(ItemModel item,int addOrUpdate, Context context) {
         CartList cartModel = getCartModel(context);
-        cartModel.addItem(item);
+        cartModel.addItem(item,addOrUpdate);
+        Preferences.getInstance().createUpdateCart(context,cartModel);
+
+
+    }
+
+    public void addDiscountForAllTicket(DiscountModel model, Context context) {
+        CartList cartModel = getCartModel(context);
+        cartModel.addDiscountForAll(model);
         Preferences.getInstance().createUpdateCart(context,cartModel);
 
 
@@ -37,6 +46,11 @@ public class ManageCartModel implements Serializable {
         Preferences.getInstance().createUpdateCart(context,cartModel);
     }
 
+    public void deleteGeneralCartDiscount(List<DiscountModel> discounts, Context context) {
+        CartList cartModel = getCartModel(context);
+        cartModel.removeGeneralDiscount(discounts);
+        Preferences.getInstance().createUpdateCart(context,cartModel);
+    }
 
 
     public double getTotal(Context context) {

@@ -6,6 +6,9 @@
     <data>
 
         <variable
+            name="ticketCount"
+            type="Integer" />
+        <variable
             name="titleLand"
             type="String" />
 
@@ -97,7 +100,7 @@
                                             android:background="@drawable/ic_ticket"
                                             android:gravity="center"
                                             android:padding="5dp"
-                                            android:text="0"
+                                            android:text="@{String.valueOf(ticketCount)}"
                                             android:textColor="@color/black"
                                             android:textSize="16sp"
                                             android:textStyle="bold" />
@@ -126,6 +129,7 @@
                                             android:textSize="18sp" />
 
                                         <TextView
+                                            android:id="@+id/tvTicketCountPort"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:layout_gravity="center_vertical"
@@ -133,10 +137,12 @@
                                             android:layout_marginEnd="12dp"
                                             android:gravity="center"
                                             android:padding="5dp"
-                                            android:text="00.00"
                                             android:textColor="@color/black"
                                             android:textSize="16sp"
-                                            android:textStyle="bold" />
+                                            android:textStyle="bold"
+                                            numberFormat="@{String.valueOf(total)}"
+                                            type="@{null}"
+                                            />
 
                                     </LinearLayout>
                                 </LinearLayout>
@@ -271,6 +277,7 @@
                                     />-->
 
                                 <LinearLayout
+                                    android:id="@+id/llDiscount"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="horizontal"
@@ -541,6 +548,17 @@
                 android:id="@+id/dialogItemExtras"
                 layout="@layout/dialog_item_extras"
                 />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/flDialogCartDiscount"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/dialogCartDiscount"
+                layout="@layout/dialog_cart_discounts" />
         </FrameLayout>
 
     </FrameLayout>

@@ -37,6 +37,7 @@ public class ItemModel implements Serializable {
     private List<ModifierModel.Data> selectedModifiers = new ArrayList<>();
     private int amount = 1;
     private List<DiscountModel> discounts = new ArrayList<>();
+    private String comment = "";
 
 
     public ItemModel() {
@@ -206,11 +207,9 @@ public class ItemModel implements Serializable {
         if (selectedVariant!=null){
             price = Double.parseDouble(selectedVariant.getPrice());
         }
-        Log.e("price,",price+"");
         double totalPrice =  price* amount;
         double totalModifiers = 0.0;
         for (ModifierModel.Data data : getSelectedModifiers()) {
-            Log.e("data",data.getTitle());
             if (data.isSelected()){
                 totalModifiers += Double.parseDouble(data.getCost())*getAmount();
 
@@ -292,5 +291,13 @@ public class ItemModel implements Serializable {
 
     public void setNetTotal(double netTotal) {
         this.netTotal = netTotal;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

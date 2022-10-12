@@ -194,6 +194,7 @@
     <string name="amount2">Quantity</string>
     <string name="enter_comment">Enter comment</string>
     <string name="tax">Tax</string>
+    <string name="are_you_sure_you_want_to_clear_the_ticket">Are you sure you want to clear the ticket?</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

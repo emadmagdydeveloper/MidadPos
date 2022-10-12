@@ -193,6 +193,7 @@
                     android:paddingEnd="0dp"
                     >
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtComment"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/transparent"
@@ -258,7 +259,7 @@
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:checked="@{item.tax!=null?item.tax.checked:false}"
+                        android:checked="@{item.tax!=null?item.tax.singleChecked:false}"
                         android:clickable="false"
                         android:focusable="false"
                         android:gravity="start"
@@ -266,8 +267,7 @@
                         android:textAlignment="viewStart"
                         android:textColor="@color/black"
                         android:textSize="16sp"
-                        numberFormat="@{item.price}"
-                        type="@{item.type}"
+                        android:text='@{item.tax!=null?item.tax.rate+"%":""}'
                         android:layout_margin="16dp"
 
                         />
