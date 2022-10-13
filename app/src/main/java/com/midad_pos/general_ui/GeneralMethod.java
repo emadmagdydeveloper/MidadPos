@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
@@ -269,6 +270,24 @@ public class GeneralMethod {
            }
 
            view.setText(data);
+
+        }
+
+    }
+
+    @BindingAdapter("customerName")
+    public static void customerName(TextView view, CustomerModel model) {
+        if (model != null) {
+           if (model.getName()!=null&&!model.getName().isEmpty()){
+               view.setText(model.getName());
+           }else if (model.getEmail()!=null&&!model.getEmail().isEmpty())
+           {
+               view.setText(model.getEmail());
+           }
+           else if (model.getPhone_number()!=null&&!model.getPhone_number().isEmpty())
+           {
+               view.setText(model.getPhone_number());
+           }
 
         }
 

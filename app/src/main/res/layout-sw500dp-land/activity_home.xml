@@ -412,15 +412,18 @@
                             android:layout_height="match_parent"
                             android:background="@color/white_trans2" />
 
+
                         <TextView
+                            android:id="@+id/charge"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:enabled="false"
+                            android:background="@drawable/small_rounded_primary"
                             android:gravity="center"
                             android:text="@string/charge"
                             android:textAllCaps="true"
-                            android:textColor="@drawable/disable_text_color"
+                            android:enabled="@{total>0?true:false}"
+                            android:textColor='@drawable/disable_text_color'
                             android:textSize="14sp" />
                     </LinearLayout>
 

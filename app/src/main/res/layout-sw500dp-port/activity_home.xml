@@ -25,6 +25,7 @@
         <variable
             name="total"
             type="Double" />
+
         <import type="android.view.View"/>
     </data>
 
@@ -196,16 +197,20 @@
                                     android:layout_height="0dp" />
 
                                 <TextView
+                                    android:id="@+id/charge"
                                     android:layout_width="0dp"
                                     android:layout_height="70dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/small_rounded_primary"
-                                    android:enabled="false"
+                                    android:enabled="@{total>0?true:false}"
                                     android:gravity="center"
                                     android:text="@string/charge"
                                     android:textAllCaps="true"
-                                    android:textColor="@drawable/disable_text_color"
-                                    android:textSize="18sp" />
+                                    android:textColor='@drawable/disable_text_color'
+                                    android:textSize="18sp"
+
+
+                                    />
                             </LinearLayout>
                         </LinearLayout>
 

@@ -195,6 +195,11 @@
     <string name="enter_comment">Enter comment</string>
     <string name="tax">Tax</string>
     <string name="are_you_sure_you_want_to_clear_the_ticket">Are you sure you want to clear the ticket?</string>
+    <string name="vat_num">VAT number</string>
+    <string name="add_to_ticket">Add to ticket</string>
+    <string name="split">Split</string>
+    <string name="total_due">Total amount due</string>
+    <string name="cash_received">Cash received</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

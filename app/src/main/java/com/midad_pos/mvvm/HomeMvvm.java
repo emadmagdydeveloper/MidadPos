@@ -1,6 +1,8 @@
 package com.midad_pos.mvvm;
 
 import android.app.Application;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,6 +11,10 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
+import com.midad_pos.model.CustomerDataModel;
+import com.midad_pos.model.CustomerModel;
+import com.midad_pos.model.SingleCustomerModel;
+import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.cart.CartList;
 import com.midad_pos.model.cart.ManageCartModel;
 import com.midad_pos.model.AddCustomerModel;
@@ -22,6 +28,7 @@ import com.midad_pos.model.ItemsDataModel;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.preferences.Preferences;
 import com.midad_pos.remote.Api;
+import com.midad_pos.share.Common;
 import com.midad_pos.tags.Tags;
 
 import java.io.IOException;
@@ -32,7 +39,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -74,6 +84,13 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<List<DiscountModel>> discounts;
     public boolean showPin = true;
     private MutableLiveData<Boolean> isTicketModel;
+    ///////////////////////////
+    private List<CustomerModel> mainCustomerList = new ArrayList<>();
+    private MutableLiveData<List<CustomerModel>> customers;
+    private MutableLiveData<Boolean> isCustomerLoading;
+    private MutableLiveData<Boolean> onCustomerUpdatedSuccess;
+
+
 
     //////////////////////////////////////////////////////////////////////////
     private ManageCartModel manageCartModel;
@@ -81,6 +98,7 @@ public class HomeMvvm extends AndroidViewModel {
     public boolean isItemForUpdate = false;
     private MutableLiveData<List<DiscountModel>> cartDiscounts;
     private List<DiscountModel> deletedCartDiscounts = new ArrayList<>();
+
 
     public HomeMvvm(@NonNull Application application) {
         super(application);
@@ -92,6 +110,7 @@ public class HomeMvvm extends AndroidViewModel {
         getCountriesData().setValue(new ArrayList<>(Arrays.asList(countries)));
         getCountryPos().setValue(0);
         getAddCustomerModel();
+        getCustomers();
     }
 
     public MutableLiveData<CartList> getCart() {
@@ -266,9 +285,6 @@ public class HomeMvvm extends AndroidViewModel {
         return itemForPrice;
     }
 
-    public void searchCustomer(String query) {
-        getSearchQueryCustomer().setValue(query);
-    }
 
     public MutableLiveData<Integer> getTicketCount() {
         if (ticketCount == null) {
@@ -278,7 +294,7 @@ public class HomeMvvm extends AndroidViewModel {
         return ticketCount;
     }
 
-    public MutableLiveData<List<DiscountModel>>getCartDiscounts() {
+    public MutableLiveData<List<DiscountModel>> getCartDiscounts() {
         if (cartDiscounts == null) {
             cartDiscounts = new MutableLiveData<>();
         }
@@ -300,6 +316,132 @@ public class HomeMvvm extends AndroidViewModel {
             camera.setValue(CodeScanner.CAMERA_BACK);
         }
         return camera;
+    }
+
+    public MutableLiveData<List<CustomerModel>> getCustomersInstance() {
+        if (customers == null) {
+            customers = new MutableLiveData<>();
+        }
+        return customers;
+    }
+
+    public MutableLiveData<Boolean> getIsCustomerLoading() {
+        if (isCustomerLoading == null) {
+            isCustomerLoading = new MutableLiveData<>();
+        }
+        return isCustomerLoading;
+    }
+
+    public MutableLiveData<Boolean> getOnCustomerUpdatedSuccess() {
+        if (onCustomerUpdatedSuccess == null) {
+            onCustomerUpdatedSuccess = new MutableLiveData<>();
+        }
+        return onCustomerUpdatedSuccess;
+    }
+
+    public void getCustomers() {
+        getIsCustomerLoading().setValue(true);
+        Api.getService(Tags.base_url)
+                .getCustomers(userModel.getData().getSelectedUser() != null ? userModel.getData().getSelectedUser().getId() : userModel.getData().getUser().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<CustomerDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<CustomerDataModel> response) {
+                        getIsCustomerLoading().setValue(false);
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    mainCustomerList.clear();
+                                    mainCustomerList.addAll(response.body().getData());
+                                    searchCustomer(getSearchQueryCustomer().getValue());
+
+                                } else {
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        getIsCustomerLoading().setValue(false);
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
+    }
+
+    public void searchCustomer(String query) {
+        getSearchQueryCustomer().setValue(query);
+
+        if (query == null || query.isEmpty()) {
+            getCustomersInstance().setValue(mainCustomerList);
+        } else {
+            Observable.fromIterable(mainCustomerList)
+                    .filter(customerModel -> {
+                        if (customerModel.getName().startsWith(query)) {
+                            return true;
+                        } else if (customerModel.getEmail().startsWith(query)) {
+                            return true;
+                        } else if (customerModel.getPhone_number().startsWith(query)) {
+                            return true;
+                        }
+
+                        return false;
+
+                    }).toList().toObservable()
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .debounce(1, TimeUnit.SECONDS)
+                    .subscribe(new Observer<List<CustomerModel>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            disposable.add(d);
+                        }
+
+                        @Override
+                        public void onNext(List<CustomerModel> list) {
+                            getCustomersInstance().setValue(list);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+
+        }
     }
 
     public void getCategoryData(String user_id) {
@@ -374,10 +516,10 @@ public class HomeMvvm extends AndroidViewModel {
                     for (DiscountModel discountModel : mainDiscountList) {
 
 
-                        if (isDiscountExist(discountModel)){
+                        if (isDiscountExist(discountModel)) {
                             discountModel.setSelected(true);
 
-                        }else {
+                        } else {
                             discountModel.setSelected(false);
                         }
 
@@ -417,9 +559,9 @@ public class HomeMvvm extends AndroidViewModel {
                         List<DiscountModel> list = new ArrayList<>();
                         for (DiscountModel discountModel : mainDiscountList) {
                             if (discountModel.getTitle().startsWith(query)) {
-                                if (isDiscountExist(discountModel)){
+                                if (isDiscountExist(discountModel)) {
                                     discountModel.setSelected(true);
-                                }else {
+                                } else {
                                     discountModel.setSelected(false);
 
                                 }
@@ -579,6 +721,75 @@ public class HomeMvvm extends AndroidViewModel {
                 });
     }
 
+    public void addCustomer(Context context) {
+        if (getAddCustomerModel().getValue() == null) {
+            return;
+        }
+        AddCustomerModel addCustomerModel = getAddCustomerModel().getValue();
+        ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        Api.getService(Tags.base_url)
+                .addCustomer(userModel.getData().getSelectedUser().getId(), addCustomerModel.getName(), addCustomerModel.getEmail(), addCustomerModel.getPhone(), addCustomerModel.getAddress(), addCustomerModel.getCity(), addCustomerModel.getPostal_code(), addCustomerModel.getCountry(), addCustomerModel.getTax())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<SingleCustomerModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<SingleCustomerModel> response) {
+                        dialog.dismiss();
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                       if (getCustomersInstance().getValue()!=null){
+
+                                           getOnCustomerUpdatedSuccess().setValue(true);
+                                           getCustomersInstance().getValue().add(0,response.body().getData());
+                                           searchCustomer(getSearchQueryCustomer().getValue());
+                                       }
+
+                                } else {
+                                    Log.e("error", response.body().getStatus() + "__" + response.body().getMessage().toString());
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dialog.dismiss();
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+
+                    }
+                });
+
+    }
+
     public void updatePrice(String p) {
         String price = getPrice().getValue();
         if (price != null) {
@@ -603,16 +814,16 @@ public class HomeMvvm extends AndroidViewModel {
                 if (!price.contains(".")) {
                     price += ".00";
                 }
-                if (price.contains(",")){
-                    price = price.replace(",","");
+                if (price.contains(",")) {
+                    price = price.replace(",", "");
                 }
-                price = String.format(Locale.US,"%.2f",Double.parseDouble(price));
+                price = String.format(Locale.US, "%.2f", Double.parseDouble(price));
 
                 /*if (price.length()==7){
                     price = new StringBuilder(price).insert(1,",").toString();
                 }*/
 
-                Log.e("priceeee", price+"leng"+price.length());
+                Log.e("priceeee", price + "leng" + price.length());
                 getPrice().setValue(price);
             }
 
@@ -642,7 +853,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
     }
 
-    public void addCartItem( int  add_update_type) {
+    public void addCartItem(int add_update_type) {
         if (getItemForPrice().getValue() != null) {
             ItemModel itemModel = getItemForPrice().getValue();
             double total = 0.0;
@@ -654,34 +865,34 @@ public class HomeMvvm extends AndroidViewModel {
             }
 
             itemModel.setNetTotal(total);
-            manageCartModel.addItemToCart(getItemForPrice().getValue(),add_update_type, getApplication().getApplicationContext());
+            manageCartModel.addItemToCart(getItemForPrice().getValue(), add_update_type, getApplication().getApplicationContext());
             getCart().setValue(manageCartModel.getCartModel(getApplication().getApplicationContext()));
         }
     }
 
-    private boolean isDiscountExist(DiscountModel discountModel){
-        for (DiscountModel model:manageCartModel.getCartModel(getApplication().getApplicationContext()).getDiscounts()){
-            if (model.getId().equals(discountModel.getId())){
+    private boolean isDiscountExist(DiscountModel discountModel) {
+        for (DiscountModel model : manageCartModel.getCartModel(getApplication().getApplicationContext()).getDiscounts()) {
+            if (model.getId().equals(discountModel.getId())) {
                 return true;
             }
         }
         return false;
     }
 
-    public void clearCart(){
+    public void clearCart() {
         manageCartModel.clearCart(getApplication().getApplicationContext());
         getCart().setValue(new CartList());
     }
-    
-    public void removeItemFromCart(int pos){
-        if (getCart().getValue()!=null){
-            manageCartModel.deleteItemFromCart(getCart().getValue().getItems().get(pos),getApplication().getApplicationContext());
+
+    public void removeItemFromCart(int pos) {
+        if (getCart().getValue() != null) {
+            manageCartModel.deleteItemFromCart(getCart().getValue().getItems().get(pos), getApplication().getApplicationContext());
             getCart().getValue().removeItem(pos);
-            if (getCart().getValue().getItems().size()==0){
+            if (getCart().getValue().getItems().size() == 0) {
                 manageCartModel.clearCart(getApplication().getApplicationContext());
                 getCart().setValue(new CartList());
 
-            }else {
+            } else {
                 getCart().setValue(getCart().getValue());
 
             }
@@ -689,24 +900,24 @@ public class HomeMvvm extends AndroidViewModel {
         }
     }
 
-    public void getCartDiscount(){
+    public void getCartDiscount() {
         List<DiscountModel> discounts = getCartDiscounts().getValue();
         if (discounts != null) {
             discounts.clear();
-        }else {
+        } else {
             discounts = new ArrayList<>();
         }
         deletedCartDiscounts = new ArrayList<>();
 
-        if (getCart().getValue()!=null&&getCart().getValue().getDiscounts().size()>0){
+        if (getCart().getValue() != null && getCart().getValue().getDiscounts().size() > 0) {
             discounts.addAll(getCart().getValue().getDiscounts());
         }
 
         getCartDiscounts().setValue(discounts);
     }
 
-    public void deleteCartDiscountItem(int pos){
-        if (getCartDiscounts().getValue()!=null){
+    public void deleteCartDiscountItem(int pos) {
+        if (getCartDiscounts().getValue() != null) {
             deletedCartDiscounts.add(getCartDiscounts().getValue().get(pos));
 
             getCartDiscounts().getValue().remove(pos);
@@ -716,15 +927,16 @@ public class HomeMvvm extends AndroidViewModel {
 
     }
 
-    public void deleteGeneralDiscountFromCart(){
-        if (getCart().getValue()!=null){
-            manageCartModel.deleteGeneralCartDiscount(deletedCartDiscounts,getApplication().getApplicationContext());
+    public void deleteGeneralDiscountFromCart() {
+        if (getCart().getValue() != null) {
+            manageCartModel.deleteGeneralCartDiscount(deletedCartDiscounts, getApplication().getApplicationContext());
             getCart().getValue().removeGeneralDiscount(deletedCartDiscounts);
             getCart().setValue(getCart().getValue());
         }
     }
-    public void addDiscountForAllTicket(DiscountModel discountModel){
-        manageCartModel.addDiscountForAllTicket(discountModel,getApplication().getApplicationContext());
+
+    public void addDiscountForAllTicket(DiscountModel discountModel) {
+        manageCartModel.addDiscountForAllTicket(discountModel, getApplication().getApplicationContext());
     }
 
 }

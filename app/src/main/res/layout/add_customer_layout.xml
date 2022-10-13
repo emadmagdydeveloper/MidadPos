@@ -207,6 +207,7 @@
                                 android:textSize="14sp"
                                 android:paddingStart="0dp"
                                 android:paddingEnd="0dp"
+                                android:maxLength="15"
 
                                 />
                         </com.google.android.material.textfield.TextInputLayout>
@@ -248,112 +249,6 @@
                                 android:text="@={model.address}"
                                 android:paddingStart="0dp"
                                 android:paddingEnd="0dp"
-                                />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="24dp"
-                        >
-                        <androidx.legacy.widget.Space
-                            android:layout_width="48dp"
-                            android:layout_height="0dp"/>
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            app:hintEnabled="true"
-                            app:hintAnimationEnabled="true"
-                            android:hint="@string/city"
-                            >
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/transparent"
-                                style="@style/text_input"
-                                android:lines="1"
-                                android:textSize="14sp"
-                                android:textColor="@color/black"
-                                android:text="@={model.city}"
-                                android:paddingStart="0dp"
-                                android:paddingEnd="0dp"
-
-                                />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="24dp"
-                        >
-                        <androidx.legacy.widget.Space
-                            android:layout_width="48dp"
-                            android:layout_height="0dp"/>
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            app:hintEnabled="true"
-                            app:hintAnimationEnabled="true"
-                            android:hint="@string/region"
-                            >
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/transparent"
-                                style="@style/text_input"
-                                android:lines="1"
-                                android:textSize="14sp"
-                                android:textColor="@color/black"
-                                android:text="@={model.region}"
-                                android:paddingStart="0dp"
-                                android:paddingEnd="0dp"
-
-                                />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="24dp"
-                        >
-                        <androidx.legacy.widget.Space
-                            android:layout_width="48dp"
-                            android:layout_height="0dp"/>
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            app:hintEnabled="true"
-                            app:hintAnimationEnabled="true"
-                            android:hint="@string/postal_code"
-                            >
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/transparent"
-                                style="@style/text_input"
-                                android:lines="1"
-                                android:textColor="@color/black"
-                                android:textSize="14sp"
-                                android:text="@={model.postal_code}"
-                                android:paddingStart="0dp"
-                                android:paddingEnd="0dp"
-
-
                                 />
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -410,21 +305,51 @@
                         android:gravity="center_vertical"
                         android:layout_marginTop="24dp"
                         >
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_bar_code"
-                            android:tint="@color/grey4"
-                            />
                         <androidx.legacy.widget.Space
-                            android:layout_width="24dp"
+                            android:layout_width="48dp"
                             android:layout_height="0dp"/>
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             app:hintEnabled="true"
                             app:hintAnimationEnabled="true"
-                            android:hint="@string/customer_code"
+                            android:hint="@string/city"
+                            >
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/transparent"
+                                style="@style/text_input"
+                                android:lines="1"
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:text="@={model.city}"
+                                android:paddingStart="0dp"
+                                android:paddingEnd="0dp"
+
+                                />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="24dp"
+                        >
+                        <androidx.legacy.widget.Space
+                            android:layout_width="48dp"
+                            android:layout_height="0dp"/>
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:hintEnabled="true"
+                            app:hintAnimationEnabled="true"
+                            android:hint="@string/postal_code"
                             >
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -435,13 +360,17 @@
                                 android:lines="1"
                                 android:textColor="@color/black"
                                 android:textSize="14sp"
-                                android:text="@={model.customer_code}"
+                                android:text="@={model.postal_code}"
                                 android:paddingStart="0dp"
                                 android:paddingEnd="0dp"
+
+
                                 />
                         </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>
+
+
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -454,7 +383,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_note"
+                            android:src="@drawable/ic_tax"
                             android:tint="@color/grey4"
                             />
                         <androidx.legacy.widget.Space
@@ -465,7 +394,7 @@
                             android:layout_height="wrap_content"
                             app:hintEnabled="true"
                             app:hintAnimationEnabled="true"
-                            android:hint="@string/note"
+                            android:hint="@string/vat_num"
                             >
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -476,7 +405,7 @@
                                 android:lines="1"
                                 android:textColor="@color/black"
                                 android:textSize="14sp"
-                                android:text="@={model.note}"
+                                android:text="@={model.tax}"
                                 android:paddingStart="0dp"
                                 android:paddingEnd="0dp"
                                 />

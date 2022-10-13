@@ -1,10 +1,12 @@
 package com.midad_pos.services;
 
 import com.midad_pos.model.CategoryDataModel;
+import com.midad_pos.model.CustomerDataModel;
 import com.midad_pos.model.DiscountDataModel;
 import com.midad_pos.model.HomeIndexModel;
 import com.midad_pos.model.ItemsDataModel;
 import com.midad_pos.model.SingleCategoryData;
+import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 
@@ -116,5 +118,19 @@ public interface Service {
                                                     @Field("for_all") String for_all
     );
 
+    @GET("api/customers")
+    Single<Response<CustomerDataModel>> getCustomers(@Query("user_id") String user_id);
 
+    @FormUrlEncoded
+    @POST("api/customers")
+    Single<Response<SingleCustomerModel>> addCustomer(@Field("user_id") String user_id,
+                                                      @Field("name") String name,
+                                                      @Field("email") String email,
+                                                      @Field("phone_number") String phone_number,
+                                                      @Field("address") String address,
+                                                      @Field("city") String city,
+                                                      @Field("postal_code") String postal_code,
+                                                      @Field("country") String country,
+                                                      @Field("tax_number") String tax_number
+    );
 }

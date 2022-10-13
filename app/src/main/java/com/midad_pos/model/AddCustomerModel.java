@@ -16,11 +16,9 @@ public class AddCustomerModel extends BaseObservable implements Serializable {
     private String phone;
     private String address;
     private String city;
-    private String region;
     private String postal_code;
     private String country;
-    private String customer_code;
-    private String note;
+    private String tax;
     private boolean isValid;
 
     public AddCustomerModel() {
@@ -29,11 +27,9 @@ public class AddCustomerModel extends BaseObservable implements Serializable {
         this.phone ="";
         this.address ="";
         this.city ="";
-        this.region ="";
         this.postal_code ="";
         this.country ="";
-        this.customer_code ="";
-        this.note="";
+        this.tax="";
         this.isValid =false;
     }
 
@@ -80,7 +76,6 @@ public class AddCustomerModel extends BaseObservable implements Serializable {
     public void setAddress(String address) {
         this.address = address;
         notifyPropertyChanged(BR.address);
-        setValid(!address.isEmpty());
     }
 
     @Bindable
@@ -91,19 +86,8 @@ public class AddCustomerModel extends BaseObservable implements Serializable {
     public void setCity(String city) {
         this.city = city;
         notifyPropertyChanged(BR.city);
-        setValid(!city.isEmpty());
     }
 
-    @Bindable
-    public String getRegion() {
-        return region;
-    }
-
-    public void setRegion(String region) {
-        this.region = region;
-        notifyPropertyChanged(BR.region);
-        setValid(!region.isEmpty());
-    }
 
     @Bindable
     public String getPostal_code() {
@@ -113,7 +97,6 @@ public class AddCustomerModel extends BaseObservable implements Serializable {
     public void setPostal_code(String postal_code) {
         this.postal_code = postal_code;
         notifyPropertyChanged(BR.postal_code);
-        setValid(!postal_code.isEmpty());
     }
 
     @Bindable
@@ -128,25 +111,13 @@ public class AddCustomerModel extends BaseObservable implements Serializable {
     }
 
     @Bindable
-    public String getCustomer_code() {
-        return customer_code;
+    public String getTax() {
+        return tax;
     }
 
-    public void setCustomer_code(String customer_code) {
-        this.customer_code = customer_code;
-        notifyPropertyChanged(BR.customer_code);
-        setValid(!customer_code.isEmpty());
-    }
-
-    @Bindable
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-        notifyPropertyChanged(BR.note);
-        setValid(!note.isEmpty());
+    public void setTax(String tax) {
+        this.tax = tax;
+        notifyPropertyChanged(BR.tax);
     }
 
     @Bindable
@@ -157,6 +128,5 @@ public class AddCustomerModel extends BaseObservable implements Serializable {
     public void setValid(boolean valid) {
         isValid = valid;
         notifyPropertyChanged(BR.valid);
-        Log.e("data",valid+"");
     }
 }

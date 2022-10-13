@@ -18,7 +18,7 @@
     <string name="termsLink"><![CDATA[<font color ="#000000">أوافق على </font><a href="https://www.google.com" color= "#9F56DB">شروط إستخدام</a> <font color="#000000">تطبيق مداد نقطة بيع كما اتطلعت على </font> <a href="https://www.google.com" color="#9F56DB">السياسة والخصوصية</a>]]></string>
     <string name="ticket">تذكرة</string>
     <string name="save">حفظ</string>
-    <string name="charge">التكلفة</string>
+    <string name="charge">السداد</string>
     <string name="search">بحث</string>
     <string name="open">فتح</string>
     <string name="close">غلق</string>
@@ -195,6 +195,11 @@
     <string name="enter_comment">أدخل تعليق</string>
     <string name="tax">الضريبة</string>
     <string name="are_you_sure_you_want_to_clear_the_ticket">هل أنت متأكد من أنك ترغب في إزالة التذكرة ؟</string>
+    <string name="vat_num">الرقم الضريبي</string>
+    <string name="add_to_ticket">إضافة إلى التذكرة</string>
+    <string name="split">تقسيم</string>
+    <string name="total_due">إجمالي المبلغ المستحق</string>
+    <string name="cash_received">النقد المستلم</string>
 
 
     <string-array name="delivery_options">

@@ -29,6 +29,9 @@
         tools:ignore="AllowBackup"
         tools:targetApi="q">
         <activity
+            android:name=".uis.activity_charge.ChargeActivity"
+            android:exported="false" />
+        <activity
             android:name=".uis.activity_add_discount.AddDiscountActivity"
             android:exported="false" />
         <activity
@@ -60,8 +63,8 @@
             android:exported="false" />
         <activity
             android:name=".uis.activity_items.ItemsActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".uis.activity_refund.RefundActivity"
             android:exported="false" />
@@ -76,8 +79,8 @@
             android:exported="false" />
         <activity
             android:name=".uis.activity_home.HomeActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".uis.activity_sign_up_2.SignUp2Activity"
             android:exported="false" />

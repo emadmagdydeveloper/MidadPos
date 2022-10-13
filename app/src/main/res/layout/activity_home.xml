@@ -282,7 +282,9 @@
                             android:layout_height="match_parent"
                             android:background="@color/white_trans2" />
 
+
                         <LinearLayout
+                            android:id="@+id/llCharge"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
@@ -294,14 +296,20 @@
                                 android:layout_height="wrap_content"
                                 android:text="@string/charge"
                                 android:textAllCaps="true"
-                                android:textColor="@color/white"
-                                android:textSize="16sp" />
+                                android:textSize="16sp"
+                                android:enabled="@{total>0?true:false}"
+                                android:textColor='@drawable/disable_text_color'
+
+
+                                />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="00.00"
-                                android:textColor="@color/white"
+                                numberFormat="@{String.valueOf(total)}"
+                                type="@{null}"
+                                android:enabled="@{total>0?true:false}"
+                                android:textColor='@drawable/disable_text_color'
                                 android:textSize="14sp" />
 
                         </LinearLayout>
