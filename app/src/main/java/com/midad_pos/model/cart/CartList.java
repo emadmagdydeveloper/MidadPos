@@ -2,6 +2,7 @@ package com.midad_pos.model.cart;
 
 import android.util.Log;
 
+import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
@@ -16,8 +17,13 @@ public class CartList implements Serializable {
     private double total;
     private double total_discount;
     private double total_tax;
+    private String delivery_id;
+    private String delivery_name;
+    private double remaining = 0.0;
+    private double paidAmount = 0.0;
     private List<DiscountModel> discounts = new ArrayList<>();
     private List<ItemModel> items = new ArrayList<>();
+    private CustomerModel customerModel;
 
     public double getNet_total() {
         return net_total;
@@ -57,6 +63,14 @@ public class CartList implements Serializable {
 
     public void setDiscounts(List<DiscountModel> discounts) {
         this.discounts = discounts;
+    }
+
+    public String getDelivery_name() {
+        return delivery_name;
+    }
+
+    public void setDelivery_name(String delivery_name) {
+        this.delivery_name = delivery_name;
     }
 
     public List<ItemModel> getItems() {
@@ -551,8 +565,40 @@ public class CartList implements Serializable {
         }
         return false;
     }
+
+    public String getDelivery_id() {
+        return delivery_id;
+    }
+
+    public void setDelivery_id(String delivery_id) {
+        this.delivery_id = delivery_id;
+    }
+
+    public double getRemaining() {
+        return remaining;
+    }
+
+    public void setRemaining(double remaining) {
+        this.remaining = remaining;
+    }
+
     public void clear() {
         getItems().clear();
     }
 
+    public double getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(double paidAmount) {
+        this.paidAmount = paidAmount;
+    }
+
+    public CustomerModel getCustomerModel() {
+        return customerModel;
+    }
+
+    public void setCustomerModel(CustomerModel customerModel) {
+        this.customerModel = customerModel;
+    }
 }

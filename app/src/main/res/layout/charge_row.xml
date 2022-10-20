@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="model"
+            type="com.midad_pos.model.ChargeModel" />
+        <variable
+            name="pos"
+            type="Integer" />
+        <import type="android.view.View"/>
+    </data>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:paddingBottom="16dp"
+    >
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_delete"
+        app:tint="@color/grey4"
+        android:padding="3dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="16dp"
+
+        />
+    <androidx.legacy.widget.Space
+        android:layout_width="12dp"
+        android:layout_height="0dp"/>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp"
+        >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:lines="1"
+                android:gravity="start"
+                android:textAlignment="viewStart"
+                android:text='@{model.payment_type.equals("cash")?@string/cash:@string/card}'
+                />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_drop_down"
+                android:padding="3dp"
+                app:tint="@color/grey4"
+                android:visibility='@{model.paid?View.GONE:View.VISIBLE,default=visible}'
+
+                />
+
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey4"
+            android:layout_marginTop="16dp"
+            />
+        <EditText
+            android:id="@+id/edtPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:inputType="number"
+            android:lines="1"
+            android:textColor="@color/black"
+            android:text="@{model.price}"
+            />
+    </LinearLayout>
+    <androidx.legacy.widget.Space
+        android:layout_width="16dp"
+        android:layout_height="0dp"/>
+    <FrameLayout
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+
+        >
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/small_rounded_primary"
+            android:stateListAnimator="@null"
+            android:textSize="15sp"
+            android:text="@string/charge"
+            android:textColor="@drawable/disable_text_color"
+            android:enabled='@{!model.price.equals("0.00")}'
+            android:visibility='@{model.paid?View.GONE:View.VISIBLE,default=visible}'
+
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility='@{model.paid?View.VISIBLE:View.GONE,default=gone}'
+
+
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18dp"
+                android:text="@string/paid"
+                />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_correct2"
+                android:tint="@color/colorPrimary"
+                />
+        </LinearLayout>
+    </FrameLayout>
+
+</LinearLayout>
+</layout>

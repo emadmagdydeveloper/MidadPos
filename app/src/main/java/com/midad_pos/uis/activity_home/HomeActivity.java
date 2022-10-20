@@ -50,6 +50,7 @@ import com.midad_pos.databinding.DialogClearTicketLayoutBinding;
 import com.midad_pos.model.AddCustomerModel;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
+import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
@@ -795,6 +796,16 @@ public class HomeActivity extends DrawerBaseActivity {
                 cartAdapter.updateList(cartList.getItems());
             }
 
+            if (binding.toolbarLandAddUser!=null){
+                if (cartList.getCustomerModel()==null){
+                    binding.toolbarLandAddUser.setImageResource(R.drawable.ic_add_user);
+
+                }else {
+                    binding.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
+
+                }
+            }
+
 
         });
 
@@ -922,6 +933,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
                 if (mvvm.getCart().getValue() != null) {
                     CartList cartList = mvvm.getCart().getValue();
+                    Log.e("ccc",cartList.getDelivery_name());
                     if (cartList.getTotalPrice()>0){
                         navigateToChargeActivity();
                     }
@@ -942,6 +954,7 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
     private void navigateToChargeActivity() {
+        mvvm.showPin = false;
         Intent intent = new Intent(this, ChargeActivity.class);
         startActivity(intent);
 
@@ -1048,11 +1061,14 @@ public class HomeActivity extends DrawerBaseActivity {
         popupMenu.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.inPlace) {
                 mvvm.getSelectedDeliveryOptions().setValue(getString(R.string.in_place));
+                mvvm.addDeliveryOption("1",getString(R.string.in_place));
             } else if (item.getItemId() == R.id.takeAway) {
                 mvvm.getSelectedDeliveryOptions().setValue(getString(R.string.takeaway));
+                mvvm.addDeliveryOption("2",getString(R.string.takeaway));
 
             } else if (item.getItemId() == R.id.delivery) {
                 mvvm.getSelectedDeliveryOptions().setValue(getString(R.string.delivery));
+                mvvm.addDeliveryOption("3",getString(R.string.delivery));
 
             }
             return true;
@@ -1147,6 +1163,19 @@ public class HomeActivity extends DrawerBaseActivity {
         MenuItem menuItemBarCode = menu.findItem(R.id.barcode);
         MenuItem menuItemCameraSwitch = menu.findItem(R.id.cameraSwitch);
         menuItemCameraSwitch.setVisible(false);
+
+        if(mvvm.getCart().getValue()!=null){
+            if (mvvm.getCart().getValue().getCustomerModel()!=null){
+
+                menuItemAddUser.setIcon(R.drawable.ic_checked_user);
+
+            }else {
+
+                menuItemAddUser.setIcon(R.drawable.ic_add_user);
+
+            }
+
+        }
 
 
         menuItemSearch.getIcon().setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN);
@@ -1600,6 +1629,16 @@ public class HomeActivity extends DrawerBaseActivity {
         mvvm.deleteCartDiscountItem(adapterPosition);
     }
 
+    public void assignCustomerToCart(CustomerModel customerModel) {
+        mvvm.assignCustomerToCart(customerModel);
+        binding.dialogCustomer.setVisibility(View.GONE);
+        mvvm.getIsOpenedCustomerDialog().setValue(false);
+        invalidateOptionsMenu();
+        if (binding.toolbarLandAddUser!=null){
+            binding.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
+        }
+    }
+
     @Override
     protected void onPause() {
         if (codeScanner != null) {
@@ -1625,6 +1664,7 @@ public class HomeActivity extends DrawerBaseActivity {
         super.onDestroy();
         disposable.clear();
     }
+
 
 
 }

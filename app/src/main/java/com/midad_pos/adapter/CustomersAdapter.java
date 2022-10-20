@@ -13,6 +13,7 @@ import com.midad_pos.databinding.CustomerRowBinding;
 import com.midad_pos.databinding.DiscountBinding;
 import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DiscountModel;
+import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
 
 import java.util.List;
@@ -36,6 +37,12 @@ public class CustomersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Holder myHolder = (Holder) holder;
         myHolder.binding.setModel(list.get(position));
+        myHolder.binding.addToTicket.setOnClickListener(v -> {
+            if (context instanceof HomeActivity){
+                HomeActivity activity = (HomeActivity) context;
+                activity.assignCustomerToCart(list.get(myHolder.getAdapterPosition()));
+            }
+        });
 
 
     }

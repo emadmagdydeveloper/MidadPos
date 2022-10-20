@@ -102,72 +102,59 @@
                         android:text="@string/total_due"
                         />
 
-
-                    <com.google.android.material.textfield.TextInputLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/cash_received"
-                        app:hintEnabled="true"
-                        app:hintAnimationEnabled="true"
-                        app:hintTextColor="@color/colorPrimary"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:layout_marginTop="60dp"
                         >
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtCash"
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:background="@color/transparent"
-                            android:paddingStart="0dp"
-                            android:paddingEnd="0dp"
-                            android:inputType="number"
-                            android:lines="1"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <FrameLayout
-                        android:id="@+id/flCash"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="26dp"
-                        android:background="@drawable/pay_bg"
-                        >
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center_vertical"
+                            android:hint="@string/cash_received"
+                            app:hintEnabled="true"
+                            app:hintAnimationEnabled="true"
+                            app:hintTextColor="@color/colorPrimary"
+                            app:startIconDrawable="@drawable/ic_cash"
+                            style="@style/text_input_appearance"
                             >
-                            <ImageView
-                                android:id="@+id/iconCash"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:padding="3dp"
-                                android:src="@drawable/ic_cash"
-                                app:tint="@drawable/icon_enable"
-                                />
-                            <androidx.legacy.widget.Space
-                                android:layout_width="8dp"
-                                android:layout_height="0dp"/>
-                            <TextView
-                                android:id="@+id/tvCash"
-                                android:layout_width="wrap_content"
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtCash"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="18sp"
-                                android:text="@string/cash"
-                                android:textStyle="bold"
-                                android:textAllCaps="true"
-                                android:textColor="@drawable/disable_grey_text_color"
-                                android:enabled="@{enabled}"
-
+                                android:background="@color/transparent"
+                                android:paddingStart="0dp"
+                                android:paddingEnd="0dp"
+                                android:inputType="number"
+                                android:lines="1"
                                 />
-                        </LinearLayout>
-                    </FrameLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <androidx.legacy.widget.Space
+                            android:layout_width="16dp"
+                            android:layout_height="0dp"/>
+                        <Button
+                            android:id="@+id/btnCharge"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/small_rounded_primary"
+                            app:backgroundTint="@null"
+                            android:textColor='@drawable/disable_text_color'
+                            android:text="@string/charge"
+                            android:enabled="@{enabled}"
+
+                            />
+                    </LinearLayout>
+
+
 
                     <FrameLayout
                         android:id="@+id/flCard"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:layout_marginTop="48dp"
+                        android:layout_marginTop="26dp"
                         android:background="@drawable/pay_bg"
                         >
                         <LinearLayout
@@ -192,13 +179,11 @@
                                 android:id="@+id/tvCard"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:textColor="@color/black"
                                 android:textSize="18sp"
                                 android:text="@string/card"
                                 android:textStyle="bold"
                                 android:textAllCaps="true"
-                                android:textColor="@drawable/disable_grey_text_color"
-                                android:enabled="@{enabled}"
-
                                 />
                         </LinearLayout>
                     </FrameLayout>
@@ -208,7 +193,6 @@
 
 
         </LinearLayout>
-
         <FrameLayout
             android:id="@+id/splitTicket"
             android:layout_width="match_parent"
@@ -236,6 +220,5 @@
                 layout="@layout/payment_layout"
                 />
         </FrameLayout>
-
     </FrameLayout>
 </layout>

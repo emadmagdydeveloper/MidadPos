@@ -200,6 +200,13 @@
     <string name="split">Split</string>
     <string name="total_due">Total amount due</string>
     <string name="cash_received">Cash received</string>
+    <string name="payments">Payments</string>
+    <string name="done">Done</string>
+    <string name="remaining">Remaining</string>
+    <string name="paid">Paid</string>
+    <string name="new_sale">New Sale</string>
+    <string name="total_paid">Total paid</string>
+    <string name="change">Change</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

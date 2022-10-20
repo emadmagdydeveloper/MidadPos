@@ -28,6 +28,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup"
         tools:targetApi="q">
+
         <activity
             android:name=".uis.activity_charge.ChargeActivity"
             android:exported="false" />

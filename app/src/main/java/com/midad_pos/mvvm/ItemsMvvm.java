@@ -64,7 +64,7 @@ public class ItemsMvvm extends AndroidViewModel {
     private MutableLiveData<List<DiscountModel>> discounts;
     private MutableLiveData<Boolean> isDiscountDeleteMode;
     private MutableLiveData<List<Integer>> deletedDiscountIds;
-
+    public boolean showPin =false;
 
     private CompositeDisposable disposable = new CompositeDisposable();
 

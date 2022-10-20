@@ -57,7 +57,7 @@
     <string name="cashier">Cashier :</string>
     <string name="refund">المبلغ المسترد</string>
     <string name="pos">نقطة البيع :</string>
-    <string name="card">Card</string>
+    <string name="card">بطاقة</string>
     <string name="send_email">إرسال الإيصال عبر البريد الإلكتروني</string>
     <string name="enter_email">أدخل البريد الإلكتروني</string>
     <string name="send">إرسال</string>
@@ -200,6 +200,13 @@
     <string name="split">تقسيم</string>
     <string name="total_due">إجمالي المبلغ المستحق</string>
     <string name="cash_received">النقد المستلم</string>
+    <string name="payments">المدفوعات</string>
+    <string name="done">تم</string>
+    <string name="remaining">المتبقي</string>
+    <string name="paid">دُفِعَ</string>
+    <string name="new_sale">عملية بيع جديدة</string>
+    <string name="total_paid">إجمالي المدفوع</string>
+    <string name="change">الباقي</string>
 
 
     <string-array name="delivery_options">

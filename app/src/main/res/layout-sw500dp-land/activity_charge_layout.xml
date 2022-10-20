@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+
+
+        <variable
+            name="deliveryOption"
+            type="String" />
+
+        <variable
+            name="totalVat"
+            type="Double" />
+        <variable
+            name="totalDiscounts"
+            type="Double" />
+        <variable
+            name="total"
+            type="Double" />
+        <import type="android.view.View"/>
+        <variable
+            name="enabled"
+            type="Boolean" />
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".6"
+                app:cardElevation="3dp"
+
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.appbar.AppBarLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white">
+
+                        <androidx.appcompat.widget.Toolbar
+                            android:id="@+id/toolBarHomeLand"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/white">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ticket"
+                                android:textColor="@color/black"
+                                android:textSize="20sp"
+                                android:textStyle="bold" />
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end">
+
+
+                                <ImageView
+                                    android:id="@+id/toolbarLandAddUser"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="end"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:src="@drawable/ic_add_user"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:tint="@color/grey4" />
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                        </androidx.appcompat.widget.Toolbar>
+                    </com.google.android.material.appbar.AppBarLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llDelivery"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <TextView
+                            android:id="@+id/tvDelivery"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@{deliveryOption}"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/grey9" />
+
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/nestedScrollViewLand"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:fillViewport="true"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/recViewCart"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+
+                                >
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:layout_marginBottom="16dp"
+                                    android:background="@color/grey9"
+                                    android:visibility='@{totalVat>0?View.VISIBLE:(totalDiscounts>0?View.VISIBLE:View.GONE)}'
+                                    />
+
+                                <LinearLayout
+                                    android:id="@+id/llDiscount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:visibility="@{totalDiscounts>0?View.VISIBLE:View.GONE,default=gone}"
+
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/discounts"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+
+                                        numberFormat="@{String.valueOf(totalDiscounts)}"
+                                        type="@{null}"
+
+                                        />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:layout_marginTop="16dp"
+                                    android:visibility="@{totalVat>0?View.VISIBLE:View.GONE,default=gone}"
+
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/tax"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        numberFormat="@{String.valueOf(totalVat)}"
+                                        type="@{null}"
+
+                                        />
+                                </LinearLayout>
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_margin="16dp"
+                                    android:background="@color/grey9"
+                                    android:visibility='@{totalVat>0?View.VISIBLE:(totalDiscounts>0?View.VISIBLE:View.GONE)}'
+
+                                    />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:visibility="@{total>0?View.VISIBLE:View.GONE,default=gone}"
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/total"
+                                        android:textStyle="bold"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/black"
+                                        android:textStyle="bold"
+                                        numberFormat="@{String.valueOf(total)}"
+                                        type="@{null}"
+                                        />
+                                </LinearLayout>
+
+
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </androidx.core.widget.NestedScrollView>
+
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.4"
+                android:layout_height="match_parent"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+
+                    >
+
+                    <com.google.android.material.appbar.AppBarLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <com.google.android.material.appbar.MaterialToolbar
+                            android:id="@+id/toolBarCharge"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/colorPrimary"
+                            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+                            >
+                            <ImageView
+                                android:id="@+id/arrow"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_back_arrow"
+                                app:tint="@color/white"
+                                android:padding="3dp"
+                                android:rotation='@{lang.equals("ar")?180:0}'
+                                />
+
+                            <Button
+                                android:id="@+id/split"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:textColor="@color/white"
+                                android:textSize="15sp"
+                                android:text="@string/split"
+                                android:background="@color/transparent"
+                                />
+                        </com.google.android.material.appbar.MaterialToolbar>
+                    </com.google.android.material.appbar.AppBarLayout>
+
+
+
+
+                    <androidx.core.widget.NestedScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fillViewport="true"
+                        >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:textSize="28sp"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"
+                                numberFormat="@{String.valueOf(total)}"
+                                type="@{null}"
+                                android:layout_marginTop="5dp"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:textSize="20sp"
+                                android:textColor="@color/grey17"
+                                android:text="@string/total_due"
+                                />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginTop="60dp"
+                                >
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/cash_received"
+                                    app:hintEnabled="true"
+                                    app:hintAnimationEnabled="true"
+                                    app:hintTextColor="@color/colorPrimary"
+                                    app:startIconDrawable="@drawable/ic_cash"
+                                    style="@style/text_input_appearance"
+                                    >
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/edtCash"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@color/transparent"
+                                        android:paddingStart="0dp"
+                                        android:paddingEnd="0dp"
+                                        android:inputType="number"
+                                        android:lines="1"
+                                        />
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                                <androidx.legacy.widget.Space
+                                    android:layout_width="16dp"
+                                    android:layout_height="0dp"/>
+                                <Button
+                                    android:id="@+id/btnCharge"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/small_rounded_primary"
+                                    app:backgroundTint="@null"
+                                    android:textColor='@drawable/disable_text_color'
+                                    android:text="@string/charge"
+                                    android:enabled="@{enabled}"
+
+                                    />
+                            </LinearLayout>
+
+
+
+                            <FrameLayout
+                                android:id="@+id/flCard"
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginTop="26dp"
+                                android:background="@drawable/pay_bg"
+                                >
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:gravity="center_vertical"
+                                    >
+                                    <ImageView
+                                        android:id="@+id/iconCard"
+                                        android:layout_width="24dp"
+                                        android:layout_height="24dp"
+                                        android:padding="3dp"
+                                        android:src="@drawable/ic_card"
+                                        app:tint="@drawable/icon_enable"
+
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="8dp"
+                                        android:layout_height="0dp"/>
+                                    <TextView
+                                        android:id="@+id/tvCard"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="18sp"
+                                        android:text="@string/card"
+                                        android:textStyle="bold"
+                                        android:textAllCaps="true"
+                                        android:textColor="@drawable/disable_grey_text_color"
+                                        android:enabled="@{enabled}"
+                                        />
+                                </LinearLayout>
+                            </FrameLayout>
+
+                        </LinearLayout>
+                    </androidx.core.widget.NestedScrollView>
+
+
+                </LinearLayout>
+
+
+                <FrameLayout
+                    android:id="@+id/splitTicket"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:visibility="gone"
+                    >
+                    <include
+                        android:id="@+id/ticketSplit"
+                        layout="@layout/ticket_split_layout"
+                        />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/flPayment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:visibility="gone"
+                    >
+                    <include
+                        android:id="@+id/payment"
+                        layout="@layout/payment_layout"
+                        />
+                </FrameLayout>
+            </FrameLayout>
+
+
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+</layout>

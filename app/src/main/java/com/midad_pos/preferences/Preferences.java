@@ -2,6 +2,7 @@ package com.midad_pos.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 
 import com.midad_pos.model.cart.CartList;

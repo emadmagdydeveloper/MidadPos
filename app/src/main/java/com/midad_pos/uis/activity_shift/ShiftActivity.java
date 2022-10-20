@@ -88,35 +88,27 @@ public class ShiftActivity extends DrawerBaseActivity {
             public void afterTextChanged(Editable editable) {
                 binding.openShiftLayout.edtAmount.removeTextChangedListener(this);
                 String num = editable.toString().trim();
-
-
-                if (num.isEmpty() || num.equals("0.00") || num.equals("0")) {
-                    num = "0.00";
-                    binding.openShiftLayout.edtAmount.setText(num);
+                if (num.equals("0.00") || num.isEmpty()) {
+                    binding.openShiftLayout.edtAmount.setText("0.00");
                     binding.openShiftLayout.edtAmount.setSelection(binding.openShiftLayout.edtAmount.getText().length());
 
 
-                } else {
+                } else  {
+                    num = num.replace(".", "");
+                    num = num.replace(",", "");
+                    float pr = Float.parseFloat(num) / 100.0f;
+                    num = String.format(Locale.US, "%.2f", pr);
+                    if (num.length()>=9){
+                        binding.openShiftLayout.edtAmount.setText("999,999.99");
 
+                    }else if (num.length()==7||num.length()==8){
+                        StringBuilder builder = new StringBuilder(num);
+                        builder.insert(num.length()-6,",");
+                        num = builder.toString();
+                        binding.openShiftLayout.edtAmount.setText(num);
 
-                    num = num.replace(".", "").replace(",", "");
-
-                    BigDecimal bigDecimal = BigDecimal.valueOf(Float.parseFloat(num));
-
-                    BigDecimal newNum = bigDecimal.divide(BigDecimal.valueOf(100.0));
-                    if (newNum.toString().equals("0")) {
-                        binding.openShiftLayout.edtAmount.setText("0.00");
-
-                    } else {
-                        DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-                        decimalFormat.applyPattern("###,###.##");
-
-                        String amount = decimalFormat.format(newNum);
-                        binding.openShiftLayout.edtAmount.setText(amount);
-                        Log.e("ddd", amount.length() + "");
-                        if (amount.length() == 12) {
-                            binding.openShiftLayout.edtAmount.setText("999,999.99");
-                        }
+                    }else {
+                        binding.openShiftLayout.edtAmount.setText(num);
 
                     }
 

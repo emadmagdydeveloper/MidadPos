@@ -109,30 +109,26 @@ public class AddItemModel extends BaseObservable implements Serializable {
     }
 
     public void setPrice(String price) {
-        if (price.isEmpty()){
-            price ="0";
-
-        }
-        this.price = price.replace(".","");
-        this.price = this.price.replace(",","");
-        BigDecimal num = BigDecimal.valueOf(Float.parseFloat(this.price)).divide(BigDecimal.valueOf(100.0));
-        if (num.floatValue()==0){
-            this.price ="0.00";
+        if (price.equals("0.00")||price.isEmpty()){
+            price ="0.00";
+            this.price = price;
         }else {
-
-            DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-            decimalFormat.applyPattern("###,###.##");
-
-            if (decimalFormat.format(num).length()==9){
+            price = price.replace(".", "");
+            price = price.replace(",", "");
+            float pr = Float.parseFloat(price) / 100.0f;
+            price = String.format(Locale.US, "%.2f", pr);
+            if (price.length()>=9){
                 this.price ="999,999.99";
+            }else if (price.length()==7||price.length()==8){
+                StringBuilder builder = new StringBuilder(price);
+                builder.insert(price.length()-6,",");
+                this.price = builder.toString();
+
+
             }else {
-                this.price = decimalFormat.format(num);
+               this.price = price;
 
             }
-
-
-
-
         }
 
 
@@ -149,31 +145,26 @@ public class AddItemModel extends BaseObservable implements Serializable {
 
     public void setCost(String cost) {
 
-        if (cost.isEmpty()){
-            cost ="0";
-
-
-        }
-        this.cost = cost.replace(".","");
-        this.cost = this.cost.replace(",","");
-        BigDecimal num = BigDecimal.valueOf(Float.parseFloat(this.cost)).divide(BigDecimal.valueOf(100.0));
-        if (num.floatValue()==0){
-            this.cost ="0.00";
+        if (cost.equals("0.00")||cost.isEmpty()){
+            cost ="0.00";
+            this.cost = cost;
         }else {
-
-            DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-            decimalFormat.applyPattern("###,###.##");
-
-            if (decimalFormat.format(num).length()==9){
+            cost = cost.replace(".", "");
+            cost = cost.replace(",", "");
+            float pr = Float.parseFloat(cost) / 100.0f;
+            cost = String.format(Locale.US, "%.2f", pr);
+            if (cost.length()>=9){
                 this.cost ="999,999.99";
+            }else if (cost.length()==7||cost.length()==8){
+                StringBuilder builder = new StringBuilder(cost);
+                builder.insert(cost.length()-6,",");
+                this.cost = builder.toString();
+
+
             }else {
-                this.cost = decimalFormat.format(num);
+                this.cost = cost;
 
             }
-
-
-
-
         }
         notifyPropertyChanged(BR.cost);
         isDataValid();

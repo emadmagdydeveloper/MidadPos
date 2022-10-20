@@ -91,7 +91,6 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> onCustomerUpdatedSuccess;
 
 
-
     //////////////////////////////////////////////////////////////////////////
     private ManageCartModel manageCartModel;
     private MutableLiveData<CartList> cart;
@@ -150,6 +149,8 @@ public class HomeMvvm extends AndroidViewModel {
         if (selectedDeliveryOptions == null) {
             selectedDeliveryOptions = new MutableLiveData<>();
             selectedDeliveryOptions.setValue(getApplication().getApplicationContext().getString(R.string.in_place));
+            addDeliveryOption("1", getApplication().getString(R.string.in_place));
+
         }
         return selectedDeliveryOptions;
     }
@@ -746,12 +747,12 @@ public class HomeMvvm extends AndroidViewModel {
                         if (response.isSuccessful()) {
                             if (response.body() != null) {
                                 if (response.body().getStatus() == 200) {
-                                       if (getCustomersInstance().getValue()!=null){
+                                    if (getCustomersInstance().getValue() != null) {
 
-                                           getOnCustomerUpdatedSuccess().setValue(true);
-                                           getCustomersInstance().getValue().add(0,response.body().getData());
-                                           searchCustomer(getSearchQueryCustomer().getValue());
-                                       }
+                                        getOnCustomerUpdatedSuccess().setValue(true);
+                                        getCustomersInstance().getValue().add(0, response.body().getData());
+                                        searchCustomer(getSearchQueryCustomer().getValue());
+                                    }
 
                                 } else {
                                     Log.e("error", response.body().getStatus() + "__" + response.body().getMessage().toString());
@@ -792,38 +793,26 @@ public class HomeMvvm extends AndroidViewModel {
 
     public void updatePrice(String p) {
         String price = getPrice().getValue();
+
         if (price != null) {
-            if (price.equals("0.00") && p.equals("00")) {
+            if ((price.equals("0.00") && p.equals("00")) || price.isEmpty()) {
                 getPrice().setValue("0.00");
 
-            } else if (price.isEmpty()) {
-                getPrice().setValue("0.00");
-
-            } else if (price.length() == 9) {
+            } else if (price.length() >=9) {
                 getPrice().setValue("999,999.99");
-            } else if (price.length() < 9) {
+            } else {
                 price = price.replace(".", "");
                 price = price.replace(",", "");
                 price += p;
-                price = String.valueOf(Integer.parseInt(price));
+                float pr = Float.parseFloat(price) / 100.00f;
+                price = String.format(Locale.US, "%.2f", pr);
 
-                BigDecimal bigDecimal = new BigDecimal(price).divide(BigDecimal.valueOf(100.00));
-                DecimalFormat format = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-                format.applyPattern("###,###.##");
-                price = format.format(bigDecimal);
-                if (!price.contains(".")) {
-                    price += ".00";
+                if (price.length()==7||price.length()==8){
+                    StringBuilder builder = new StringBuilder(price);
+                    builder.insert(price.length()-6,",");
+                    price = builder.toString();
+
                 }
-                if (price.contains(",")) {
-                    price = price.replace(",", "");
-                }
-                price = String.format(Locale.US, "%.2f", Double.parseDouble(price));
-
-                /*if (price.length()==7){
-                    price = new StringBuilder(price).insert(1,",").toString();
-                }*/
-
-                Log.e("priceeee", price + "leng" + price.length());
                 getPrice().setValue(price);
             }
 
@@ -840,14 +829,16 @@ public class HomeMvvm extends AndroidViewModel {
 
                 price = price.substring(0, price.length() - 1);
 
-                BigDecimal bigDecimal = new BigDecimal(price).divide(BigDecimal.valueOf(100.0));
-                DecimalFormat format = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-                format.applyPattern("###,###.##");
-                String newPrice = format.format(bigDecimal);
-                if (newPrice.equals("0")) {
-                    newPrice = "0.00";
+                float pr = Float.parseFloat(price) / 100.00f;
+                price = String.format(Locale.US, "%.2f", pr);
+
+                if (price.length()==7||price.length()==8){
+                    StringBuilder builder = new StringBuilder(price);
+                    builder.insert(price.length()-6,",");
+                    price = builder.toString();
+
                 }
-                getPrice().setValue(newPrice);
+                getPrice().setValue(price);
 
             }
         }
@@ -939,4 +930,14 @@ public class HomeMvvm extends AndroidViewModel {
         manageCartModel.addDiscountForAllTicket(discountModel, getApplication().getApplicationContext());
     }
 
+    public void addDeliveryOption(String deliveryId, String deliveryName) {
+        manageCartModel.addDeliveryToCart(deliveryId, deliveryName, getApplication().getApplicationContext());
+    }
+
+    public void assignCustomerToCart(CustomerModel customerModel) {
+        if (getCart().getValue()!=null){
+            getCart().getValue().setCustomerModel(customerModel);
+        }
+        manageCartModel.assignCustomerToCart(customerModel,getApplication().getApplicationContext());
+    }
 }
