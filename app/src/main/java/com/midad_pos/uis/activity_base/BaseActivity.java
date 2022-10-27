@@ -30,29 +30,22 @@ import io.paperdb.Paper;
 
 public class BaseActivity extends AppCompatActivity {
     private ActivityBaseLayoutBinding binding;
-    private BaseMvvm mvvm;
+    public BaseMvvm baseMvvm;
     public static final String READ_PERM = Manifest.permission.READ_EXTERNAL_STORAGE;
     public static final String WRITE_PERM = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     public static final String CAM_PERM = Manifest.permission.CAMERA;
     public static final String FINELOCPerm = Manifest.permission.ACCESS_FINE_LOCATION;
-    public boolean showPin = false;
 
 
     @Override
     public void setContentView(View view) {
+        baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_base_layout, null, false);
         binding.container.addView(view);
         super.setContentView(binding.getRoot());
         initViews();
     }
 
-    protected BaseMvvm getBaseMvvm(){
-        if (mvvm==null){
-            mvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
-
-        }
-        return mvvm;
-    }
     @Override
     protected void attachBaseContext(Context newBase) {
         Paper.init(newBase);
@@ -64,8 +57,17 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (baseMvvm==null){
+            baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
+
+        }
+        baseMvvm.getPayments();
+    }
+
     private void initViews() {
-        mvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         if (binding != null) {
             binding.pinView.setLang(getLang());
             binding.pinView.btn1.setOnClickListener(v -> updatePinView("1"));
@@ -80,10 +82,10 @@ public class BaseActivity extends AppCompatActivity {
             binding.pinView.btn0.setOnClickListener(v -> updatePinView("0"));
             binding.pinView.btnClear.setOnClickListener(v -> updatePinView(""));
 
-            if (mvvm.getPinCode().getValue() != null) {
-                updatePinView(mvvm.getPinCode().getValue());
+            if (baseMvvm.getPinCode().getValue() != null) {
+                updatePinView(baseMvvm.getPinCode().getValue());
             }
-            if (mvvm.getPay_in_out().getValue() != null && mvvm.getPay_in_out().getValue()) {
+            if (baseMvvm.getPay_in_out().getValue() != null && baseMvvm.getPay_in_out().getValue()) {
                 if (binding.pinView.timeClock != null) {
                     binding.pinView.timeClock.setVisibility(View.GONE);
                 } else {
@@ -123,7 +125,7 @@ public class BaseActivity extends AppCompatActivity {
                     }
 
                     binding.pinView.alarmCheck.setVisibility(View.VISIBLE);
-                    mvvm.getPay_in_out().setValue(true);
+                    baseMvvm.getPay_in_out().setValue(true);
                     updatePinView("");
                 });
             }
@@ -148,7 +150,7 @@ public class BaseActivity extends AppCompatActivity {
 
                 }
 
-                mvvm.getPay_in_out().setValue(false);
+                baseMvvm.getPay_in_out().setValue(false);
 
                 updatePinView("");
             });
@@ -159,7 +161,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void updatePinView(String number) {
-        mvvm.getPinCode().setValue(number);
+        baseMvvm.getPinCode().setValue(number);
         if (number.isEmpty()) {
             binding.pinView.firstPinView.setText("");
 
@@ -189,7 +191,7 @@ public class BaseActivity extends AppCompatActivity {
                     }else {
                         userModel.getData().setSelectedUser(user);
                         setUserModel(userModel);
-                        mvvm.getOnUserRefreshed().setValue(true);
+                        baseMvvm.getOnUserRefreshed().setValue(true);
                         binding.pinContainer.setVisibility(View.GONE);
                         binding.container.setVisibility(View.VISIBLE);
                         updatePinView("");
@@ -214,7 +216,6 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void hidePinCodeView(){
         if (binding!=null){
-            showPin =false;
             binding.pinContainer.setVisibility(View.GONE);
             binding.container.setVisibility(View.VISIBLE);
             updatePinView("");

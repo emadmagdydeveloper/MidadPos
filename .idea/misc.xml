@@ -81,7 +81,7 @@
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout-sw500dp-land/add_customer_dialog.xml" value="0.12" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout-sw500dp-land/add_customer_layout.xml" value="0.2" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout-sw500dp-land/category_layout.xml" value="0.1" />
-        <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout-sw500dp-land/charge_row.xml" value="0.10400000000000001" />
+        <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout-sw500dp-land/charge_row.xml" value="0.16" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout-sw500dp-land/customer_display_layout.xml" value="0.11200000000000002" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout-sw500dp-land/dialog_add_price.xml" value="0.1" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout-sw500dp-land/dialog_assign_items.xml" value="0.1" />
@@ -214,6 +214,7 @@
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/dialog_send_email.xml" value="0.22083333333333333" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/dialog_shift_report_layout.xml" value="0.21614583333333334" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/dialog_shifts_layout.xml" value="0.2171875" />
+        <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/dialog_split_price.xml" value="0.22083333333333333" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/discount.xml" value="0.536" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/discount_row.xml" value="0.4" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/discounts_layout.xml" value="0.2" />
@@ -237,9 +238,10 @@
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/main_item_modifier_row.xml" value="0.2203125" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/menu_separator.xml" value="0.22083333333333333" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/modifier_row.xml" value="0.2171875" />
-        <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/navigation_view_header.xml" value="0.22083333333333333" />
+        <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/navigation_view_header.xml" value="0.43771626297577854" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/open_shift_layout.xml" value="0.16" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/payment_layout.xml" value="0.22083333333333333" />
+        <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/payment_row.xml" value="0.22083333333333333" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/pinview_layout.xml" value="0.264" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/printer_layout.xml" value="0.22083333333333333" />
         <entry key="..\:/works/Courses/work_android/NamiCompany/MidadPOS/app/src/main/res/layout/spinner_country_row.xml" value="0.22083333333333333" />

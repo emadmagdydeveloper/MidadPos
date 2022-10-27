@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 
 import com.midad_pos.language.Language;
+import com.midad_pos.uis.activity_charge.ChargeActivity;
 import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
 import com.midad_pos.uis.activity_login.LoginActivity;
@@ -24,6 +25,8 @@ import java.util.Set;
 
 
 public class App extends MultiDexApplication {
+    public static boolean showHomePin = true;
+
     private Set<Activity> runningActivities = new HashSet<>();
 
     @Override
@@ -40,6 +43,11 @@ public class App extends MultiDexApplication {
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle bundle) {
                 if (activity instanceof ReceiptsActivity||activity instanceof ItemsActivity||activity instanceof SettingsActivity||activity instanceof SupportActivity||activity instanceof ShiftActivity){
                     runningActivities.add(activity);
+                    showHomePin = false;
+                }
+
+                if (activity instanceof ChargeActivity){
+                    showHomePin = false;
                 }
 
             }

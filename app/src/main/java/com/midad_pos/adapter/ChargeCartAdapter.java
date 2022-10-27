@@ -42,6 +42,7 @@ public class ChargeCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
 
 
+
     }
 
 
@@ -66,6 +67,7 @@ public class ChargeCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.list = list;
         notifyDataSetChanged();
     }
+
 
 
 }

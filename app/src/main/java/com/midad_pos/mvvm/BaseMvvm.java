@@ -1,20 +1,48 @@
 package com.midad_pos.mvvm;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.midad_pos.R;
+import com.midad_pos.model.DeliveryDataModel;
+import com.midad_pos.model.PaymentDataModel;
+import com.midad_pos.model.PaymentModel;
+import com.midad_pos.model.UserModel;
+import com.midad_pos.preferences.Preferences;
+import com.midad_pos.remote.Api;
+import com.midad_pos.tags.Tags;
+
+import java.io.IOException;
+import java.util.List;
+
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
+
 public class BaseMvvm extends AndroidViewModel {
+    private final String TAG = BaseMvvm.class.getName();
     private MutableLiveData<String> pinCode;
     private MutableLiveData<Boolean> pay_in_out;
     private MutableLiveData<Boolean> onUserRefreshed;
-    private MutableLiveData<Boolean> onCategoryAdded;
+    private MutableLiveData<PaymentDataModel.Data> payments;
+    private UserModel userModel;
+    private MutableLiveData<String> onError;
+
+    private CompositeDisposable disposable = new CompositeDisposable();
 
 
     public BaseMvvm(@NonNull Application application) {
         super(application);
+        userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
+
+
     }
 
     public MutableLiveData<String> getPinCode() {
@@ -40,10 +68,81 @@ public class BaseMvvm extends AndroidViewModel {
         return onUserRefreshed;
     }
 
-    public MutableLiveData<Boolean> getOnCategoryAdded() {
-        if (onCategoryAdded == null) {
-            onCategoryAdded = new MutableLiveData<>();
+    public MutableLiveData<PaymentDataModel.Data> getPaymentsInstance() {
+        if (payments == null) {
+            payments = new MutableLiveData<>();
         }
-        return onCategoryAdded;
+        return payments;
+    }
+
+    public MutableLiveData<String> getOnError() {
+        if (onError == null) {
+            onError = new MutableLiveData<>();
+
+        }
+        return onError;
+    }
+
+    public void getPayments() {
+        if (getPaymentsInstance().getValue()!=null){
+            getPaymentsInstance().setValue(getPaymentsInstance().getValue());
+            return;
+        }
+        Api.getService(Tags.base_url)
+                .getPayments(userModel.getData().getSelectedUser().getId(),userModel.getData().getSelectedWereHouse().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<PaymentDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<PaymentDataModel> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                   getPaymentsInstance().setValue(response.body().getData());
+
+                                } else {
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
+    }
+
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        disposable.clear();
     }
 }

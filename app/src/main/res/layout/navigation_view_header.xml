@@ -52,16 +52,22 @@
                 />
         </LinearLayout>
 
-        <com.makeramen.roundedimageview.RoundedImageView
+        <androidx.cardview.widget.CardView
             android:id="@+id/lock"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            app:riv_mutate_background="true"
-            android:background="@color/grey0"
-            app:riv_corner_radius="20dp"
-            android:src="@drawable/ic_lock"
-            android:padding="8dp"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="@color/grey0"
 
-            />
+            >
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_lock"
+                />
+        </androidx.cardview.widget.CardView>
+
     </LinearLayout>
 </layout>

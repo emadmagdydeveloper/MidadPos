@@ -1153,8 +1153,10 @@ public class ItemsActivity extends DrawerBaseActivity {
     }
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
         disposable.clear();
+
     }
 
     @Override
@@ -1185,6 +1187,8 @@ public class ItemsActivity extends DrawerBaseActivity {
             hidePinCodeView();
         }
     }
+
+
 
 
 }

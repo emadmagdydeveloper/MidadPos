@@ -17,7 +17,7 @@ public class ItemModel implements Serializable {
     private String color;
     private String shape;
     private String price = "0.0";
-    private String cost;
+    private String cost="0.0";
     private String code;
     private String barcode_symbology;
     private String brand_id;

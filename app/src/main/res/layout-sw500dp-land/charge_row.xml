@@ -40,6 +40,7 @@
 
 
             <LinearLayout
+                android:id="@+id/llSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -50,10 +51,11 @@
                     android:layout_weight="1"
                     android:textColor="@color/black"
                     android:textSize="15sp"
+                    android:minHeight="48dp"
                     android:lines="1"
-                    android:gravity="start"
+                    android:gravity="start|center_vertical"
                     android:textAlignment="viewStart"
-                    android:text='@{model.payment_type.equals("cash")?@string/cash:@string/card}'
+                    android:text='@{model.paymentModel!=null?model.paymentModel.name:""}'
 
                     />
                 <ImageView
@@ -63,7 +65,7 @@
                     android:padding="3dp"
                     app:tint="@color/grey4"
                     android:visibility='@{model.paid?View.GONE:View.VISIBLE,default=visible}'
-
+                    android:layout_gravity="center_vertical"
                     />
 
             </LinearLayout>
@@ -79,18 +81,30 @@
             android:layout_width="16dp"
             android:layout_height="0dp"/>
 
-        <EditText
-            android:id="@+id/edtPrice"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:lines="1"
-            android:textColor="@color/black"
-            android:text="@{model.price}"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/edtPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:lines="1"
+                android:textColor="@color/black"
+                android:text="@{model.price}"
+                android:gravity="center_vertical"
+                />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey4"
+                android:layout_marginTop="8dp"
+                />
+        </LinearLayout>
 
-
-            />
         <androidx.legacy.widget.Space
             android:layout_width="24dp"
             android:layout_height="0dp"/>

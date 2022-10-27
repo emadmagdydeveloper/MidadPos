@@ -1,6 +1,7 @@
 package com.midad_pos.adapter;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -12,10 +13,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
-import com.midad_pos.databinding.ChargeCartItemRowBinding;
 import com.midad_pos.databinding.ChargeRowBinding;
 import com.midad_pos.model.ChargeModel;
-import com.midad_pos.model.ItemModel;
 import com.midad_pos.uis.activity_charge.ChargeActivity;
 
 import java.util.List;
@@ -43,15 +42,26 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Holder myHolder = (Holder) holder;
         myHolder.binding.setModel(list.get(position));
+
+
         myHolder.binding.delete.setOnClickListener(v -> {
-            if (list.size()>1){
+            if (list.size() > 1) {
                 ChargeActivity activity = (ChargeActivity) context;
-                activity.deleteSplit();
+                activity.deleteSplit(myHolder.getAdapterPosition());
             }
         });
 
+        myHolder.binding.edtPrice.setOnClickListener(v -> {
+            ChargeActivity activity = (ChargeActivity) context;
+            activity.updatePriceChange(list.get(myHolder.getAdapterPosition()),myHolder.getAdapterPosition());
+        });
 
-
+        myHolder.binding.llSpinner.setOnClickListener(v -> {
+            if (context instanceof ChargeActivity) {
+                ChargeActivity activity = (ChargeActivity) context;
+                activity.chooseSplitPayment(list.get(myHolder.getAdapterPosition()), myHolder.getAdapterPosition(), myHolder.binding.llSpinner);
+            }
+        });
 
 
     }
@@ -62,6 +72,11 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return list != null ? list.size() : 0;
     }
 
+    public void updateRemaining(Double remaining) {
+        this.remaining = remaining;
+        notifyDataSetChanged();
+    }
+
     public static class Holder extends RecyclerView.ViewHolder {
         public ChargeRowBinding binding;
 
@@ -69,20 +84,13 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             super(binding.getRoot());
             this.binding = binding;
         }
-        
+
     }
 
 
-
-    public void updateList(List<ChargeModel> list){
+    public void updateList(List<ChargeModel> list) {
         this.list = list;
         notifyDataSetChanged();
-    }
-
-    public void updateRemaining(double remaining){
-        this.remaining = remaining;
-        notifyDataSetChanged();
-
     }
 
 

@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_drawer_base;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,22 +39,21 @@ import java.util.Objects;
 public class DrawerBaseActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ActivityDrawerBaseBinding binding;
     private NavigationViewHeaderBinding navigationViewHeaderBinding;
-    private BaseMvvm baseMvvm;
     private int itemId;
     private int selectedPos = 0;
 
     @Override
     public void setContentView(View view) {
+
         binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_drawer_base, null, false);
         navigationViewHeaderBinding = DataBindingUtil.bind(binding.navigationView.getHeaderView(0));
         binding.frameLayoutContent.addView(view);
         super.setContentView(binding.getRoot());
         binding.navigationView.setNavigationItemSelectedListener(this);
-        baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         baseMvvm.getOnUserRefreshed().observe(this, aBoolean -> {
             navigationViewHeaderBinding.setModel(getUserModel());
         });
-
+        baseMvvm.getPayments();
         navigationViewHeaderBinding.lock.setOnClickListener(v -> {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
             showPinCodeView();
@@ -67,9 +67,6 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         super.onCreate(savedInstanceState);
     }
 
-    protected BaseMvvm getBaseMvvm() {
-        return baseMvvm;
-    }
 
     @Override
     protected void onResume() {
@@ -177,9 +174,8 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
     @Override
     protected void onStop() {
-        showPinCodeView();
-
         super.onStop();
+        showPinCodeView();
 
 
 
@@ -191,5 +187,6 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
     protected void onDestroy() {
         super.onDestroy();
         hidePinCodeView();
+
     }
 }

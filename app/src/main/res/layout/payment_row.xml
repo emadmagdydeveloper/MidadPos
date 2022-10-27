@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="model"
+            type="com.midad_pos.model.PaymentModel" />
+    </data>
+    <FrameLayout
+        android:id="@+id/flPayment"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="26dp"
+        android:background="@drawable/pay_bg"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_vertical"
+            >
+            <ImageView
+                android:id="@+id/iconCash"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="3dp"
+                android:src='@{model.type.equalsIgnoreCase("card")?@drawable/ic_card:@drawable/ic_pay_other}'
+                app:tint="@drawable/icon_enable"
+                />
+            <androidx.legacy.widget.Space
+                android:layout_width="8dp"
+                android:layout_height="0dp"/>
+            <TextView
+                android:id="@+id/tvCash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="@{model.name}"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@drawable/disable_grey_text_color"
+                android:enabled="@{model.enable}"
+
+                />
+        </LinearLayout>
+    </FrameLayout>
+
+</layout>

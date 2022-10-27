@@ -14,7 +14,7 @@
 
         <variable
             name="deliveryOption"
-            type="String" />
+            type="com.midad_pos.model.DeliveryModel" />
 
         <variable
             name="totalVat"
@@ -238,7 +238,7 @@
                                     android:id="@+id/tvDelivery"
                                     android:layout_width="180dp"
                                     android:layout_height="wrap_content"
-                                    android:text="@{deliveryOption}"
+                                    android:text="@{deliveryOption.name}"
                                     android:textColor="@color/black"
                                     android:textSize="16sp" />
 

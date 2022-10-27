@@ -2,9 +2,11 @@ package com.midad_pos.services;
 
 import com.midad_pos.model.CategoryDataModel;
 import com.midad_pos.model.CustomerDataModel;
+import com.midad_pos.model.DeliveryDataModel;
 import com.midad_pos.model.DiscountDataModel;
 import com.midad_pos.model.HomeIndexModel;
 import com.midad_pos.model.ItemsDataModel;
+import com.midad_pos.model.PaymentDataModel;
 import com.midad_pos.model.SingleCategoryData;
 import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.StatusResponse;
@@ -133,4 +135,15 @@ public interface Service {
                                                       @Field("country") String country,
                                                       @Field("tax_number") String tax_number
     );
+
+    @GET("api/setting/dinner")
+    Single<Response<DeliveryDataModel>> getDining(@Query("user_id") String user_id,
+                                                  @Query("warehouse_id") String warehouse_id
+    );
+
+    @GET("api/setting/payments")
+    Single<Response<PaymentDataModel>> getPayments(@Query("user_id") String user_id,
+                                                   @Query("warehouse_id") String warehouse_id
+    );
+
 }

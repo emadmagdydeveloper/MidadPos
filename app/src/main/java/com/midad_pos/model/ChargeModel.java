@@ -3,7 +3,7 @@ package com.midad_pos.model;
 import java.io.Serializable;
 
 public class ChargeModel implements Serializable {
-    private String payment_type;
+    private PaymentModel paymentModel;
     private String price;
     private boolean isPaid;
     private boolean isEdited = false;
@@ -11,18 +11,18 @@ public class ChargeModel implements Serializable {
     public ChargeModel() {
     }
 
-    public ChargeModel(String payment_type, String price, boolean isPaid) {
-        this.payment_type = payment_type;
+    public ChargeModel(PaymentModel paymentModel, String price, boolean isPaid) {
+        this.paymentModel = paymentModel;
         this.price = price;
         this.isPaid = isPaid;
     }
 
-    public String getPayment_type() {
-        return payment_type;
+    public PaymentModel getPaymentModel() {
+        return paymentModel;
     }
 
-    public void setPayment_type(String payment_type) {
-        this.payment_type = payment_type;
+    public void setPaymentModel(PaymentModel paymentModel) {
+        this.paymentModel = paymentModel;
     }
 
     public String getPrice() {

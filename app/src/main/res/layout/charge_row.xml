@@ -44,6 +44,7 @@
 
 
         <LinearLayout
+            android:id="@+id/llSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -57,7 +58,7 @@
                 android:lines="1"
                 android:gravity="start"
                 android:textAlignment="viewStart"
-                android:text='@{model.payment_type.equals("cash")?@string/cash:@string/card}'
+                android:text='@{model.paymentModel!=null?model.paymentModel.name:""}'
                 />
             <ImageView
                 android:layout_width="24dp"
@@ -76,15 +77,22 @@
             android:background="@color/grey4"
             android:layout_marginTop="16dp"
             />
-        <EditText
+        <TextView
             android:id="@+id/edtPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:inputType="number"
+            android:minHeight="48dp"
             android:lines="1"
             android:textColor="@color/black"
             android:text="@{model.price}"
+            android:gravity="center_vertical"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey4"
+            android:layout_marginTop="16dp"
             />
     </LinearLayout>
     <androidx.legacy.widget.Space

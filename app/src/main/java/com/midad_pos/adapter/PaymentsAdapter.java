@@ -10,27 +10,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
 import com.midad_pos.databinding.CustomerRowBinding;
-import com.midad_pos.databinding.DiscountBinding;
+import com.midad_pos.databinding.PaymentRowBinding;
 import com.midad_pos.model.CustomerModel;
-import com.midad_pos.model.DiscountModel;
+import com.midad_pos.model.PaymentModel;
 import com.midad_pos.uis.activity_charge.ChargeActivity;
 import com.midad_pos.uis.activity_home.HomeActivity;
-import com.midad_pos.uis.activity_items.ItemsActivity;
 
 import java.util.List;
 
-public class CustomersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<CustomerModel> list;
+public class PaymentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private List<PaymentModel> list;
     private Context context;
 
-    public CustomersAdapter(Context context) {
+    public PaymentsAdapter(Context context) {
         this.context = context;
     }
 
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        CustomerRowBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.customer_row, parent, false);
+        PaymentRowBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.payment_row, parent, false);
         return new Holder(binding);
     }
 
@@ -38,13 +37,10 @@ public class CustomersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Holder myHolder = (Holder) holder;
         myHolder.binding.setModel(list.get(position));
-        myHolder.binding.addToTicket.setOnClickListener(v -> {
-            if (context instanceof HomeActivity){
-                HomeActivity activity = (HomeActivity) context;
-                activity.assignCustomerToCart(list.get(myHolder.getAdapterPosition()));
-            }else if (context instanceof ChargeActivity){
+        myHolder.itemView.setOnClickListener(v -> {
+            if (context instanceof ChargeActivity){
                 ChargeActivity activity = (ChargeActivity) context;
-                activity.assignCustomerToCart(list.get(myHolder.getAdapterPosition()));
+                activity.choosePayment(list.get(myHolder.getAdapterPosition()));
             }
         });
 
@@ -58,15 +54,15 @@ public class CustomersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public static class Holder extends RecyclerView.ViewHolder {
-        private CustomerRowBinding binding;
+        private PaymentRowBinding binding;
 
-        public Holder(@NonNull CustomerRowBinding binding) {
+        public Holder(@NonNull PaymentRowBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
     }
 
-    public void updateList(List<CustomerModel> list) {
+    public void updateList(List<PaymentModel> list) {
         this.list = list;
         notifyDataSetChanged();
     }

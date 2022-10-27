@@ -51,6 +51,7 @@ import com.midad_pos.model.AddCustomerModel;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
 import com.midad_pos.model.CustomerModel;
+import com.midad_pos.model.DeliveryModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
@@ -58,6 +59,7 @@ import com.midad_pos.model.VariantModel;
 import com.midad_pos.model.cart.CartList;
 import com.midad_pos.model.cart.ManageCartModel;
 import com.midad_pos.mvvm.HomeMvvm;
+import com.midad_pos.share.App;
 import com.midad_pos.uis.activity_charge.ChargeActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
@@ -234,7 +236,10 @@ public class HomeActivity extends DrawerBaseActivity {
 
         });
 
-        mvvm.getSelectedDeliveryOptions().observe(this, deliveryOption -> binding.setDeliveryOption(deliveryOption));
+        mvvm.getSelectedDeliveryOptions().observe(this, deliveryOption ->{
+            binding.setDeliveryOption(deliveryOption);
+
+        } );
 
         mvvm.getTicketCount().observe(this, ticketCount -> {
             if (binding.toolBarHomeLayout.tvTicketCount != null) {
@@ -933,7 +938,6 @@ public class HomeActivity extends DrawerBaseActivity {
 
                 if (mvvm.getCart().getValue() != null) {
                     CartList cartList = mvvm.getCart().getValue();
-                    Log.e("ccc",cartList.getDelivery_name());
                     if (cartList.getTotalPrice()>0){
                         navigateToChargeActivity();
                     }
@@ -954,7 +958,7 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
     private void navigateToChargeActivity() {
-        mvvm.showPin = false;
+
         Intent intent = new Intent(this, ChargeActivity.class);
         startActivity(intent);
 
@@ -967,6 +971,8 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
         }
+        mvvm.forNavigation = true;
+        mvvm.showPin = false;
     }
 
     private void scrollToLastItemCart() {
@@ -1056,24 +1062,26 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
     private void createDeliveryOptionPopupMenu(View view) {
-        PopupMenu popupMenu = new PopupMenu(this, view);
-        popupMenu.inflate(R.menu.home_delivery_options_menu);
-        popupMenu.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.inPlace) {
-                mvvm.getSelectedDeliveryOptions().setValue(getString(R.string.in_place));
-                mvvm.addDeliveryOption("1",getString(R.string.in_place));
-            } else if (item.getItemId() == R.id.takeAway) {
-                mvvm.getSelectedDeliveryOptions().setValue(getString(R.string.takeaway));
-                mvvm.addDeliveryOption("2",getString(R.string.takeaway));
+        if (mvvm.getDeliveryOptions().getValue()!=null){
+            PopupMenu popupMenu = new PopupMenu(this, view);
+            int pos = 0;
 
-            } else if (item.getItemId() == R.id.delivery) {
-                mvvm.getSelectedDeliveryOptions().setValue(getString(R.string.delivery));
-                mvvm.addDeliveryOption("3",getString(R.string.delivery));
-
+            for (DeliveryModel deliveryModel : mvvm.getDeliveryOptions().getValue()) {
+                popupMenu.getMenu().add(1, pos, 1, deliveryModel.getName());
+                pos++;
             }
-            return true;
-        });
-        popupMenu.show();
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+               if (mvvm.getDeliveryOptions().getValue()!=null){
+                   DeliveryModel deliveryModel = mvvm.getDeliveryOptions().getValue().get(item.getItemId());
+                   mvvm.getSelectedDeliveryOptions().setValue(deliveryModel);
+                   mvvm.addDeliveryOption(deliveryModel.getId(),deliveryModel.getName());
+               }
+                return true;
+            });
+            popupMenu.show();
+        }
+
 
     }
 
@@ -1377,75 +1385,6 @@ public class HomeActivity extends DrawerBaseActivity {
 
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateSelectedPos(0);
-        if (adapter != null) {
-            adapter.updateType(getAppSetting().getHome_layout_type());
-        }
-        if (getAppSetting().getHome_layout_type() == 1) {
-            if (binding.recView != null) {
-                binding.recView.setLayoutManager(new GridLayoutManager(this, 3));
-            }
-
-            if (binding.recViewPort != null) {
-                binding.recViewPort.setLayoutManager(new GridLayoutManager(this, 5));
-
-            }
-
-            if (binding.recViewLand != null) {
-                binding.recViewLand.setLayoutManager(new GridLayoutManager(this, 5));
-
-            }
-        } else {
-            if (binding.recView != null) {
-                binding.recView.setLayoutManager(new LinearLayoutManager(this));
-            }
-
-            if (binding.recViewPort != null) {
-                binding.recViewPort.setLayoutManager(new LinearLayoutManager(this));
-
-            }
-
-            if (binding.recViewLand != null) {
-                binding.recViewLand.setLayoutManager(new LinearLayoutManager(this));
-
-            }
-        }
-
-        if (getUserModel().getData().getSelectedUser() != null) {
-            mvvm.getCategoryData(getUserModel().getData().getSelectedUser().getId());
-
-        } else {
-            mvvm.getCategoryData(getUserModel().getData().getUser().getId());
-
-        }
-
-        if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
-            initCodeScanner(mvvm.getCamera().getValue());
-        }
-        mvvm.getDiscountsData();
-        mvvm.getItemsData();
-
-        if (mvvm.showPin) {
-            showPinCodeView();
-
-        } else {
-            hidePinCodeView();
-        }
-
-
-    }
-
-    @Override
-    public void navigation(Class<?> activityClass) {
-        super.navigation(activityClass);
-        new Handler().postDelayed(() -> mvvm.showPin = false, 1500);
-    }
-
-
     public void setItemData(ItemModel model, int adapterPosition) {
         mvvm.isItemForUpdate = false;
         List<VariantModel> variants = new ArrayList<>();
@@ -1640,6 +1579,75 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        updateSelectedPos(0);
+        if (adapter != null) {
+            adapter.updateType(getAppSetting().getHome_layout_type());
+        }
+
+        if (getAppSetting().getHome_layout_type() == 1) {
+            if (binding.recView != null) {
+                binding.recView.setLayoutManager(new GridLayoutManager(this, 3));
+            }
+
+            if (binding.recViewPort != null) {
+                binding.recViewPort.setLayoutManager(new GridLayoutManager(this, 5));
+
+            }
+
+            if (binding.recViewLand != null) {
+                binding.recViewLand.setLayoutManager(new GridLayoutManager(this, 5));
+
+            }
+        }
+        else {
+            if (binding.recView != null) {
+                binding.recView.setLayoutManager(new LinearLayoutManager(this));
+            }
+
+            if (binding.recViewPort != null) {
+                binding.recViewPort.setLayoutManager(new LinearLayoutManager(this));
+
+            }
+
+            if (binding.recViewLand != null) {
+                binding.recViewLand.setLayoutManager(new LinearLayoutManager(this));
+
+            }
+        }
+
+
+
+        if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
+            initCodeScanner(mvvm.getCamera().getValue());
+        }
+
+
+
+
+        if (App.showHomePin){
+            showPinCodeView();
+
+        }else {
+            if (mvvm.showPin) {
+                showPinCodeView();
+
+            } else {
+                hidePinCodeView();
+            }
+        }
+
+
+
+
+        mvvm.loadHomeData();
+
+
+
+    }
+
+    @Override
     protected void onPause() {
         if (codeScanner != null) {
             codeScanner.releaseResources();
@@ -1653,7 +1661,13 @@ public class HomeActivity extends DrawerBaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        mvvm.showPin = true;
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
+
+        }
 
 
     }
@@ -1661,8 +1675,10 @@ public class HomeActivity extends DrawerBaseActivity {
 
     @Override
     protected void onDestroy() {
+        mvvm.showPin = false;
         super.onDestroy();
         disposable.clear();
+
     }
 
 
