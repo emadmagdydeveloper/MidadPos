@@ -53,7 +53,10 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         baseMvvm.getOnUserRefreshed().observe(this, aBoolean -> {
             navigationViewHeaderBinding.setModel(getUserModel());
         });
-        baseMvvm.getPayments();
+        if (getUserModel()!=null){
+            baseMvvm.getPayments();
+
+        }
         navigationViewHeaderBinding.lock.setOnClickListener(v -> {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
             showPinCodeView();

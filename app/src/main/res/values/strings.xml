@@ -207,6 +207,7 @@
     <string name="new_sale">New Sale</string>
     <string name="total_paid">Total paid</string>
     <string name="change">Change</string>
+    <string name="due_amount">Due amount</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

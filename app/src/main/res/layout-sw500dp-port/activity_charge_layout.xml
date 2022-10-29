@@ -38,6 +38,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:background="@color/white"
+            android:visibility="visible"
             >
 
             <com.google.android.material.appbar.AppBarLayout
@@ -192,5 +193,7 @@
                 layout="@layout/payment_layout"
                 />
         </FrameLayout>
+
+
     </FrameLayout>
 </layout>

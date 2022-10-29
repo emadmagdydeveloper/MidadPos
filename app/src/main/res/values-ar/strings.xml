@@ -207,6 +207,7 @@
     <string name="new_sale">عملية بيع جديدة</string>
     <string name="total_paid">إجمالي المدفوع</string>
     <string name="change">الباقي</string>
+    <string name="due_amount">المبلغ المستحق</string>
 
 
     <string-array name="delivery_options">

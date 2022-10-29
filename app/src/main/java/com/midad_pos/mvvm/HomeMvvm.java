@@ -123,11 +123,15 @@ public class HomeMvvm extends AndroidViewModel {
             getCategoryData(userModel.getData().getUser().getId());
 
         }
+        if (userModel!=null&&userModel.getData().getSelectedUser()!=null){
+            getDining();
+        }
         getDiscountsData();
         getItemsData();
         getCustomers();
         getCartData();
-        getDining();
+
+
     }
 
     public void getCartData(){

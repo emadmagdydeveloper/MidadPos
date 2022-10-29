@@ -64,7 +64,10 @@ public class BaseActivity extends AppCompatActivity {
             baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
 
         }
-        baseMvvm.getPayments();
+        if (getUserModel()!=null){
+            baseMvvm.getPayments();
+
+        }
     }
 
     private void initViews() {
@@ -192,6 +195,7 @@ public class BaseActivity extends AppCompatActivity {
                         userModel.getData().setSelectedUser(user);
                         setUserModel(userModel);
                         baseMvvm.getOnUserRefreshed().setValue(true);
+
                         binding.pinContainer.setVisibility(View.GONE);
                         binding.container.setVisibility(View.VISIBLE);
                         updatePinView("");

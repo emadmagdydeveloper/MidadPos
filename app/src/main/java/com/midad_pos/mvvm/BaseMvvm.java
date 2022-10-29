@@ -34,6 +34,7 @@ public class BaseMvvm extends AndroidViewModel {
     private MutableLiveData<PaymentDataModel.Data> payments;
     private UserModel userModel;
     private MutableLiveData<String> onError;
+    private MutableLiveData<Boolean> isUserSelected;
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
@@ -68,6 +69,13 @@ public class BaseMvvm extends AndroidViewModel {
         return onUserRefreshed;
     }
 
+    public MutableLiveData<Boolean> getIsUserSelected() {
+        if (isUserSelected == null) {
+            isUserSelected = new MutableLiveData<>();
+        }
+        return isUserSelected;
+    }
+
     public MutableLiveData<PaymentDataModel.Data> getPaymentsInstance() {
         if (payments == null) {
             payments = new MutableLiveData<>();
@@ -86,6 +94,9 @@ public class BaseMvvm extends AndroidViewModel {
     public void getPayments() {
         if (getPaymentsInstance().getValue()!=null){
             getPaymentsInstance().setValue(getPaymentsInstance().getValue());
+            return;
+        }
+        if (userModel==null||userModel.getData()==null||userModel.getData().getSelectedUser()==null){
             return;
         }
         Api.getService(Tags.base_url)

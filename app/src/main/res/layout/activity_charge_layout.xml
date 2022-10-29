@@ -181,6 +181,8 @@
 
         </LinearLayout>
 
+
+
         <FrameLayout
             android:id="@+id/splitTicket"
             android:layout_width="match_parent"
@@ -208,6 +210,7 @@
                 layout="@layout/payment_layout"
                 />
         </FrameLayout>
+
 
 
 

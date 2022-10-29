@@ -76,7 +76,7 @@ public class LoginActivity extends BaseActivity {
         mvvm.getOnUserLogin().observe(this, userModel -> {
             if (userModel.getData().getUser().getWarehouses().size()>0){
                 if (userModel.getData().getUser().getWarehouses().size()>1){
-                    if (mvvm.getIsLoginDone().getValue()){
+                    if (mvvm.getIsLoginDone().getValue()!=null&&mvvm.getIsLoginDone().getValue()){
                         mvvm.getIsLoginDone().setValue(false);
                         navigateToWereHouses(userModel);
 

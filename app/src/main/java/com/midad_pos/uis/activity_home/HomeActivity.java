@@ -140,6 +140,10 @@ public class HomeActivity extends DrawerBaseActivity {
                 }
             }
         });
+
+        baseMvvm.getOnUserRefreshed().observe(this,aBoolean -> {
+            mvvm.loadHomeData();
+        });
         binding.toolBarHomeLayout.setLang(getLang());
 
         spinnerCountryAdapter = new SpinnerCountryAdapter(this, getLang());
