@@ -23,7 +23,6 @@ import java.util.Locale;
 public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ChargeModel> list;
     private Context context;
-    private double remaining = 0.0;
 
     public SplitAdapter(Context context) {
         this.context = context;
@@ -63,6 +62,11 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         });
 
+        myHolder.binding.btnCharge.setOnClickListener(v -> {
+            ChargeActivity activity = (ChargeActivity) context;
+            activity.itemSplitPay(list.get(myHolder.getAdapterPosition()));
+        });
+
 
     }
 
@@ -72,10 +76,7 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return list != null ? list.size() : 0;
     }
 
-    public void updateRemaining(Double remaining) {
-        this.remaining = remaining;
-        notifyDataSetChanged();
-    }
+
 
     public static class Holder extends RecyclerView.ViewHolder {
         public ChargeRowBinding binding;

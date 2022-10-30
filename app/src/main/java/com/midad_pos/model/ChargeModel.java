@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class ChargeModel implements Serializable {
     private PaymentModel paymentModel;
     private String price;
+    private double paidAmount=0.0;
     private boolean isPaid;
     private boolean isEdited = false;
 
@@ -16,6 +17,8 @@ public class ChargeModel implements Serializable {
         this.price = price;
         this.isPaid = isPaid;
     }
+
+
 
     public PaymentModel getPaymentModel() {
         return paymentModel;
@@ -47,5 +50,13 @@ public class ChargeModel implements Serializable {
 
     public void setEdited(boolean edited) {
         isEdited = edited;
+    }
+
+    public double getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(double paidAmount) {
+        this.paidAmount = paidAmount;
     }
 }

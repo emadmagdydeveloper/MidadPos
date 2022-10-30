@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.midad_pos.R;
 
 import com.bumptech.glide.Glide;
@@ -191,7 +192,7 @@ public class GeneralMethod {
     }
 
     @BindingAdapter({"numberFormat","type"})
-    public static void numFormat(TextView view,String num,String type) {
+    public static void numFormat(View view,String num,String type) {
         if (num != null) {
             if (type!=null){
                 String newFormat;
@@ -200,11 +201,26 @@ public class GeneralMethod {
                 }else {
                     newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(num));
                 }
-                view.setText(newFormat);
+                if (view instanceof TextView){
+                    TextView textView = (TextView) view;
+                    textView.setText(newFormat);
+                }else if (view instanceof TextInputEditText){
+                    EditText editText = (EditText) view;
+                    editText.setText(newFormat);
+
+                }
+
             }else {
                 String newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(num));
 
-                view.setText(newFormat);
+                if (view instanceof TextView){
+                    TextView textView = (TextView) view;
+                    textView.setText(newFormat);
+                }else if (view instanceof TextInputEditText){
+                    EditText editText = (EditText) view;
+                    editText.setText(newFormat);
+
+                }
             }
 
         }

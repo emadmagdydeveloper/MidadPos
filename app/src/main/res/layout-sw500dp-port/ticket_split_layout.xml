@@ -11,6 +11,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="enable"
+            type="Boolean" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -150,9 +153,11 @@
         </androidx.core.widget.NestedScrollView>
 
         <LinearLayout
+            android:id="@+id/llDone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="gone"
             >
             <View
                 android:layout_width="match_parent"
@@ -162,12 +167,14 @@
                 android:layout_marginEnd="16dp"
                 />
             <Button
+                android:id="@+id/done"
                 android:layout_width="280dp"
                 android:layout_height="64dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="36dp"
-                android:textColor="@color/white"
+                android:textColor="@drawable/disable_text_color"
+                android:enabled="@{enable}"
                 android:text="@string/done"
                 android:textSize="18sp"
                 android:background="@drawable/small_rounded_primary"

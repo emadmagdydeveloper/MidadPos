@@ -3,10 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     >
+
     <data>
+
         <variable
             name="lang"
             type="String" />
+
         <variable
             name="deliveryOption"
             type="String" />
@@ -14,118 +17,125 @@
         <variable
             name="totalVat"
             type="Double" />
+
         <variable
             name="totalDiscounts"
             type="Double" />
+
         <variable
             name="total"
             type="Double" />
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="enabled"
             type="Boolean" />
         <variable
+            name="enabledSplitItem"
+            type="Boolean" />
+
+        <variable
             name="showCash"
             type="Boolean" />
+        <variable
+            name="itemDueAmount"
+            type="Double" />
     </data>
+
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             android:background="@color/white"
-            >
+            android:orientation="vertical"
+            android:visibility="visible">
 
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                >
+                android:layout_height="wrap_content">
+
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolBarCharge"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:background="@color/colorPrimary"
-                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-                    >
+                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
+
                     <ImageView
                         android:id="@+id/arrow"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_back_arrow"
-                        app:tint="@color/white"
                         android:padding="3dp"
                         android:rotation='@{lang.equals("ar")?180:0}'
-                        />
+                        android:src="@drawable/ic_back_arrow"
+                        app:tint="@color/white" />
 
                     <Button
                         android:id="@+id/split"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
-                        android:textColor="@color/white"
-                        android:textSize="15sp"
-                        android:text="@string/split"
                         android:background="@color/transparent"
-                        />
+                        android:text="@string/split"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
                 </com.google.android.material.appbar.MaterialToolbar>
             </com.google.android.material.appbar.AppBarLayout>
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fillViewport="true"
-                >
+                android:fillViewport="true">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    >
+                    android:padding="16dp">
+
                     <TextView
+                        numberFormat="@{String.valueOf(total)}"
+                        type="@{null}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:textSize="28sp"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        numberFormat="@{String.valueOf(total)}"
-                        type="@{null}"
                         android:layout_marginTop="5dp"
-                        />
+                        android:textColor="@color/black"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:textSize="20sp"
-                        android:textColor="@color/grey17"
                         android:text="@string/total_due"
-                        />
+                        android:textColor="@color/grey17"
+                        android:textSize="20sp" />
 
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/cash_received"
-                        app:hintEnabled="true"
-                        app:hintAnimationEnabled="true"
-                        app:hintTextColor="@color/colorPrimary"
                         android:layout_marginTop="60dp"
+                        android:hint="@string/cash_received"
                         android:visibility="@{showCash?View.VISIBLE:View.GONE}"
-                        >
+                        app:hintAnimationEnabled="true"
+                        app:hintEnabled="true"
+                        app:hintTextColor="@color/colorPrimary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edtCash"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@color/transparent"
-                            android:paddingStart="0dp"
-                            android:paddingEnd="0dp"
                             android:inputType="number"
                             android:lines="1"
-                            />
+                            android:paddingStart="0dp"
+                            android:paddingEnd="0dp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <FrameLayout
@@ -137,33 +147,35 @@
                         android:visibility="@{showCash?View.VISIBLE:View.GONE}"
 
                         >
+
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:gravity="center_vertical"
-                            >
+                            android:gravity="center_vertical">
+
                             <ImageView
                                 android:id="@+id/iconCash"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:padding="3dp"
                                 android:src="@drawable/ic_cash"
-                                app:tint="@drawable/icon_enable"
-                                />
+                                app:tint="@drawable/icon_enable" />
+
                             <androidx.legacy.widget.Space
                                 android:layout_width="8dp"
-                                android:layout_height="0dp"/>
+                                android:layout_height="0dp" />
+
                             <TextView
                                 android:id="@+id/tvCash"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="18sp"
+                                android:enabled="@{enabled}"
                                 android:text="@string/cash"
-                                android:textStyle="bold"
                                 android:textAllCaps="true"
                                 android:textColor="@drawable/disable_grey_text_color"
-                                android:enabled="@{enabled}"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
 
                                 />
                         </LinearLayout>
@@ -172,8 +184,7 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recViewPayment"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        />
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
@@ -182,19 +193,17 @@
         </LinearLayout>
 
 
-
         <FrameLayout
             android:id="@+id/splitTicket"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
+
             <include
                 android:id="@+id/ticketSplit"
-                layout="@layout/ticket_split_layout"
-                />
+                layout="@layout/ticket_split_layout" />
         </FrameLayout>
 
         <FrameLayout
@@ -204,14 +213,149 @@
             android:clickable="true"
             android:focusable="true"
             android:visibility="gone"
+            android:background="@color/white"
             >
+
             <include
                 android:id="@+id/payment"
-                layout="@layout/payment_layout"
-                />
+                layout="@layout/payment_layout" />
         </FrameLayout>
 
 
+        <LinearLayout
+            android:id="@+id/llSplitItemPayment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            >
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@color/colorPrimary"
+                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
+
+                    <ImageView
+                        android:id="@+id/arrowSplitItemAmount"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:padding="3dp"
+                        android:rotation='@{lang.equals("ar")?180:0}'
+                        android:src="@drawable/ic_back_arrow"
+                        app:tint="@color/white" />
+
+
+                </com.google.android.material.appbar.MaterialToolbar>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        numberFormat="@{String.valueOf(itemDueAmount)}"
+                        type="@{null}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="5dp"
+                        android:textColor="@color/black"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="@string/due_amount"
+                        android:textColor="@color/grey17"
+                        android:textSize="20sp" />
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="60dp"
+                        android:hint="@string/cash_received"
+                        app:hintAnimationEnabled="true"
+                        app:hintEnabled="true"
+                        app:hintTextColor="@color/colorPrimary">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtCashSplitItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/transparent"
+                            android:inputType="number"
+                            android:lines="1"
+                            android:paddingStart="0dp"
+                            android:paddingEnd="0dp"
+
+                            />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <FrameLayout
+                        android:id="@+id/flCashSplitItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="26dp"
+                        android:background="@drawable/pay_bg"
+                        android:enabled="@{enabledSplitItem}"
+
+
+                        >
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:padding="3dp"
+                                android:src="@drawable/ic_cash"
+                                app:tint="@drawable/icon_enable" />
+
+                            <androidx.legacy.widget.Space
+                                android:layout_width="8dp"
+                                android:layout_height="0dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:enabled="@{enabled}"
+                                android:text="@string/cash"
+                                android:textAllCaps="true"
+                                android:textColor="@drawable/disable_grey_text_color"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+
+                                />
+                        </LinearLayout>
+                    </FrameLayout>
+
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+
+
+        </LinearLayout>
 
 
     </FrameLayout>

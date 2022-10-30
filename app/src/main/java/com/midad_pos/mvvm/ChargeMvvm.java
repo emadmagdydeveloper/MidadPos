@@ -74,7 +74,9 @@ public class ChargeMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isDialogPriceOpened;
     private MutableLiveData<String> splitPrice;
     public int splitPos = -1;
-    private MutableLiveData<Boolean> showSplitItemPayment;
+    private MutableLiveData<Boolean> showItemPaid;
+    public ChargeModel itemForPaid;
+    private MutableLiveData<String> itemSplitPrice;
 
 
 
@@ -121,12 +123,7 @@ public class ChargeMvvm extends AndroidViewModel {
         return isPaidShown;
     }
 
-    public MutableLiveData<Boolean> getShowSplitItemPayment() {
-        if (showSplitItemPayment == null) {
-            showSplitItemPayment = new MutableLiveData<>();
-        }
-        return showSplitItemPayment;
-    }
+
 
 
     public MutableLiveData<Integer> getSplitAmount() {
@@ -166,7 +163,6 @@ public class ChargeMvvm extends AndroidViewModel {
     public MutableLiveData<Double> getRemaining() {
         if (remaining == null) {
             remaining = new MutableLiveData<>();
-            remaining.setValue(0.00);
         }
         return remaining;
     }
@@ -209,6 +205,13 @@ public class ChargeMvvm extends AndroidViewModel {
             isOpenedCustomerDialog = new MutableLiveData<>();
         }
         return isOpenedCustomerDialog;
+    }
+
+    public MutableLiveData<Boolean> getShowItemPaid() {
+        if (showItemPaid == null) {
+            showItemPaid = new MutableLiveData<>();
+        }
+        return showItemPaid;
     }
 
     public MutableLiveData<Boolean> getIsAddCustomerDialogShow() {
@@ -272,6 +275,14 @@ public class ChargeMvvm extends AndroidViewModel {
             splitPrice.setValue("0.00");
         }
         return splitPrice;
+    }
+
+    public MutableLiveData<String> getItemSplitPrice() {
+        if (itemSplitPrice == null) {
+            itemSplitPrice = new MutableLiveData<>();
+            itemSplitPrice.setValue("0.00");
+        }
+        return itemSplitPrice;
     }
 
     public void getCustomers() {
@@ -450,17 +461,24 @@ public class ChargeMvvm extends AndroidViewModel {
 
     public void increase_decrease(int type) {
 
-        if (getSplitAmount().getValue() != null && getCartListInstance().getValue() != null) {
+        if (getSplitAmount().getValue() != null && getCartListInstance().getValue() != null&&getPaidAmount().getValue()!=null) {
             int amount = getSplitAmount().getValue();
             if (type == 1) {
                 if (amount < 50) {
+                    double total = Double.parseDouble(getPaidAmount().getValue());
+
+                    if (getUnPaidUnEdited().size()==0&&getTotalEditedPrice(-1)>=total){
+
+                    }else {
+                        amount++;
+                        getSplitAmount().setValue(amount);
 
 
-                    amount++;
-                    getSplitAmount().setValue(amount);
+                        addAdditionalSplit();
+                    }
 
 
-                    addAdditionalSplit();
+
 
                 }
             } else {
@@ -481,7 +499,6 @@ public class ChargeMvvm extends AndroidViewModel {
         if (getCartListInstance().getValue() != null) {
             List<ChargeModel> list = new ArrayList<>();
             double total = getCartListInstance().getValue().getTotalPrice();
-
             for (int index = 0; index < size; index++) {
                 double stepTotal = total / (size);
                 ChargeModel chargeModel;
@@ -512,16 +529,20 @@ public class ChargeMvvm extends AndroidViewModel {
 
             }
 
+
             getSplitList().setValue(list);
+            getRemainingPrice();
+
         }
 
     }
 
     public void addAdditionalSplit() {
-        if (getSplitList().getValue() != null && getRemaining().getValue() != null) {
+        if (getSplitList().getValue() != null && getPaidAmount().getValue() != null) {
             double totalPrice = 0.0;
             if (getUnPaidUnEdited().size() > 0) {
-                totalPrice = (getRemaining().getValue() - getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size() + 1);
+                totalPrice = (Double.parseDouble(getPaidAmount().getValue())-getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size() + 1);
+                Log.e("pr",getRemaining().getValue()+"__"+getTotalEditedPrice(-1)+"__"+getUnPaidUnEdited().size()+"___"+totalPrice);
                 for (ChargeModel chargeModel : getSplitList().getValue()) {
                     if (!chargeModel.isEdited()) {
                         chargeModel.setPrice(String.format(Locale.US, "%.2f", totalPrice));
@@ -529,7 +550,8 @@ public class ChargeMvvm extends AndroidViewModel {
                 }
 
             } else {
-                totalPrice = (getRemaining().getValue() - getTotalEditedPrice(-1));
+
+                totalPrice = (Double.parseDouble(getPaidAmount().getValue()) - getTotalEditedPrice(-1));
 
             }
 
@@ -560,10 +582,11 @@ public class ChargeMvvm extends AndroidViewModel {
     }
 
     public void decreaseAdditionalSplit() {
-        if (getSplitList().getValue() != null&&getRemaining().getValue()!=null) {
+        if (getSplitList().getValue() != null&&getPaidAmount().getValue()!=null) {
             getSplitList().getValue().remove(getSplitList().getValue().size()-1);
             if (getUnPaidUnEdited().size() > 0) {
-                double totalPrice = (getRemaining().getValue() - getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size());
+                double totalPrice = (Double.parseDouble(getPaidAmount().getValue())-getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size() );
+
                 for (ChargeModel chargeModel : getSplitList().getValue()) {
                     if (!chargeModel.isEdited()) {
                         chargeModel.setPrice(String.format(Locale.US, "%.2f", totalPrice));
@@ -571,6 +594,7 @@ public class ChargeMvvm extends AndroidViewModel {
                 }
 
             }
+            getRemainingPrice();
             getSplitList().setValue(getSplitList().getValue());
         }
 
@@ -596,13 +620,20 @@ public class ChargeMvvm extends AndroidViewModel {
 
             getRemainingPrice();
             if (getRemaining().getValue() != null) {
-                double remaining = getRemaining().getValue() - getTotalEditedPrice(pos);
+                double remaining = getRemaining().getValue()-getTotalEditedPrice(pos);
+                remaining = Math.abs(remaining);
+
+                Log.e("prrr",getRemaining().getValue()+"____"+getTotalEditedPrice(pos)+"___"+remaining+"___"+price);
 
                 if (price > remaining) {
                     price = remaining;
+                    model.setEdited(false);
+
+                }else {
+                    model.setEdited(true);
+
                 }
                 model.setPrice(String.format(Locale.US, "%.2f", price));
-                model.setEdited(true);
 
                 int unPaidUnEditedSize = getUnPaidUnEdited().size();
                 double stepPrice = (remaining - price) / unPaidUnEditedSize;
@@ -668,6 +699,25 @@ public class ChargeMvvm extends AndroidViewModel {
         return 0.0;
     }
 
+
+    public double getTotalPaidPrice() {
+        if (getSplitList().getValue() != null ) {
+            double total = 0.0;
+            for (int index = 0; index < getSplitList().getValue().size(); index++) {
+                ChargeModel chargeModel = getSplitList().getValue().get(index);
+                if (chargeModel.isPaid()){
+                    total += Double.parseDouble(chargeModel.getPrice());
+                }
+
+
+            }
+            return total;
+
+
+        }
+
+        return 0.0;
+    }
 
     public void getRemainingPrice() {
         if (getSplitList().getValue() != null && getPaidAmount().getValue() != null) {

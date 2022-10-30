@@ -51,7 +51,6 @@ public class ChargeActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.activity_charge, null, false);
         setContentView(binding.getRoot());
         initView();
@@ -106,6 +105,10 @@ public class ChargeActivity extends BaseActivity {
 
         });
 
+        if (mvvm.getItemSplitPrice().getValue()!=null){
+            binding.layout.edtCashSplitItem.setText(mvvm.getItemSplitPrice().getValue().replace(",",""));
+
+        }
         mvvm.getPayment().observe(this, payments -> {
             if (paymentsAdapter != null) {
                 paymentsAdapter.updateList(payments.getAll());
@@ -149,9 +152,6 @@ public class ChargeActivity extends BaseActivity {
         mvvm.getRemaining().observe(this, remaining -> {
             binding.layout.ticketSplit.setRemaining(String.format(Locale.US, "%.2f", remaining));
             binding.layout.payment.setChangeAmount(remaining + "");
-            if (splitAdapter!=null){
-                splitAdapter.updateRemaining(remaining);
-            }
             Log.e("remainAmount", remaining + "");
 
 
@@ -163,6 +163,12 @@ public class ChargeActivity extends BaseActivity {
             if (splitAdapter != null) {
                 splitAdapter.updateList(list);
             }
+            if (binding.layout.ticketSplit.llDone!=null){
+                Log.e("rem",mvvm.getRemaining().getValue()+"");
+
+                binding.layout.ticketSplit.llDone.setVisibility((mvvm.getRemaining().getValue()!=null&&mvvm.getRemaining().getValue()==0)?View.VISIBLE:View.GONE);
+            }
+            binding.layout.ticketSplit.setEnable(mvvm.getRemaining().getValue()!=null&&mvvm.getRemaining().getValue()==0);
         });
 
         mvvm.getIsPaidShown().observe(this, isShown -> {
@@ -170,7 +176,6 @@ public class ChargeActivity extends BaseActivity {
         });
 
         mvvm.getPaidAmount().observe(this, paidAmount -> {
-            Log.e("paid", paidAmount);
             binding.layout.payment.setPaidAmount(paidAmount);
         });
 
@@ -185,7 +190,19 @@ public class ChargeActivity extends BaseActivity {
         });
 
 
+
+
+
         mvvm.getSplitPrice().observe(this, price -> binding.dialogAddPrice.setPrice(price));
+
+        mvvm.getShowItemPaid().observe(this,show -> {
+            binding.layout.llSplitItemPayment.setVisibility(show?View.VISIBLE:View.GONE);
+            binding.layout.setItemDueAmount(Double.parseDouble(mvvm.itemForPaid.getPrice().replace(",","")));
+        });
+
+        binding.layout.arrowSplitItemAmount.setOnClickListener(v -> {
+            mvvm.getShowItemPaid().setValue(false);
+        });
 
         binding.layout.arrow.setOnClickListener(v -> onBackPressed());
         binding.layout.ticketSplit.arrow.setOnClickListener(v -> {
@@ -259,6 +276,58 @@ public class ChargeActivity extends BaseActivity {
 
             }
         });
+
+        binding.layout.edtCashSplitItem.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                binding.layout.edtCashSplitItem.removeTextChangedListener(this);
+                String num = editable.toString().trim();
+                if (num.equals("0.00") || num.isEmpty()) {
+                    binding.layout.edtCashSplitItem.setText("0.00");
+                    binding.layout.edtCashSplitItem.setSelection(binding.layout.edtCashSplitItem.getText().length());
+
+
+                } else {
+                    num = num.replace(".", "");
+                    num = num.replace(",", "");
+                    float pr = Float.parseFloat(num) / 100.0f;
+                    num = String.format(Locale.US, "%.2f", pr);
+                    if (num.length() >= 9) {
+                        binding.layout.edtCashSplitItem.setText("999,999.99");
+
+                    } else if (num.length() == 7 || num.length() == 8) {
+                        StringBuilder builder = new StringBuilder(num);
+                        builder.insert(num.length() - 6, ",");
+                        num = builder.toString();
+                        binding.layout.edtCashSplitItem.setText(num);
+
+                    } else {
+                        binding.layout.edtCashSplitItem.setText(num);
+
+                    }
+
+                    binding.layout.setEnabledSplitItem(Double.parseDouble(num.replace(",",""))>=Double.parseDouble(mvvm.itemForPaid.getPrice()));
+
+                }
+                mvvm.getItemSplitPrice().setValue(num);
+
+
+                binding.layout.edtCashSplitItem.setSelection(binding.layout.edtCashSplitItem.getText().length());
+                binding.layout.edtCashSplitItem.addTextChangedListener(this);
+
+            }
+        });
+
 
         if (binding.layout.flCash != null) {
             binding.layout.flCash.setOnClickListener(v -> {
@@ -455,7 +524,6 @@ public class ChargeActivity extends BaseActivity {
         binding.dialogAddPrice.btnOk.setOnClickListener(v -> {
             if (mvvm.getSplitPrice().getValue() != null) {
 
-                Log.e("qq",mvvm.getSplitPrice().getValue());
                 if (mvvm.getSplitPrice().getValue()!=null&&mvvm.splitPos!=-1){
                     mvvm.updateList(Double.parseDouble(mvvm.getSplitPrice().getValue().replace(",","")),mvvm.splitPos);
 
@@ -472,6 +540,28 @@ public class ChargeActivity extends BaseActivity {
         binding.dialogAddPrice.close.setOnClickListener(v -> {
             mvvm.getIsDialogPriceOpened().setValue(false);
         });
+
+        if (binding.layout.btnChargeSplitItem!=null){
+            binding.layout.btnChargeSplitItem.setOnClickListener(v -> {
+                mvvm.itemForPaid.setPaid(true);
+                mvvm.itemForPaid.setEdited(true);
+                mvvm.getShowItemPaid().setValue(false);
+                mvvm.getRemainingPrice();
+                mvvm.getSplitList().setValue(mvvm.getSplitList().getValue());
+
+            });
+        }
+
+        if (binding.layout.flCashSplitItem!=null){
+            binding.layout.flCashSplitItem.setOnClickListener(v -> {
+                mvvm.itemForPaid.setPaid(true);
+                mvvm.itemForPaid.setEdited(true);
+                mvvm.getShowItemPaid().setValue(false);
+                mvvm.getSplitList().setValue(mvvm.getSplitList().getValue());
+
+            });
+        }
+
 
     }
 
@@ -498,9 +588,12 @@ public class ChargeActivity extends BaseActivity {
     }
 
     public void updatePriceChange(ChargeModel model ,int pos) {
-        mvvm.splitPos = pos;
-        mvvm.getSplitPrice().setValue(model.getPrice());
-        mvvm.getIsDialogPriceOpened().setValue(true);
+        if (!model.isPaid()){
+            mvvm.splitPos = pos;
+            mvvm.getSplitPrice().setValue(model.getPrice());
+            mvvm.getIsDialogPriceOpened().setValue(true);
+        }
+
 
     }
 
@@ -575,7 +668,10 @@ public class ChargeActivity extends BaseActivity {
     }
 
     public void chooseSplitPayment(ChargeModel chargeModel, int adapterPosition, View view) {
-        createMenu(view, chargeModel, adapterPosition);
+        if (!chargeModel.isPaid()){
+            createMenu(view, chargeModel, adapterPosition);
+
+        }
     }
 
     private void createMenu(View view, ChargeModel chargeModel, int adapterPos) {
@@ -611,4 +707,20 @@ public class ChargeActivity extends BaseActivity {
         mvvm.showPin = false;
     }
 
+    public void itemSplitPay(ChargeModel chargeModel) {
+        mvvm.itemForPaid = chargeModel;
+        if (chargeModel.getPaymentModel().getType().equalsIgnoreCase("cash")){
+            mvvm.getItemSplitPrice().setValue(chargeModel.getPrice());
+            binding.layout.edtCashSplitItem.setText(chargeModel.getPrice().replace(",",""));
+
+            binding.layout.setItemDueAmount(Double.parseDouble(chargeModel.getPrice().replace(",","")));
+            mvvm.getShowItemPaid().setValue(true);
+        }else {
+            mvvm.itemForPaid.setPaid(true);
+            mvvm.itemForPaid.setEdited(true);
+            mvvm.getRemainingPrice();
+            mvvm.getSplitList().setValue(mvvm.getSplitList().getValue());
+        }
+
+    }
 }

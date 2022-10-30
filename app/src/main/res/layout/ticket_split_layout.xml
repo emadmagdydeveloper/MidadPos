@@ -11,6 +11,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="enable"
+            type="Boolean" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,8 +64,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:textColor="@color/white"
+                    android:textColor="@drawable/disable_text_color"
                     android:textSize="15sp"
+                    android:enabled="@{enable}"
                     android:text="@string/done"
                     android:background="@color/transparent"
                     />

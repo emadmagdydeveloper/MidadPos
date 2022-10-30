@@ -28,6 +28,7 @@ public class CartModel implements Serializable {
 
 
 
+
     public CartModel(String user_id, String warehouse_id, String customer_id, int total_qty, String total_discount, String total_price, int item, double order_tax, double total_tax, double grand_total, String sale_status, String pos, String draft, double paying_amount, double paid_amount, String paid_by_id, String order_discount, String payment_status, String order_discount_type, List<CartDiscount> discounts, List<Details> details) {
         this.user_id = user_id;
         this.warehouse_id = warehouse_id;

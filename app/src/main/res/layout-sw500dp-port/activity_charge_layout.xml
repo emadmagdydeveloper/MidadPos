@@ -24,10 +24,17 @@
         <variable
             name="enabled"
             type="Boolean" />
+        <variable
+            name="enabledSplitItem"
+            type="Boolean" />
 
         <variable
             name="showCash"
             type="Boolean" />
+
+        <variable
+            name="itemDueAmount"
+            type="Double" />
     </data>
     <FrameLayout
         android:layout_width="match_parent"
@@ -38,7 +45,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:background="@color/white"
-            android:visibility="visible"
             >
 
             <com.google.android.material.appbar.AppBarLayout
@@ -193,6 +199,132 @@
                 layout="@layout/payment_layout"
                 />
         </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/llSplitItemPayment"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            >
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@color/colorPrimary"
+                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+                    >
+                    <ImageView
+                        android:id="@+id/arrowSplitItemAmount"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_back_arrow"
+                        app:tint="@color/white"
+                        android:padding="3dp"
+                        android:rotation='@{lang.equals("ar")?180:0}'
+                        />
+
+
+                </com.google.android.material.appbar.MaterialToolbar>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="28sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        numberFormat="@{String.valueOf(itemDueAmount)}"
+                        type="@{null}"
+                        android:layout_marginTop="5dp"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="20sp"
+                        android:textColor="@color/grey17"
+                        android:text="@string/due_amount"
+                        />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="60dp"
+                        android:visibility="@{showCash?View.VISIBLE:View.GONE}"
+                        >
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/cash_received"
+                            app:hintEnabled="true"
+                            app:hintAnimationEnabled="true"
+                            app:hintTextColor="@color/colorPrimary"
+                            app:startIconDrawable="@drawable/ic_cash"
+                            style="@style/text_input_appearance"
+                            >
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtCashSplitItem"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/transparent"
+                                android:paddingStart="0dp"
+                                android:paddingEnd="0dp"
+                                android:inputType="number"
+                                android:lines="1"
+
+                                />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <androidx.legacy.widget.Space
+                            android:layout_width="16dp"
+                            android:layout_height="0dp"/>
+                        <Button
+                            android:id="@+id/btnChargeSplitItem"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/small_rounded_primary"
+                            app:backgroundTint="@null"
+                            android:textColor='@drawable/disable_text_color'
+                            android:text="@string/charge"
+                            android:enabled="@{enabledSplitItem}"
+
+                            />
+                    </LinearLayout>
+
+
+
+
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+
+
+        </LinearLayout>
+
 
 
     </FrameLayout>
