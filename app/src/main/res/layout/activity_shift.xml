@@ -61,7 +61,6 @@
 
             </com.google.android.material.appbar.AppBarLayout>
 
-
             <FrameLayout
                 android:id="@+id/flOpenShift"
                 android:layout_width="match_parent"
@@ -625,7 +624,12 @@
 
             </FrameLayout>
 
+
+
+
+
         </LinearLayout>
+
 
         <FrameLayout
             android:id="@+id/flDialog"
@@ -675,6 +679,16 @@
                 layout="@layout/dialog_close_shift_layout"
                 />
         </FrameLayout>
+
+        <ProgressBar
+            android:id="@+id/loader"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+
+            />
+
 
     </FrameLayout>
 

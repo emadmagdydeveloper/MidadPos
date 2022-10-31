@@ -566,5 +566,52 @@
                 layout="@layout/dialog_cart_discounts" />
         </FrameLayout>
 
+
+        <LinearLayout
+            android:id="@+id/llOpenShift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="36dp"
+            >
+            <ImageView
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:src="@drawable/ic_clock"
+                app:tint="@color/grey18"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/shift_is_close"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/grey4"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/open_shift_to_continue"
+                android:textSize="16sp"
+                />
+            <Button
+                android:id="@+id/openShift"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:text="@string/open_shift"
+                android:minWidth="180dp"
+                />
+        </LinearLayout>
+
+
     </FrameLayout>
 </layout>

@@ -108,6 +108,8 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         itemId = item.getItemId();
 
         if (item.getItemId() == R.id.sales) {
+            App.saleSelected = true;
+
             if (selectedPos != 0) {
                 App app = (App) getApplicationContext();
                 app.killAllActivities();
@@ -117,17 +119,22 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
 
         } else if (item.getItemId() == R.id.receipts) {
+            App.saleSelected = false;
+
             if (selectedPos != 1) {
                 navigation(ReceiptsActivity.class);
             }
 
         } else if (item.getItemId() == R.id.shift) {
+            App.saleSelected = false;
+
             if (selectedPos != 2) {
                 navigation(ShiftActivity.class);
             }
 
 
         } else if (item.getItemId() == R.id.items) {
+            App.saleSelected = false;
 
             if (selectedPos != 3) {
                 navigation(ItemsActivity.class);
@@ -135,16 +142,22 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
 
         } else if (item.getItemId() == R.id.settings) {
+            App.saleSelected = false;
+
             if (selectedPos != 4) {
                 navigation(SettingsActivity.class);
             }
 
         } else if (item.getItemId() == R.id.support) {
+            App.saleSelected = false;
+
             if (selectedPos != 6) {
                 navigation(SupportActivity.class);
             }
 
         } else if (item.getItemId() == R.id.backOffice) {
+            App.saleSelected = false;
+
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://midad-pos.wem-tech.site/login"));
             startActivity(intent);
 

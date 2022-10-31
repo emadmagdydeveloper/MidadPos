@@ -11,10 +11,12 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
+import com.midad_pos.model.AppSettingModel;
 import com.midad_pos.model.CustomerDataModel;
 import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DeliveryDataModel;
 import com.midad_pos.model.DeliveryModel;
+import com.midad_pos.model.ShiftDataModel;
 import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.cart.CartList;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -83,7 +86,7 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<ItemModel> itemForPrice;
 
     private MutableLiveData<List<DiscountModel>> discounts;
-    public boolean showPin = true;
+    public boolean showPin = false;
     public boolean forNavigation = false;
     private MutableLiveData<Boolean> isTicketModel;
     ///////////////////////////
@@ -100,6 +103,8 @@ public class HomeMvvm extends AndroidViewModel {
     public boolean isItemForUpdate = false;
     private MutableLiveData<List<DiscountModel>> cartDiscounts;
     private List<DiscountModel> deletedCartDiscounts = new ArrayList<>();
+    ///////////////////////////////////////////////////////////////////////////
+    private MutableLiveData<AppSettingModel> appSettingModel;
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
@@ -115,17 +120,30 @@ public class HomeMvvm extends AndroidViewModel {
         getAddCustomerModel();
     }
 
-    public void loadHomeData(){
-        if (userModel.getData().getSelectedUser() != null) {
-            getCategoryData(userModel.getData().getSelectedUser().getId());
 
-        } else {
-            getCategoryData(userModel.getData().getUser().getId());
+    public void loadHomeData(){
+
+        if (userModel!=null&&userModel.getData()!=null&&userModel.getData().getSelectedUser()!=null&&userModel.getData().getSelectedWereHouse()!=null&&userModel.getData().getSelectedPos()!=null){
+            getCurrentShift();
+        }
+
+        if (userModel!=null&&userModel.getData()!=null) {
+
+            if (userModel.getData().getSelectedUser() != null){
+                getCategoryData(userModel.getData().getSelectedUser().getId());
+
+            }else {
+                getCategoryData(userModel.getData().getUser().getId());
+
+            }
 
         }
-        if (userModel!=null&&userModel.getData().getSelectedUser()!=null){
+
+        if (userModel!=null&&userModel.getData()!=null&&userModel.getData().getSelectedUser()!=null){
             getDining();
         }
+
+
         getDiscountsData();
         getItemsData();
         getCustomers();
@@ -138,6 +156,7 @@ public class HomeMvvm extends AndroidViewModel {
         getCart().setValue(manageCartModel.getCartModel(getApplication().getApplicationContext()));
 
     }
+
 
     public MutableLiveData<CartList> getCart() {
         if (cart == null) {
@@ -363,6 +382,79 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return onCustomerUpdatedSuccess;
     }
+
+    public MutableLiveData<AppSettingModel> getAppSettingModel() {
+        if (appSettingModel == null) {
+            appSettingModel = new MutableLiveData<>();
+
+        }
+        return appSettingModel;
+    }
+
+    public void getCurrentShift() {
+        Api.getService(Tags.base_url)
+                .currentShift(userModel.getData().getSelectedUser().getId(),userModel.getData().getSelectedWereHouse().getId(),userModel.getData().getSelectedPos().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<ShiftDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<ShiftDataModel> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
+
+                                if (response.body().getStatus() == 200) {
+                                    settingModel.setIsShiftOpen(1);
+                                    settingModel.setShift_id(response.body().getData().getId());
+                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(),settingModel);
+                                    getAppSettingModel().setValue(settingModel);
+
+                                }else if (response.body().getStatus()==201){
+                                    settingModel.setIsShiftOpen(0);
+                                    settingModel.setShift_id(null);
+                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(),settingModel);
+                                    getAppSettingModel().setValue(settingModel);
+                                    clearCart();
+
+                                }else {
+
+                                }
+                            } else {
+
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
+    }
+
 
     public void getDining() {
         Api.getService(Tags.base_url)

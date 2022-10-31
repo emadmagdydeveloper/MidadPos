@@ -26,6 +26,7 @@ import java.util.Set;
 
 public class App extends MultiDexApplication {
     public static boolean showHomePin = true;
+    public static boolean saleSelected = true;
 
     private Set<Activity> runningActivities = new HashSet<>();
 
@@ -44,7 +45,10 @@ public class App extends MultiDexApplication {
                 if (activity instanceof ReceiptsActivity||activity instanceof ItemsActivity||activity instanceof SettingsActivity||activity instanceof SupportActivity||activity instanceof ShiftActivity){
                     runningActivities.add(activity);
                     showHomePin = false;
+
                 }
+
+
 
                 if (activity instanceof ChargeActivity){
                     showHomePin = false;

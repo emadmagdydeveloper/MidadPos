@@ -7,6 +7,7 @@ import com.midad_pos.model.DiscountDataModel;
 import com.midad_pos.model.HomeIndexModel;
 import com.midad_pos.model.ItemsDataModel;
 import com.midad_pos.model.PaymentDataModel;
+import com.midad_pos.model.ShiftDataModel;
 import com.midad_pos.model.SingleCategoryData;
 import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.StatusResponse;
@@ -144,6 +145,28 @@ public interface Service {
     @GET("api/setting/payments")
     Single<Response<PaymentDataModel>> getPayments(@Query("user_id") String user_id,
                                                    @Query("warehouse_id") String warehouse_id
+    );
+
+
+    @FormUrlEncoded
+    @POST("api/shift/storeShift")
+    Single<Response<ShiftDataModel>> openShift(@Field("user_id") String user_id,
+                                               @Field("cash_in_hand") String cash_in_hand,
+                                               @Field("warehouse_id") String warehouse_id,
+                                               @Field("pos_id") String pos_id
+    );
+
+    @FormUrlEncoded
+    @POST("api/shift/closeShift")
+    Single<Response<StatusResponse>> closeShift(@Field("user_id") String user_id,
+                                               @Field("shift_id") String shift_id
+
+    );
+
+    @GET("api/shift/currentShift")
+    Single<Response<ShiftDataModel>> currentShift(@Query("user_id") String user_id,
+                                                  @Query("warehouse_id") String warehouse_id,
+                                                  @Query("pos_id") String pos_id
     );
 
 }

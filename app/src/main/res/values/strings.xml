@@ -208,6 +208,10 @@
     <string name="total_paid">Total paid</string>
     <string name="change">Change</string>
     <string name="due_amount">Due amount</string>
+    <string name="shift_is_close">Shift is closed</string>
+    <string name="open_shift_to_continue">Open shift to continue</string>
+    <string name="shift_alrady_opned">Shift already opened</string>
+    <string name="shift_already_closed">Shift already closed</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

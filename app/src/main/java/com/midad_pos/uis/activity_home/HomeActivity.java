@@ -48,6 +48,7 @@ import com.midad_pos.adapter.SpinnerCountryAdapter;
 import com.midad_pos.databinding.ActivityHomeBinding;
 import com.midad_pos.databinding.DialogClearTicketLayoutBinding;
 import com.midad_pos.model.AddCustomerModel;
+import com.midad_pos.model.AppSettingModel;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.CountryModel;
 import com.midad_pos.model.CustomerModel;
@@ -63,6 +64,7 @@ import com.midad_pos.share.App;
 import com.midad_pos.uis.activity_charge.ChargeActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
+import com.midad_pos.uis.activity_shift.ShiftActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +93,7 @@ public class HomeActivity extends DrawerBaseActivity {
     private CartAdapter cartAdapter;
     private CartDiscountAdapter cartDiscountAdapter;
     private CustomersAdapter customersAdapter;
+
 
     @Override
     protected void onStart() {
@@ -168,6 +171,7 @@ public class HomeActivity extends DrawerBaseActivity {
             }
         });
 
+        mvvm.getAppSettingModel().observe(this, this::updateShiftData);
         mvvm.getIsCustomerLoading().observe(this,isLoading-> binding.addCustomerDialog.searchDialog.loader.setVisibility(isLoading?View.VISIBLE:View.GONE));
 
         binding.addCustomerDialog.searchDialog.recView.setLayoutManager(new LinearLayoutManager(this));
@@ -262,13 +266,21 @@ public class HomeActivity extends DrawerBaseActivity {
         mvvm.getCountryPos().observe(this, pos -> binding.addCustomerDialog.addCustomerLayout.spinnerCountry.setSelection(pos));
 
         mvvm.getIsLoading().observe(this, isLoading -> {
-            if (isLoading) {
+
+            if (getAppSetting().getIsShiftOpen()==0){
                 binding.llNoItems.setVisibility(View.GONE);
-                binding.loader.setVisibility(View.VISIBLE);
-            } else {
                 binding.loader.setVisibility(View.GONE);
 
+            }else {
+                if (isLoading) {
+                    binding.llNoItems.setVisibility(View.GONE);
+                    binding.loader.setVisibility(View.VISIBLE);
+                } else {
+                    binding.loader.setVisibility(View.GONE);
+
+                }
             }
+
         });
 
         mvvm.getItems().observe(this, items -> {
@@ -280,7 +292,13 @@ public class HomeActivity extends DrawerBaseActivity {
                 binding.llNoItems.setVisibility(View.GONE);
             } else {
                 if (mvvm.getIsLoading().getValue() != null && !mvvm.getIsLoading().getValue()) {
-                    binding.llNoItems.setVisibility(View.VISIBLE);
+                    if (getAppSetting().getIsShiftOpen()==0){
+                        binding.llNoItems.setVisibility(View.GONE);
+
+                    }else {
+                        binding.llNoItems.setVisibility(View.VISIBLE);
+
+                    }
 
                 }
             }
@@ -617,6 +635,9 @@ public class HomeActivity extends DrawerBaseActivity {
         });
 
         binding.btnGoToItems.setOnClickListener(view -> navigation(ItemsActivity.class));
+
+        binding.openShift.setOnClickListener(view -> navigation(ShiftActivity.class));
+
         if (binding.barcode != null && binding.llData != null) {
             binding.barcode.setOnClickListener(v -> {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -959,6 +980,44 @@ public class HomeActivity extends DrawerBaseActivity {
             });
         }
 
+    }
+
+    private void updateShiftData(AppSettingModel appSetting) {
+
+        if (getAppSetting().getIsShiftOpen()==0){
+            binding.llOpenShift.setVisibility(View.VISIBLE);
+            mvvm.clearCart();
+            if (binding.recView!=null){
+                binding.recView.setVisibility(View.GONE);
+                binding.llNoItems.setVisibility(View.GONE);
+            }
+
+            if (binding.recViewLand!=null){
+                binding.recViewLand.setVisibility(View.GONE);
+                binding.llNoItems.setVisibility(View.GONE);
+
+            }
+
+            if (binding.recViewPort!=null){
+                binding.recViewPort.setVisibility(View.GONE);
+                binding.llNoItems.setVisibility(View.GONE);
+
+            }
+        }else if (getAppSetting().getIsShiftOpen()==1){
+            binding.llOpenShift.setVisibility(View.GONE);
+            if (binding.recView!=null){
+                binding.recView.setVisibility(View.VISIBLE);
+
+            }
+
+            if (binding.recViewLand!=null){
+                binding.recViewLand.setVisibility(View.VISIBLE);
+            }
+
+            if (binding.recViewPort!=null){
+                binding.recViewPort.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void navigateToChargeActivity() {
@@ -1586,6 +1645,8 @@ public class HomeActivity extends DrawerBaseActivity {
     protected void onResume() {
         super.onResume();
         updateSelectedPos(0);
+        updateShiftData(getAppSetting());
+
         if (adapter != null) {
             adapter.updateType(getAppSetting().getHome_layout_type());
         }
@@ -1620,36 +1681,36 @@ public class HomeActivity extends DrawerBaseActivity {
 
             }
         }
-
-
-
         if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
             initCodeScanner(mvvm.getCamera().getValue());
         }
-
-
-
 
         if (App.showHomePin){
             showPinCodeView();
 
         }else {
-            if (mvvm.showPin) {
-                showPinCodeView();
-
-            } else {
+            if (App.saleSelected){
                 hidePinCodeView();
+
+
+            }else {
+                if (mvvm.showPin) {
+                    showPinCodeView();
+
+
+                } else {
+                    hidePinCodeView();
+                }
             }
+
         }
 
-
-
-
         mvvm.loadHomeData();
-
+        App.showHomePin = true;
 
 
     }
+
 
     @Override
     protected void onPause() {
@@ -1665,16 +1726,11 @@ public class HomeActivity extends DrawerBaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (mvvm.forNavigation){
-            mvvm.showPin = false;
-
-        }else {
-            mvvm.showPin = true;
-
-        }
-
+        mvvm.showPin = true;
 
     }
+
+
 
 
     @Override

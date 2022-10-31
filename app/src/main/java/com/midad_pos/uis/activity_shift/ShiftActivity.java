@@ -40,6 +40,7 @@ public class ShiftActivity extends DrawerBaseActivity {
     private void initView() {
 
         mvvm = ViewModelProviders.of(this).get(ShiftMvvm.class);
+
         binding.shiftReportLayout.setLang(getLang());
 
         if (mvvm.getIsShiftsOpened().getValue() != null && mvvm.getIsShiftsOpened().getValue()) {
@@ -55,6 +56,37 @@ public class ShiftActivity extends DrawerBaseActivity {
 
         }
 
+        Log.e("app",getAppSetting().getIsShiftOpen()+"");
+        if (getAppSetting().getIsShiftOpen()==1){
+            binding.flData.setVisibility(View.VISIBLE);
+            binding.flOpenShift.setVisibility(View.GONE);
+        }else {
+            binding.flData.setVisibility(View.GONE);
+            binding.flOpenShift.setVisibility(View.VISIBLE);
+        }
+
+        mvvm.getIsOpenSuccess().observe(this, success -> {
+            binding.flData.setVisibility(View.VISIBLE);
+            binding.flOpenShift.setVisibility(View.GONE);
+        });
+
+        mvvm.getIsShiftsClosed().observe(this, success -> {
+            binding.flData.setVisibility(View.GONE);
+            binding.flOpenShift.setVisibility(View.VISIBLE);
+        });
+
+        mvvm.getIsLoading().observe(this, isLoading -> {
+            if (isLoading) {
+                binding.loader.setVisibility(View.VISIBLE);
+                binding.flOpenShift.setVisibility(View.GONE);
+                binding.flData.setVisibility(View.GONE);
+            } else {
+                binding.loader.setVisibility(View.GONE);
+
+            }
+
+
+        });
         binding.imageShift.setOnClickListener(v -> {
             binding.flDialog.setVisibility(View.VISIBLE);
             binding.flShift.setVisibility(View.VISIBLE);
@@ -93,21 +125,21 @@ public class ShiftActivity extends DrawerBaseActivity {
                     binding.openShiftLayout.edtAmount.setSelection(binding.openShiftLayout.edtAmount.getText().length());
 
 
-                } else  {
+                } else {
                     num = num.replace(".", "");
                     num = num.replace(",", "");
                     float pr = Float.parseFloat(num) / 100.0f;
                     num = String.format(Locale.US, "%.2f", pr);
-                    if (num.length()>=9){
+                    if (num.length() >= 9) {
                         binding.openShiftLayout.edtAmount.setText("999,999.99");
 
-                    }else if (num.length()==7||num.length()==8){
+                    } else if (num.length() == 7 || num.length() == 8) {
                         StringBuilder builder = new StringBuilder(num);
-                        builder.insert(num.length()-6,",");
+                        builder.insert(num.length() - 6, ",");
                         num = builder.toString();
                         binding.openShiftLayout.edtAmount.setText(num);
 
-                    }else {
+                    } else {
                         binding.openShiftLayout.edtAmount.setText(num);
 
                     }
@@ -144,6 +176,8 @@ public class ShiftActivity extends DrawerBaseActivity {
             binding.dialogCloseShift.setVisibility(View.GONE);
 
         });
+        binding.btnCloseShift.setOnClickListener(v -> mvvm.closeShift());
+        binding.openShiftLayout.btnOpenShift.setOnClickListener(v -> mvvm.openShift());
 
     }
 

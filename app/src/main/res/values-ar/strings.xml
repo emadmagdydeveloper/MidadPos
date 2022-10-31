@@ -208,6 +208,10 @@
     <string name="total_paid">إجمالي المدفوع</string>
     <string name="change">الباقي</string>
     <string name="due_amount">المبلغ المستحق</string>
+    <string name="shift_is_close">تم إغلاق المناوبة</string>
+    <string name="open_shift_to_continue">قم بفتح المناوبة للإستمرار</string>
+    <string name="shift_alrady_opned">لقد تم فتح المناوبة بالفعل</string>
+    <string name="shift_already_closed">لقد تم إنهاء المناوبة بالفعل</string>
 
 
     <string-array name="delivery_options">

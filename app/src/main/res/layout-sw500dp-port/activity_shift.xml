@@ -644,6 +644,8 @@
 
 
         </LinearLayout>
+
+
         <FrameLayout
             android:id="@+id/flDialog"
             android:layout_width="match_parent"
@@ -702,6 +704,14 @@
                 />
         </FrameLayout>
 
+        <ProgressBar
+            android:id="@+id/loader"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+
+            />
 
     </FrameLayout>
 
