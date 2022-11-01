@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -11,14 +12,18 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.midad_pos.R;
 import com.midad_pos.model.AddCustomerModel;
+import com.midad_pos.model.AppSettingModel;
 import com.midad_pos.model.ChargeModel;
 import com.midad_pos.model.CountryModel;
 import com.midad_pos.model.CustomerDataModel;
 import com.midad_pos.model.CustomerModel;
+import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
+import com.midad_pos.model.ModifierModel;
 import com.midad_pos.model.PaymentDataModel;
 import com.midad_pos.model.PaymentModel;
 import com.midad_pos.model.SingleCustomerModel;
+import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.model.cart.CartList;
 import com.midad_pos.model.cart.CartModel;
@@ -29,8 +34,10 @@ import com.midad_pos.share.Common;
 import com.midad_pos.tags.Tags;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -77,7 +84,7 @@ public class ChargeMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> showItemPaid;
     public ChargeModel itemForPaid;
     private MutableLiveData<String> itemSplitPrice;
-
+    private MutableLiveData<Boolean> onTicketAddedSuccess;
 
 
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -122,8 +129,6 @@ public class ChargeMvvm extends AndroidViewModel {
         }
         return isPaidShown;
     }
-
-
 
 
     public MutableLiveData<Integer> getSplitAmount() {
@@ -285,6 +290,13 @@ public class ChargeMvvm extends AndroidViewModel {
         return itemSplitPrice;
     }
 
+
+    public MutableLiveData<Boolean> getOnTicketAddedSuccess() {
+        if (onTicketAddedSuccess == null) {
+            onTicketAddedSuccess = new MutableLiveData<>();
+        }
+        return onTicketAddedSuccess;
+    }
     public void getCustomers() {
         getIsCustomerLoading().setValue(true);
         Api.getService(Tags.base_url)
@@ -461,23 +473,21 @@ public class ChargeMvvm extends AndroidViewModel {
 
     public void increase_decrease(int type) {
 
-        if (getSplitAmount().getValue() != null && getCartListInstance().getValue() != null&&getPaidAmount().getValue()!=null) {
+        if (getSplitAmount().getValue() != null && getCartListInstance().getValue() != null && getPaidAmount().getValue() != null) {
             int amount = getSplitAmount().getValue();
             if (type == 1) {
                 if (amount < 50) {
                     double total = Double.parseDouble(getPaidAmount().getValue());
 
-                    if (getUnPaidUnEdited().size()==0&&getTotalEditedPrice(-1)>=total){
+                    if (getUnPaidUnEdited().size() == 0 && getTotalEditedPrice(-1) >= total) {
 
-                    }else {
+                    } else {
                         amount++;
                         getSplitAmount().setValue(amount);
 
 
                         addAdditionalSplit();
                     }
-
-
 
 
                 }
@@ -541,8 +551,8 @@ public class ChargeMvvm extends AndroidViewModel {
         if (getSplitList().getValue() != null && getPaidAmount().getValue() != null) {
             double totalPrice = 0.0;
             if (getUnPaidUnEdited().size() > 0) {
-                totalPrice = (Double.parseDouble(getPaidAmount().getValue())-getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size() + 1);
-                Log.e("pr",getRemaining().getValue()+"__"+getTotalEditedPrice(-1)+"__"+getUnPaidUnEdited().size()+"___"+totalPrice);
+                totalPrice = (Double.parseDouble(getPaidAmount().getValue()) - getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size() + 1);
+                Log.e("pr", getRemaining().getValue() + "__" + getTotalEditedPrice(-1) + "__" + getUnPaidUnEdited().size() + "___" + totalPrice);
                 for (ChargeModel chargeModel : getSplitList().getValue()) {
                     if (!chargeModel.isEdited()) {
                         chargeModel.setPrice(String.format(Locale.US, "%.2f", totalPrice));
@@ -582,10 +592,10 @@ public class ChargeMvvm extends AndroidViewModel {
     }
 
     public void decreaseAdditionalSplit() {
-        if (getSplitList().getValue() != null&&getPaidAmount().getValue()!=null) {
-            getSplitList().getValue().remove(getSplitList().getValue().size()-1);
+        if (getSplitList().getValue() != null && getPaidAmount().getValue() != null) {
+            getSplitList().getValue().remove(getSplitList().getValue().size() - 1);
             if (getUnPaidUnEdited().size() > 0) {
-                double totalPrice = (Double.parseDouble(getPaidAmount().getValue())-getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size() );
+                double totalPrice = (Double.parseDouble(getPaidAmount().getValue()) - getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size());
 
                 for (ChargeModel chargeModel : getSplitList().getValue()) {
                     if (!chargeModel.isEdited()) {
@@ -620,16 +630,16 @@ public class ChargeMvvm extends AndroidViewModel {
 
             getRemainingPrice();
             if (getRemaining().getValue() != null) {
-                double remaining = getRemaining().getValue()-getTotalEditedPrice(pos);
+                double remaining = getRemaining().getValue() - getTotalEditedPrice(pos);
                 remaining = Math.abs(remaining);
 
-                Log.e("prrr",getRemaining().getValue()+"____"+getTotalEditedPrice(pos)+"___"+remaining+"___"+price);
+                Log.e("prrr", getRemaining().getValue() + "____" + getTotalEditedPrice(pos) + "___" + remaining + "___" + price);
 
                 if (price > remaining) {
                     price = remaining;
                     model.setEdited(false);
 
-                }else {
+                } else {
                     model.setEdited(true);
 
                 }
@@ -701,11 +711,11 @@ public class ChargeMvvm extends AndroidViewModel {
 
 
     public double getTotalPaidPrice() {
-        if (getSplitList().getValue() != null ) {
+        if (getSplitList().getValue() != null) {
             double total = 0.0;
             for (int index = 0; index < getSplitList().getValue().size(); index++) {
                 ChargeModel chargeModel = getSplitList().getValue().get(index);
-                if (chargeModel.isPaid()){
+                if (chargeModel.isPaid()) {
                     total += Double.parseDouble(chargeModel.getPrice());
                 }
 
@@ -743,28 +753,6 @@ public class ChargeMvvm extends AndroidViewModel {
         manageCartModel.assignCustomerToCart(customerModel, getApplication().getApplicationContext());
     }
 
-    public void addTicket() {
-        CartList cartList = getCartListInstance().getValue();
-        if (cartList != null) {
-            String customer_id = null;
-            if (cartList.getCustomerModel() != null) {
-                customer_id = cartList.getCustomerModel().getId();
-            }
-            int total_qty = 0;
-            double totalTaxRate = 0.0;
-
-            for (ItemModel itemModel : cartList.getItems()) {
-                total_qty += itemModel.getAmount();
-                if (itemModel.getTax() != null) {
-                    totalTaxRate += Double.parseDouble(itemModel.getTax().getRate());
-                }
-            }
-
-
-            // CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(),userModel.getData().getSelectedWereHouse().getId(),customer_id,total_qty,cartList.getTotalDiscountValue()+"",cartList.getNetTotalPrice()+"",cartList.getItems().size(),cartList.getTotalTaxPrice(),cartList.getTotalTaxPrice(),cartList.getTotalPrice(),"1",userModel.getData().getSelectedPos().getId(),"0",);
-
-        }
-    }
 
     public void updatePayments(PaymentDataModel.Data data, boolean isEnable) {
         if (getPayment().getValue() == null) {
@@ -859,5 +847,139 @@ public class ChargeMvvm extends AndroidViewModel {
 
     }
 
+    public void addTicket(Context context) {
+        ProgressDialog dialog = Common.createProgressDialog(context,context.getString(R.string.wait));
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+
+        CartList cartList = getCartListInstance().getValue();
+        if (cartList != null && getPaymentType().getValue() != null && getRemaining().getValue() != null && getPaidAmount().getValue() != null) {
+            String customer_id = null;
+            if (cartList.getCustomerModel() != null) {
+                customer_id = cartList.getCustomerModel().getId();
+            }
+            List<CartModel.Detail> detailList = new ArrayList<>();
+
+
+            for (ItemModel itemModel : cartList.getItems()) {
+                double totalDiscount = 0.0;
+                List<CartModel.Discount> discountsItem = new ArrayList<>();
+                List<CartModel.Modifier> modifiers = new ArrayList<>();
+
+
+                double tax_rate = 0.0;
+                if (itemModel.getTax() != null) {
+
+                    tax_rate = Double.parseDouble(itemModel.getTax().getRate());
+
+                }
+
+                for (DiscountModel discountModel : itemModel.getDiscounts()) {
+                    CartModel.Discount discount = new CartModel.Discount(discountModel.getId());
+                    discountsItem.add(discount);
+                    totalDiscount += Double.parseDouble(discountModel.getValue());
+                }
+                String variant_id = null;
+                double price = Double.parseDouble(itemModel.getPrice().replace(",",""));
+                if (itemModel.getSelectedVariant()!=null){
+                    variant_id = itemModel.getSelectedVariant().getId();
+                    price = Double.parseDouble(itemModel.getSelectedVariant().getPrice().replace(",",""));
+                }
+
+                for (ModifierModel modifierModel:itemModel.getModifiers()){
+                    double total = 0.0;
+                    List<CartModel.ModifierDetails> modifierDetails = new ArrayList<>();
+                    for (ModifierModel.Data data:modifierModel.getModifiers_data()){
+                        double totalDataCost = itemModel.getAmount()*Double.parseDouble(data.getCost());
+                        total += totalDataCost;
+
+                        CartModel.ModifierDetails details = new CartModel.ModifierDetails(data.getId(),Double.parseDouble(data.getCost()),totalDataCost);
+                        modifierDetails.add(details);
+                    }
+                    CartModel.Modifier modifier = new CartModel.Modifier(itemModel.getId(),modifierModel.getId(),total+"",modifierDetails);
+
+                    modifiers.add(modifier);
+                }
+
+
+                CartModel.Detail detail = new CartModel.Detail(itemModel.getId(),variant_id,itemModel.getAmount(),price,totalDiscount+"",tax_rate+"", itemModel.getComment(),modifiers,discountsItem);
+                detailList.add(detail);
+            }
+
+            AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
+            CartModel.Payment payment = new CartModel.Payment(cartList.getTotalPrice(), Double.parseDouble(getPaidAmount().getValue().replace(",", "")), getRemaining().getValue(), getPaymentType().getValue() + "");
+            List<CartModel.Payment> payments = new ArrayList<>();
+            payments.add(payment);
+
+            List<CartModel.Discount> discounts = new ArrayList<>();
+            for (DiscountModel discountModel : cartList.getDiscounts()) {
+                CartModel.Discount discount = new CartModel.Discount(discountModel.getId());
+                discounts.add(discount);
+            }
+
+
+
+            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), "1", "0", payments, discounts, detailList);
+            List<CartModel.Cart> carts = new ArrayList<>();
+            carts.add(cart);
+            CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(),customer_id,carts );
+
+
+            Api.getService(Tags.base_url)
+                    .storeOrder(cartModel)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new SingleObserver<Response<StatusResponse>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            disposable.add(d);
+                        }
+
+                        @Override
+                        public void onSuccess(Response<StatusResponse> response) {
+                            dialog.dismiss();
+                            if (response.isSuccessful()) {
+                                if (response.body() != null) {
+
+                                    if (response.body().getStatus() == 200) {
+                                        manageCartModel.clearCart(context);
+                                        getOnTicketAddedSuccess().setValue(true);
+                                    }
+                                }
+                            } else {
+
+
+                                try {
+                                    Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+
+                            if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                                Log.e("error", e.getMessage() + "");
+                                Toast.makeText(getApplication().getApplicationContext(), R.string.check_network, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    });
+        }
+    }
+
+
+    private String getDate() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        return format.format(new Date());
+    }
 
 }

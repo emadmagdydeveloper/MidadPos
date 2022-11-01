@@ -12,6 +12,7 @@ import com.midad_pos.model.SingleCategoryData;
 import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
+import com.midad_pos.model.cart.CartModel;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Response;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -159,7 +161,7 @@ public interface Service {
     @FormUrlEncoded
     @POST("api/shift/closeShift")
     Single<Response<StatusResponse>> closeShift(@Field("user_id") String user_id,
-                                               @Field("shift_id") String shift_id
+                                                @Field("shift_id") String shift_id
 
     );
 
@@ -168,5 +170,9 @@ public interface Service {
                                                   @Query("warehouse_id") String warehouse_id,
                                                   @Query("pos_id") String pos_id
     );
+
+
+    @POST("api/shift/closeShift")
+    Single<Response<StatusResponse>> storeOrder(@Body CartModel cartModel);
 
 }
