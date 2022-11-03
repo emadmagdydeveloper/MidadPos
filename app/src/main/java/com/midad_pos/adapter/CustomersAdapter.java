@@ -1,6 +1,7 @@
 package com.midad_pos.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -22,6 +23,7 @@ import java.util.List;
 public class CustomersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<CustomerModel> list;
     private Context context;
+    private Holder oldHolder;
 
     public CustomersAdapter(Context context) {
         this.context = context;
@@ -38,14 +40,41 @@ public class CustomersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Holder myHolder = (Holder) holder;
         myHolder.binding.setModel(list.get(position));
+
+        if (oldHolder==null&&list.get(position).isAddedToCart()){
+            oldHolder = myHolder;
+        }
+
         myHolder.binding.addToTicket.setOnClickListener(v -> {
+
+            CustomerModel model = list.get(myHolder.getAdapterPosition());
+
+            if (oldHolder!=null){
+                CustomerModel oldModel = list.get(oldHolder.getAdapterPosition());
+                if (oldModel.isAddedToCart()&& !model.getId().equals(oldModel.getId())){
+                    oldModel.setAddedToCart(false);
+                    list.set(oldHolder.getAdapterPosition(),oldModel);
+                    oldHolder.binding.setModel(oldModel);
+                }
+            }
+
+
+
+            model.setAddedToCart(!model.isAddedToCart());
+            list.set(myHolder.getAdapterPosition(),model);
+            myHolder.binding.setModel(model);
+
+
+            oldHolder = myHolder;
+
             if (context instanceof HomeActivity){
                 HomeActivity activity = (HomeActivity) context;
-                activity.assignCustomerToCart(list.get(myHolder.getAdapterPosition()));
+                activity.assignCustomerToCart(model);
             }else if (context instanceof ChargeActivity){
                 ChargeActivity activity = (ChargeActivity) context;
-                activity.assignCustomerToCart(list.get(myHolder.getAdapterPosition()));
+                activity.assignCustomerToCart(model);
             }
+
         });
 
 

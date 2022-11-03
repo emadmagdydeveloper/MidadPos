@@ -3,7 +3,9 @@ package com.midad_pos.uis.activity_home;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
@@ -59,6 +61,7 @@ import com.midad_pos.model.ModifierModel;
 import com.midad_pos.model.VariantModel;
 import com.midad_pos.model.cart.CartList;
 import com.midad_pos.model.cart.ManageCartModel;
+import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.mvvm.HomeMvvm;
 import com.midad_pos.share.App;
 import com.midad_pos.uis.activity_charge.ChargeActivity;
@@ -127,6 +130,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
     private void initView() {
+        baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         mvvm = ViewModelProviders.of(this).get(HomeMvvm.class);
         codeScanner = new CodeScanner(this, binding.scanCode);
 
@@ -308,6 +312,16 @@ public class HomeActivity extends DrawerBaseActivity {
             if (homeDiscountAdapter != null) {
                 homeDiscountAdapter.updateList(discounts);
             }
+
+
+            if (discounts.size()>0){
+                binding.llNoItems.setVisibility(View.GONE);
+
+            }else {
+                binding.llNoItems.setVisibility(View.VISIBLE);
+
+            }
+
         });
 
         mvvm.mainItemDiscountList.observe(this, discounts -> {
@@ -1637,7 +1651,13 @@ public class HomeActivity extends DrawerBaseActivity {
         mvvm.getIsOpenedCustomerDialog().setValue(false);
         invalidateOptionsMenu();
         if (binding.toolbarLandAddUser!=null){
-            binding.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
+            if (customerModel.isAddedToCart()){
+                binding.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
+
+            }else {
+                binding.toolbarLandAddUser.setImageResource(R.drawable.ic_add_user);
+
+            }
         }
     }
 

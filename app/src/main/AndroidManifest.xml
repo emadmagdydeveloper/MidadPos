@@ -81,7 +81,8 @@
         <activity
             android:name=".uis.activity_home.HomeActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan"
+            />
         <activity
             android:name=".uis.activity_sign_up_2.SignUp2Activity"
             android:exported="false" />

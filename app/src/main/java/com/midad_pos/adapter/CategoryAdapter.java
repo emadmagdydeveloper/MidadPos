@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
@@ -15,7 +16,10 @@ import com.midad_pos.databinding.BusinessTypeRowBinding;
 import com.midad_pos.databinding.CategoryItemBinding;
 import com.midad_pos.model.BusinessTypeModel;
 import com.midad_pos.model.CategoryModel;
+import com.midad_pos.model.ItemModel;
 import com.midad_pos.uis.activity_items.ItemsActivity;
+import com.midad_pos.utils.DiffUtilsCategories;
+import com.midad_pos.utils.DiffUtilsItems;
 
 import java.util.List;
 
@@ -72,7 +76,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void updateList(List<CategoryModel> list){
+        DiffUtilsCategories callback = new DiffUtilsCategories(this.list,list);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
         this.list = list;
-        notifyDataSetChanged();
+        diffResult.dispatchUpdatesTo(this);
+
     }
 }

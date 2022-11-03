@@ -81,6 +81,7 @@ public interface Service {
                                              @Part("image_type") RequestBody image_type,
                                              @Part("color") RequestBody color,
                                              @Part("shape") RequestBody shape,
+                                             @Part("warehouse_id") RequestBody warehouse_id,
                                              @Part("modifier_ids[]") List<RequestBody> modifiers,
                                              @Part List<MultipartBody.Part> images
     );

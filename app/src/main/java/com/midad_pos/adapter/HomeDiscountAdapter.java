@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
@@ -15,11 +16,14 @@ import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
+import com.midad_pos.utils.DiffUtilsDiscount;
+import com.midad_pos.utils.DiffUtilsItems;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeDiscountAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<DiscountModel> list;
+    private List<DiscountModel> list = new ArrayList<>();
     private Context context;
     private String lang;
 
@@ -44,8 +48,8 @@ public class HomeDiscountAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             DiscountModel model = list.get(myHolder.getAdapterPosition());
             if (!model.isSelected()){
                 model.setSelected(true);
-                myHolder.binding.setModel(model);
-                list.set(myHolder.getAdapterPosition(),model);
+               // myHolder.binding.setModel(model);
+                //list.set(myHolder.getAdapterPosition(),model);
                 HomeActivity activity = (HomeActivity) context;
                 activity.addDiscountForAll(model,myHolder.getAdapterPosition());
             }
@@ -71,7 +75,10 @@ public class HomeDiscountAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void updateList(List<DiscountModel> list){
-        this.list = list;
-        notifyDataSetChanged();
+        DiffUtilsDiscount callback = new DiffUtilsDiscount(this.list,list);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
+        this.list.clear();
+        this.list.addAll(list);
+        diffResult.dispatchUpdatesTo(this);
     }
 }

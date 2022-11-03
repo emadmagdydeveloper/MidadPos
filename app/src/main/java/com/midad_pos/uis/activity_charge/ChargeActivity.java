@@ -614,9 +614,18 @@ public class ChargeActivity extends BaseActivity {
             binding.layout.dialogCustomer.setVisibility(View.GONE);
             mvvm.getIsOpenedCustomerDialog().setValue(false);
             invalidateOptionsMenu();
-            if (binding.layout.toolbarLandAddUser != null) {
-                binding.layout.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
+
+            if (customerModel.isAddedToCart()){
+                if (binding.layout.toolbarLandAddUser != null) {
+                    binding.layout.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
+                }
+            }else {
+                if (binding.layout.toolbarLandAddUser != null) {
+                    binding.layout.toolbarLandAddUser.setImageResource(R.drawable.ic_add_user);
+                }
             }
+
+
         }
 
     }

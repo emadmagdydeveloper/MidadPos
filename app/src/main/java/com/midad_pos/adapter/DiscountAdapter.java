@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
@@ -15,11 +16,13 @@ import com.midad_pos.databinding.DiscountsLayoutBinding;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.uis.activity_items.ItemsActivity;
+import com.midad_pos.utils.DiffUtilsDiscount;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DiscountAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<DiscountModel> list;
+    private List<DiscountModel> list = new ArrayList<>();
     private Context context;
 
     public DiscountAdapter(Context context) {
@@ -72,7 +75,11 @@ public class DiscountAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void updateList(List<DiscountModel> list) {
-        this.list = list;
-        notifyDataSetChanged();
+        DiffUtilsDiscount callback = new DiffUtilsDiscount(this.list,list);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
+        this.list.clear();
+        this.list.addAll(list);
+        diffResult.dispatchUpdatesTo(this);
+
     }
 }

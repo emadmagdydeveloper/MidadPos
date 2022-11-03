@@ -194,11 +194,13 @@ public class BaseActivity extends AppCompatActivity {
                     }else {
                         userModel.getData().setSelectedUser(user);
                         setUserModel(userModel);
-                        baseMvvm.getOnUserRefreshed().setValue(true);
 
                         binding.pinContainer.setVisibility(View.GONE);
                         binding.container.setVisibility(View.VISIBLE);
                         updatePinView("");
+
+                        baseMvvm.getOnUserRefreshed().setValue(true);
+
 
                     }
 

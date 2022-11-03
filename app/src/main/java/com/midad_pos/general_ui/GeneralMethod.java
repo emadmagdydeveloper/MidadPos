@@ -26,6 +26,9 @@ import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -226,6 +229,20 @@ public class GeneralMethod {
         }
 
     }
+
+
+    @BindingAdapter("amountFormat")
+    public static void amountFormat(TextView view,String amountFormat) {
+        if (amountFormat != null) {
+            amountFormat = amountFormat.replace(",","");
+            String newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(amountFormat));
+            NumberFormat format = new DecimalFormat("###,###.##");
+            String amount = format.format(newFormat);
+            view.setText(amount);
+        }
+
+    }
+
 
     @BindingAdapter("discountTitle")
     public static void discountTitle(TextView view, DiscountModel model) {

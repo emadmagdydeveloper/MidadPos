@@ -50,9 +50,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:text="@string/add_to_ticket"
+                android:text="@{model.addedToCart?@string/remove_from_ticket:@string/add_to_ticket}"
                 android:textColor="@color/colorPrimary"
                 android:textSize="12sp" />
+
+
         </LinearLayout>
 
         <LinearLayout

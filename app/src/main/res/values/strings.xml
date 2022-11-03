@@ -212,6 +212,9 @@
     <string name="open_shift_to_continue">Open shift to continue</string>
     <string name="shift_alrady_opned">Shift already opened</string>
     <string name="shift_already_closed">Shift already closed</string>
+    <string name="remove_from_ticket">Remove from ticket</string>
+    <string name="barcode_unique">barcode must be unique</string>
+    <string name="tendered">Total tendered</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

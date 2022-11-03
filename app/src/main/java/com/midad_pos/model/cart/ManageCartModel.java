@@ -62,6 +62,12 @@ public class ManageCartModel implements Serializable {
         Preferences.getInstance().createUpdateCart(context,cartModel);
     }
 
+    public void removeCustomerFromCart(Context context) {
+        CartList cartModel = getCartModel(context);
+        cartModel.setCustomerModel(null);
+        Preferences.getInstance().createUpdateCart(context,cartModel);
+    }
+
     public void deleteGeneralCartDiscount(List<DiscountModel> discounts, Context context) {
         CartList cartModel = getCartModel(context);
         cartModel.removeGeneralDiscount(discounts);

@@ -1,11 +1,13 @@
 package com.midad_pos.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
@@ -14,11 +16,13 @@ import com.midad_pos.databinding.ItemHomeImageRowBinding;
 import com.midad_pos.databinding.ItemHomeShapeRowBinding;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.uis.activity_home.HomeActivity;
+import com.midad_pos.utils.DiffUtilsItems;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<ItemModel> list;
+    private List<ItemModel> list = new ArrayList<>();
     private Context context;
     private int type = 1;
 
@@ -106,10 +110,14 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void updateList(List<ItemModel> list){
-        this.list = list;
-        notifyDataSetChanged();
-    }
+        Log.e("ss",list.size()+"");
+        DiffUtilsItems callback = new DiffUtilsItems(this.list,list);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
+        this.list.clear();
+        this.list.addAll(list);
+        diffResult.dispatchUpdatesTo(this);
 
+    }
     public void updateType(int type){
         this.type = type;
         notifyDataSetChanged();

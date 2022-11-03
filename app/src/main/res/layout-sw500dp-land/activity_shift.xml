@@ -8,6 +8,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="model"
+            type="com.midad_pos.model.ShiftModel" />
 
 
     </data>
@@ -150,12 +153,11 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -169,7 +171,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="1"
+                                        android:text="@{model.shift_no}"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
@@ -177,12 +179,11 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -196,56 +197,54 @@
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="emad magdy"
-                                        android:ems="8"
-                                        android:textColor="@color/black"
-                                        android:textSize="15sp"
-                                        android:lines="1"
                                         android:ellipsize="end"
+                                        android:ems="8"
                                         android:gravity="start"
+                                        android:lines="1"
+                                        android:text="@{model.user.name}"
                                         android:textAlignment="viewStart"
-                                        />
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
 
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="30-08-2022 11:00 Am"
-                                        android:textColor="@color/black"
-                                        android:textSize="15sp"
                                         android:gravity="end"
+                                        android:text="@{model.created_at}"
                                         android:textAlignment="viewEnd"
-                                        />
+                                        android:textColor="@color/black"
+                                        android:textSize="13sp" />
                                 </LinearLayout>
 
                                 <View
                                     android:layout_width="match_parent"
                                     android:layout_height="1dp"
-                                    android:background="@color/grey1"
                                     android:layout_marginTop="16dp"
+                                    android:background="@color/grey1"
 
                                     />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
+                                    android:layout_marginEnd="16dp"
                                     android:text="@string/cash_drawer"
                                     android:textColor="@color/colorPrimary"
                                     android:textSize="15sp"
-                                    android:layout_marginStart="16dp"
-                                    android:layout_marginEnd="16dp"
-                                    android:layout_marginTop="16dp"
                                     android:textStyle="bold"
 
                                     />
+
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="36dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="24dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -253,30 +252,30 @@
                                         android:text="@string/starting_cash"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{model.cash_in_hand}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
+
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -284,30 +283,30 @@
                                         android:text="@string/cash_payments"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.cash_payment)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
+
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -315,30 +314,30 @@
                                         android:text="@string/cash_refund"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.cash_refund)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
+
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -346,30 +345,30 @@
                                         android:text="@string/paid_in"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.paid_in)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
+
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -377,18 +376,19 @@
                                         android:text="@string/paid_out"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.paid_out)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
+
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
@@ -396,12 +396,11 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -409,43 +408,42 @@
                                         android:text="@string/expected_cash_amount"
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
-                                        android:textStyle="bold"
-                                        />
+                                        android:textStyle="bold" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
+                                        amountFormat="@{String.valueOf(model.expected_cash)}"
+
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
-                                        android:textStyle="bold"
-                                        />
+                                        android:textStyle="bold" />
                                 </LinearLayout>
 
                                 <View
                                     android:layout_width="match_parent"
                                     android:layout_height="1dp"
+                                    android:layout_marginTop="16dp"
                                     android:background="@color/grey1"
-                                    android:layout_marginTop="24dp"
 
                                     />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
+                                    android:layout_marginEnd="16dp"
                                     android:text="@string/sales_summary"
                                     android:textColor="@color/colorPrimary"
                                     android:textSize="15sp"
-                                    android:layout_marginStart="16dp"
-                                    android:layout_marginEnd="16dp"
-                                    android:layout_marginTop="24dp"
                                     android:textStyle="bold"
 
                                     />
@@ -453,12 +451,11 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="36dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="24dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -466,35 +463,32 @@
                                         android:text="@string/gross_sales"
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
-                                        android:textStyle="bold"
-                                        />
+                                        android:textStyle="bold" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
+                                        amountFormat="@{String.valueOf(model.gross_sales)}"
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
-                                        android:textStyle="bold"
-                                        />
+                                        android:textStyle="bold" />
                                 </LinearLayout>
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -502,18 +496,19 @@
                                         android:text="@string/refund"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
+                                        amountFormat="@{String.valueOf(model.refund)}"
+
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
@@ -521,12 +516,11 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
@@ -534,18 +528,19 @@
                                         android:text="@string/discount"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
+                                        amountFormat="@{String.valueOf(model.total_discount)}"
+
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
@@ -553,42 +548,31 @@
                                 <View
                                     android:layout_width="match_parent"
                                     android:layout_height="1dp"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
+                                    android:layout_marginEnd="16dp"
                                     android:background="@color/grey1"
-                                    android:layout_marginTop="24dp"
-                                    android:layout_marginStart="16dp"
-                                    android:layout_marginEnd="16dp"
-
-                                    />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/net_sales"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp"
-                                    android:layout_marginStart="16dp"
-                                    android:layout_marginEnd="16dp"
-                                    android:layout_marginTop="24dp"
-                                    android:textStyle="bold"
 
                                     />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
                                     android:orientation="horizontal"
-                                    android:layout_marginTop="36dp"
+                                    android:gravity="center_vertical"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
                                     >
-
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="@string/cash"
+                                        android:text="@string/net_sales"
                                         android:textColor="@color/black"
-                                        android:textSize="15sp" />
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+
+                                        />
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
@@ -598,45 +582,92 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginStart="8dp"
-                                        android:layout_marginEnd="8dp"
-                                        android:text="00.00"
                                         android:textColor="@color/black"
-                                        android:textSize="15sp" />
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        numberFormat="@{model.net_sales}"
+                                        />
                                 </LinearLayout>
+
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:layout_marginTop="24dp"
                                     android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    android:layout_marginBottom="24dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="@string/card"
+                                        android:text="@string/tax"
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        android:text="00.00"
+                                        amountFormat="@{String.valueOf(model.total_order_tax)}"
+
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
                                 </LinearLayout>
 
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginTop="16dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:background="@color/grey1"
+
+                                    />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginTop="24dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/tendered"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_marginEnd="8dp"
+                                        amountFormat="@{String.valueOf(model.total_tendered)}"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+
+                                <androidx.recyclerview.widget.RecyclerView
+                                    android:id="@+id/recViewShiftPayment"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"/>
 
                             </LinearLayout>
 

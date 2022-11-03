@@ -286,6 +286,7 @@ public class AddItemMvvm extends AndroidViewModel {
     }
 
     public void addItem(Context context){
+        userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
         if (getAddItemModel().getValue()!=null){
             AddItemModel model = getAddItemModel().getValue();
             ProgressDialog dialog = Common.createProgressDialog(context,context.getString(R.string.creating_item));
@@ -302,6 +303,8 @@ public class AddItemMvvm extends AndroidViewModel {
             }
             RequestBody barcode = Common.getRequestBodyText(model.getBarcode());
             RequestBody barcode_type = Common.getRequestBodyText(model.getBarcode_type());
+            RequestBody warehouse_id = Common.getRequestBodyText(userModel.getData().getSelectedWereHouse().getId());
+
             RequestBody price = null;
             if (model.getPrice().isEmpty()){
                 price = Common.getRequestBodyText("0.00");
@@ -342,7 +345,7 @@ public class AddItemMvvm extends AndroidViewModel {
 
 
             Api.getService(Tags.base_url)
-                    .addItem(user_id,name,category_id,barcode,price,cost,unit_id,tax_id,barcode_type,imageType,color,shape,modifiers,images)
+                    .addItem(user_id,name,category_id,barcode,price,cost,unit_id,tax_id,barcode_type,imageType,color,shape,warehouse_id,modifiers,images)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new SingleObserver<Response<StatusResponse>>() {
@@ -354,12 +357,11 @@ public class AddItemMvvm extends AndroidViewModel {
                         @Override
                         public void onSuccess(Response<StatusResponse> response) {
                             dialog.dismiss();
-                            Log.e("code",response.body().getStatus()+""+response.body().getMessage().toString());
                             if (response.isSuccessful()) {
                                 if (response.body() != null) {
                                     if (response.body().getStatus() == 200) {
                                         getOnAddedSuccess().setValue(true);
-                                    } else {
+                                    }else {
                                         getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
                                     }
                                 } else {

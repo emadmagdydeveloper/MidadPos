@@ -122,6 +122,7 @@ public class HomeMvvm extends AndroidViewModel {
 
 
     public void loadHomeData(){
+        userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
 
         if (userModel!=null&&userModel.getData()!=null&&userModel.getData().getSelectedUser()!=null&&userModel.getData().getSelectedWereHouse()!=null&&userModel.getData().getSelectedPos()!=null){
             getCurrentShift();
@@ -268,8 +269,8 @@ public class HomeMvvm extends AndroidViewModel {
     public MutableLiveData<AddCustomerModel> getAddCustomerModel() {
         if (addCustomerModel == null) {
             addCustomerModel = new MutableLiveData<>();
-            AddCustomerModel model = new AddCustomerModel();
-            addCustomerModel.setValue(model);
+            /*AddCustomerModel model = new AddCustomerModel();
+            addCustomerModel.setValue(model);*/
         }
         return addCustomerModel;
     }
@@ -581,15 +582,58 @@ public class HomeMvvm extends AndroidViewModel {
         getSearchQueryCustomer().setValue(query);
 
         if (query == null || query.isEmpty()) {
-            getCustomersInstance().setValue(mainCustomerList);
+            Observable.fromIterable(mainCustomerList)
+                    .filter(customerModel -> {
+
+                        if (getCart().getValue()!=null&&getCart().getValue().getCustomerModel()!=null&&getCart().getValue().getCustomerModel().getId().equals(customerModel.getId())){
+                            customerModel.setAddedToCart(true);
+                        }
+
+
+                        return true;
+
+                    }).toList().toObservable()
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .debounce(1, TimeUnit.SECONDS)
+                    .subscribe(new Observer<List<CustomerModel>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            disposable.add(d);
+                        }
+
+                        @Override
+                        public void onNext(List<CustomerModel> list) {
+                            getCustomersInstance().setValue(list);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
         } else {
             Observable.fromIterable(mainCustomerList)
                     .filter(customerModel -> {
+
+                        if (getCart().getValue()!=null&&getCart().getValue().getCustomerModel()!=null&&getCart().getValue().getCustomerModel().getId().equals(customerModel.getId())){
+                            Log.e("bb","bb");
+                            customerModel.setAddedToCart(true);
+                        }
+
                         if (customerModel.getName().startsWith(query)) {
+
                             return true;
                         } else if (customerModel.getEmail().startsWith(query)) {
+
                             return true;
                         } else if (customerModel.getPhone_number().startsWith(query)) {
+
                             return true;
                         }
 
@@ -721,7 +765,7 @@ public class HomeMvvm extends AndroidViewModel {
 
                                 }
                             } else {
-                                list.add(itemModel);
+                               // list.add(itemModel);
 
                             }
                         }
@@ -738,7 +782,7 @@ public class HomeMvvm extends AndroidViewModel {
                     if (mainDiscountList != null) {
                         List<DiscountModel> list = new ArrayList<>();
                         for (DiscountModel discountModel : mainDiscountList) {
-                            if (discountModel.getTitle().startsWith(query)) {
+                            if (discountModel.getTitle().toLowerCase().startsWith(query.toLowerCase())) {
                                 if (isDiscountExist(discountModel)) {
                                     discountModel.setSelected(true);
                                 } else {
@@ -756,17 +800,17 @@ public class HomeMvvm extends AndroidViewModel {
                         List<ItemModel> list = new ArrayList<>();
                         for (ItemModel itemModel : mainItemList) {
                             if (itemModel.getCategory() != null) {
-                                if (getSelectedCategory().getValue() != null && getSelectedCategory().getValue().getId() == -1) {
-                                    if (itemModel.getName().startsWith(query)) {
+                                if (getSelectedCategory().getValue() != null && getSelectedCategory().getValue().getId() == -1&&getSelectedCategory().getValue().getId() == -2) {
+                                    if (itemModel.getName().toLowerCase().startsWith(query.toLowerCase())) {
                                         list.add(itemModel);
                                     }
                                 } else {
-                                    if (itemModel.getName().startsWith(query) && itemModel.getCategory().getId() == getSelectedCategory().getValue().getId()) {
+                                    if (itemModel.getName().toLowerCase().startsWith(query.toLowerCase()) && itemModel.getCategory().getId() == getSelectedCategory().getValue().getId()) {
                                         list.add(itemModel);
                                     }
                                 }
                             } else {
-                                if (itemModel.getName().startsWith(query)) {
+                                if (itemModel.getName().toLowerCase().startsWith(query.toLowerCase())) {
                                     list.add(itemModel);
                                 }
                             }
@@ -905,6 +949,8 @@ public class HomeMvvm extends AndroidViewModel {
         if (getAddCustomerModel().getValue() == null) {
             return;
         }
+        userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
+
         AddCustomerModel addCustomerModel = getAddCustomerModel().getValue();
         ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
         dialog.setCancelable(false);
@@ -1114,10 +1160,22 @@ public class HomeMvvm extends AndroidViewModel {
     }
 
     public void assignCustomerToCart(CustomerModel customerModel) {
-        if (getCart().getValue()!=null){
-            getCart().getValue().setCustomerModel(customerModel);
+        if (customerModel.isAddedToCart()){
+            if (getCart().getValue()!=null){
+                getCart().getValue().setCustomerModel(customerModel);
+            }
+            manageCartModel.assignCustomerToCart(customerModel,getApplication().getApplicationContext());
+
+        }else {
+            removeCustomerFromCart();
         }
-        manageCartModel.assignCustomerToCart(customerModel,getApplication().getApplicationContext());
+    }
+
+    public void removeCustomerFromCart() {
+        if (getCart().getValue()!=null){
+            getCart().getValue().setCustomerModel(null);
+        }
+        manageCartModel.removeCustomerFromCart(getApplication().getApplicationContext());
     }
 
     @Override

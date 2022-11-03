@@ -24,6 +24,7 @@ public class CustomerModel implements Serializable {
     private String is_active;
     private String created_at;
     private String updated_at;
+    private boolean isAddedToCart;
 
     public String getId() {
         return id;
@@ -107,5 +108,13 @@ public class CustomerModel implements Serializable {
 
     public String getUpdated_at() {
         return updated_at;
+    }
+
+    public boolean isAddedToCart() {
+        return isAddedToCart;
+    }
+
+    public void setAddedToCart(boolean addedToCart) {
+        isAddedToCart = addedToCart;
     }
 }
