@@ -10,6 +10,7 @@ import com.midad_pos.model.PaymentDataModel;
 import com.midad_pos.model.ShiftDataModel;
 import com.midad_pos.model.SingleCategoryData;
 import com.midad_pos.model.SingleCustomerModel;
+import com.midad_pos.model.SinglePayInOutData;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.model.cart.CartModel;
@@ -175,5 +176,15 @@ public interface Service {
 
     @POST("api/shift/closeShift")
     Single<Response<StatusResponse>> storeOrder(@Body CartModel cartModel);
+
+    @FormUrlEncoded
+    @POST("api/shift/storeShiftData")
+    Single<Response<SinglePayInOutData>> payInOut(@Field("user_id") String user_id,
+                                                  @Field("cash_register_id") String cash_register_id,
+                                                  @Field("amount") String amount,
+                                                  @Field("comment") String comment,
+                                                  @Field("type") String type
+
+                                              );
 
 }

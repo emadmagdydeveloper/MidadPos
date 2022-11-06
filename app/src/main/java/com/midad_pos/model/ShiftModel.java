@@ -157,6 +157,7 @@ public class ShiftModel implements Serializable {
         private String user_id;
         private String created_at;
         private String updated_at;
+        private User user;
 
         public int getId() {
             return id;
@@ -188,6 +189,10 @@ public class ShiftModel implements Serializable {
 
         public String getUpdated_at() {
             return updated_at;
+        }
+
+        public User getUser() {
+            return user;
         }
     }
 

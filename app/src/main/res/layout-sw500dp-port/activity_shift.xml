@@ -580,7 +580,7 @@
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
                                         android:textStyle="bold"
-                                        numberFormat="@{model.net_sales}"
+                                        amountFormat="@{String.valueOf(model.net_sales)}"
                                         />
                                 </LinearLayout>
 

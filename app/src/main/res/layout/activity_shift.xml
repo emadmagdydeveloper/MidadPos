@@ -171,7 +171,7 @@
                                     android:layout_marginStart="8dp"
                                     android:layout_marginEnd="8dp"
                                     android:ellipsize="end"
-                                    android:ems="8"
+                                    android:ems="6"
                                     android:gravity="start"
                                     android:lines="1"
                                     android:text="@{model.user.name}"
@@ -186,14 +186,14 @@
                                     android:text="@{model.created_at}"
                                     android:textAlignment="viewEnd"
                                     android:textColor="@color/black"
-                                    android:textSize="13sp" />
+                                    android:textSize="12sp" />
                             </LinearLayout>
 
                             <View
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginTop="16dp"
-                                android:background="@color/grey1"
+                                android:background="@color/grey3"
 
                                 />
 
@@ -404,7 +404,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginTop="16dp"
-                                android:background="@color/grey1"
+                                android:background="@color/grey3"
 
                                 />
 
@@ -524,7 +524,7 @@
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="16dp"
                                 android:layout_marginEnd="16dp"
-                                android:background="@color/grey1"
+                                android:background="@color/grey3"
 
                                 />
 
@@ -558,7 +558,9 @@
                                     android:textColor="@color/black"
                                     android:textSize="15sp"
                                     android:textStyle="bold"
-                                    numberFormat="@{model.net_sales}"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    amountFormat="@{String.valueOf(model.net_sales)}"
                                     />
                             </LinearLayout>
 
@@ -600,7 +602,7 @@
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="16dp"
                                 android:layout_marginEnd="16dp"
-                                android:background="@color/grey1"
+                                android:background="@color/grey3"
 
                                 />
 

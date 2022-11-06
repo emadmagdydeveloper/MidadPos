@@ -1,7 +1,10 @@
 package com.midad_pos.uis.activity_shift;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,11 +15,13 @@ import android.util.Log;
 import android.view.View;
 
 import com.midad_pos.R;
+import com.midad_pos.adapter.ShiftPaymentAdapter;
 import com.midad_pos.databinding.ActivityShiftBinding;
 import com.midad_pos.mvvm.ShiftMvvm;
 import com.midad_pos.uis.activity_cash_management.CashManagementActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -26,6 +31,8 @@ import java.util.Locale;
 public class ShiftActivity extends DrawerBaseActivity {
     private ShiftMvvm mvvm;
     private ActivityShiftBinding binding;
+    private ShiftPaymentAdapter paymentAdapter;
+    private ActivityResultLauncher<Intent> launcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,18 @@ public class ShiftActivity extends DrawerBaseActivity {
 
         binding.shiftReportLayout.setLang(getLang());
 
+        binding.recViewShiftPayment.setLayoutManager(new LinearLayoutManager(this));
+        binding.recViewShiftPayment.setHasFixedSize(true);
+        paymentAdapter = new ShiftPaymentAdapter(this);
+        binding.recViewShiftPayment.setAdapter(paymentAdapter);
+
+        mvvm.getShift().observe(this,shiftModel -> {
+            binding.setModel(shiftModel);
+            if (paymentAdapter!=null){
+                paymentAdapter.updateList(shiftModel.getPayments());
+            }
+            binding.flData.setVisibility(View.VISIBLE);
+        });
         if (mvvm.getIsShiftsOpened().getValue() != null && mvvm.getIsShiftsOpened().getValue()) {
             binding.flDialog.setVisibility(View.VISIBLE);
             binding.flShift.setVisibility(View.VISIBLE);
@@ -56,7 +75,6 @@ public class ShiftActivity extends DrawerBaseActivity {
 
         }
 
-        Log.e("app",getAppSetting().getIsShiftOpen()+"");
         if (getAppSetting().getIsShiftOpen()==1){
             binding.flData.setVisibility(View.VISIBLE);
             binding.flOpenShift.setVisibility(View.GONE);
@@ -163,8 +181,15 @@ public class ShiftActivity extends DrawerBaseActivity {
         });
 
         binding.btnCashManagement.setOnClickListener(v -> {
+            mvvm.getForNavigation().setValue(true);
+
             Intent intent = new Intent(this, CashManagementActivity.class);
-            startActivity(intent);
+            if (mvvm.getShift().getValue()!=null&&mvvm.getShift().getValue().getData()!=null){
+                intent.putExtra("data", (Serializable) mvvm.getShift().getValue().getData());
+
+            }
+            launcher.launch(intent);
+            Log.e("vv","tyuio");
             overridePendingTransition(0, 0);
         });
 
@@ -178,6 +203,36 @@ public class ShiftActivity extends DrawerBaseActivity {
         });
         binding.btnCloseShift.setOnClickListener(v -> mvvm.closeShift());
         binding.openShiftLayout.btnOpenShift.setOnClickListener(v -> mvvm.openShift());
+
+        launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),result -> {
+            if (result.getResultCode()==RESULT_OK){
+                mvvm.getCurrentShift();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mvvm.getShowPin().getValue()!=null&&mvvm.getShowPin().getValue()){
+            showPinCodeView();
+        }else {
+            hidePinCodeView();
+        }
+        mvvm.getForNavigation().setValue(false);
+        mvvm.getShowPin().setValue(false);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mvvm.getForNavigation().getValue()!=null&&mvvm.getForNavigation().getValue()){
+            mvvm.getShowPin().setValue(false);
+        }else {
+            mvvm.getShowPin().setValue(true);
+
+        }
 
     }
 
@@ -197,7 +252,13 @@ public class ShiftActivity extends DrawerBaseActivity {
             super.onBackPressed();
         }
 
+
+
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mvvm.getShowPin().setValue(false);
+    }
 }

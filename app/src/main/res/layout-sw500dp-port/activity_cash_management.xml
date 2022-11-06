@@ -121,6 +121,7 @@
                         >
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtComment"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@color/transparent"
@@ -139,6 +140,7 @@
                         android:orientation="horizontal">
 
                         <Button
+                            android:id="@+id/btnPayIn"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
@@ -152,6 +154,7 @@
                             app:backgroundTint="@null" />
 
                         <Button
+                            android:id="@+id/btnPayOut"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
@@ -185,6 +188,7 @@
                         android:textSize="15sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"

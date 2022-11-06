@@ -1756,6 +1756,7 @@ public class HomeActivity extends DrawerBaseActivity {
     @Override
     protected void onDestroy() {
         mvvm.showPin = false;
+        App.showHomePin = false;
         super.onDestroy();
         disposable.clear();
 

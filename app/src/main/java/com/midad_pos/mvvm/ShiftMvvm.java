@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.midad_pos.R;
 import com.midad_pos.model.AppSettingModel;
 import com.midad_pos.model.ShiftDataModel;
+import com.midad_pos.model.ShiftModel;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.preferences.Preferences;
@@ -39,6 +40,9 @@ public class ShiftMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isShiftReportsOpened;
     private MutableLiveData<Boolean> isLoading;
     private MutableLiveData<Boolean> isOpenSuccess;
+    private MutableLiveData<ShiftModel> shift;
+    private MutableLiveData<Boolean> showPin;
+    private MutableLiveData<Boolean> forNavigation;
 
     private UserModel userModel;
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -47,7 +51,10 @@ public class ShiftMvvm extends AndroidViewModel {
     public ShiftMvvm(@NonNull Application application) {
         super(application);
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
-
+        AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
+        if (settingModel!=null&&settingModel.getIsShiftOpen()==1){
+            getCurrentShift();
+        }
         getStartAmount();
     }
 
@@ -68,12 +75,37 @@ public class ShiftMvvm extends AndroidViewModel {
         return isShiftsOpened;
     }
 
+    public MutableLiveData<ShiftModel> getShift() {
+        if (shift == null) {
+            shift = new MutableLiveData<>();
+        }
+
+        return shift;
+    }
+
     public MutableLiveData<Boolean> getIsShiftsClosed() {
         if (isShiftsClosed == null) {
             isShiftsClosed = new MutableLiveData<>();
         }
 
         return isShiftsClosed;
+    }
+    public MutableLiveData<Boolean> getForNavigation() {
+        if (forNavigation == null) {
+            forNavigation = new MutableLiveData<>();
+            forNavigation.setValue(false);
+        }
+
+        return forNavigation;
+    }
+
+    public MutableLiveData<Boolean> getShowPin() {
+        if (showPin == null) {
+            showPin = new MutableLiveData<>();
+            showPin.setValue(false);
+        }
+
+        return showPin;
     }
 
     public MutableLiveData<Boolean> getIsLoading() {
@@ -126,7 +158,7 @@ public class ShiftMvvm extends AndroidViewModel {
                                     AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
                                     settingModel.setIsShiftOpen(1);
                                     settingModel.setShift_id(response.body().getData().getId());
-                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(),settingModel);
+                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(), settingModel);
                                     getIsOpenSuccess().setValue(true);
                                 } else if (response.body().getStatus() == 431) {
                                     Toast.makeText(getApplication().getApplicationContext(), R.string.shift_alrady_opned, Toast.LENGTH_SHORT).show();
@@ -166,7 +198,7 @@ public class ShiftMvvm extends AndroidViewModel {
 
         getIsLoading().setValue(true);
         Api.getService(Tags.base_url)
-                .closeShift(userModel.getData().getSelectedUser().getId(),settingModel.getShift_id())
+                .closeShift(userModel.getData().getSelectedUser().getId(), settingModel.getShift_id())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<StatusResponse>>() {
@@ -185,7 +217,7 @@ public class ShiftMvvm extends AndroidViewModel {
                                 if (response.body().getStatus() == 200) {
                                     settingModel.setIsShiftOpen(0);
                                     settingModel.setShift_id(null);
-                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(),settingModel);
+                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(), settingModel);
                                     getIsShiftsClosed().setValue(true);
                                 } else if (response.body().getStatus() == 406) {
                                     getIsShiftsClosed().setValue(true);
@@ -215,6 +247,57 @@ public class ShiftMvvm extends AndroidViewModel {
                         } else {
                             Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
 
+
+                        }
+                    }
+                });
+    }
+
+    public void getCurrentShift() {
+        getIsLoading().setValue(true);
+        userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
+        Api.getService(Tags.base_url)
+                .currentShift(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), userModel.getData().getSelectedPos().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<ShiftDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<ShiftDataModel> response) {
+                        getIsLoading().setValue(false);
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    getShift().setValue(response.body().getData());
+                                }
+                            }
+                        } else {
+                            Log.e("v","v");
+
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        getIsLoading().setValue(false);
+                        Log.e("error", e.getMessage() + "");
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.check_network, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
 
                         }
                     }

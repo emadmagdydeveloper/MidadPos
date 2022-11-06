@@ -25,11 +25,16 @@ import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
+import com.midad_pos.model.ShiftModel;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -194,32 +199,32 @@ public class GeneralMethod {
 
     }
 
-    @BindingAdapter({"numberFormat","type"})
-    public static void numFormat(View view,String num,String type) {
+    @BindingAdapter({"numberFormat", "type"})
+    public static void numFormat(View view, String num, String type) {
         if (num != null) {
-            if (type!=null){
+            if (type != null) {
                 String newFormat;
-                if (type.equals("per")){
+                if (type.equals("per")) {
                     newFormat = num + "%";
-                }else {
+                } else {
                     newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(num));
                 }
-                if (view instanceof TextView){
+                if (view instanceof TextView) {
                     TextView textView = (TextView) view;
                     textView.setText(newFormat);
-                }else if (view instanceof TextInputEditText){
+                } else if (view instanceof TextInputEditText) {
                     EditText editText = (EditText) view;
                     editText.setText(newFormat);
 
                 }
 
-            }else {
+            } else {
                 String newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(num));
 
-                if (view instanceof TextView){
+                if (view instanceof TextView) {
                     TextView textView = (TextView) view;
                     textView.setText(newFormat);
-                }else if (view instanceof TextInputEditText){
+                } else if (view instanceof TextInputEditText) {
                     EditText editText = (EditText) view;
                     editText.setText(newFormat);
 
@@ -232,13 +237,11 @@ public class GeneralMethod {
 
 
     @BindingAdapter("amountFormat")
-    public static void amountFormat(TextView view,String amountFormat) {
+    public static void amountFormat(TextView view, String amountFormat) {
         if (amountFormat != null) {
-            amountFormat = amountFormat.replace(",","");
+            amountFormat = amountFormat.replace(",", "");
             String newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(amountFormat));
-            NumberFormat format = new DecimalFormat("###,###.##");
-            String amount = format.format(newFormat);
-            view.setText(amount);
+            view.setText(newFormat);
         }
 
     }
@@ -248,18 +251,18 @@ public class GeneralMethod {
     public static void discountTitle(TextView view, DiscountModel model) {
         if (model != null) {
             String type = model.getType();
-            if (type!=null){
+            if (type != null) {
                 String newFormat;
-                if (type.equals("per")){
+                if (type.equals("per")) {
                     newFormat = model.getValue() + "%";
-                }else {
+                } else {
                     newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(model.getValue()));
                 }
                 view.setText(newFormat);
-            }else {
+            } else {
                 String newFormat = String.format(Locale.US, "%.2f", Double.parseDouble(model.getValue()));
 
-                view.setText(model.getTitle()+","+newFormat);
+                view.setText(model.getTitle() + "," + newFormat);
             }
 
         }
@@ -267,42 +270,42 @@ public class GeneralMethod {
     }
 
     @BindingAdapter("itemTotal")
-    public static void itemTotal(TextView view,ItemModel model) {
+    public static void itemTotal(TextView view, ItemModel model) {
         if (model != null) {
             String newFormat = String.format(Locale.US, "%.2f", model.getTotalPrice());
 
-            view.setText(model.getName()+" "+newFormat);
+            view.setText(model.getName() + " " + newFormat);
 
         }
 
     }
 
     @BindingAdapter("iconTint")
-    public static void iconTint(ImageView view,boolean isSelected) {
+    public static void iconTint(ImageView view, boolean isSelected) {
 
-        if (isSelected){
-            view.setColorFilter(ContextCompat.getColor(view.getContext(),R.color.grey17));
-        }else {
-            view.setColorFilter(ContextCompat.getColor(view.getContext(),R.color.grey14));
+        if (isSelected) {
+            view.setColorFilter(ContextCompat.getColor(view.getContext(), R.color.grey17));
+        } else {
+            view.setColorFilter(ContextCompat.getColor(view.getContext(), R.color.grey14));
 
         }
 
     }
 
     @BindingAdapter("cartItemExtra")
-    public static void cartItemTotal(TextView view,ItemModel model) {
+    public static void cartItemTotal(TextView view, ItemModel model) {
         if (model != null) {
-           StringBuilder builder = new StringBuilder();
-           for (ModifierModel.Data data : model.getSelectedModifiers()){
-               builder.append(data.getTitle());
-               builder.append(",");
-           }
-           String data = builder.toString();
-           if (data.endsWith(",")){
-               data = data.substring(0,data.lastIndexOf(","));
-           }
+            StringBuilder builder = new StringBuilder();
+            for (ModifierModel.Data data : model.getSelectedModifiers()) {
+                builder.append(data.getTitle());
+                builder.append(",");
+            }
+            String data = builder.toString();
+            if (data.endsWith(",")) {
+                data = data.substring(0, data.lastIndexOf(","));
+            }
 
-           view.setText(data);
+            view.setText(data);
 
         }
 
@@ -311,16 +314,49 @@ public class GeneralMethod {
     @BindingAdapter("customerName")
     public static void customerName(TextView view, CustomerModel model) {
         if (model != null) {
-           if (model.getName()!=null&&!model.getName().isEmpty()){
-               view.setText(model.getName());
-           }else if (model.getEmail()!=null&&!model.getEmail().isEmpty())
-           {
-               view.setText(model.getEmail());
-           }
-           else if (model.getPhone_number()!=null&&!model.getPhone_number().isEmpty())
-           {
-               view.setText(model.getPhone_number());
-           }
+            if (model.getName() != null && !model.getName().isEmpty()) {
+                view.setText(model.getName());
+            } else if (model.getEmail() != null && !model.getEmail().isEmpty()) {
+                view.setText(model.getEmail());
+            } else if (model.getPhone_number() != null && !model.getPhone_number().isEmpty()) {
+                view.setText(model.getPhone_number());
+            }
+
+        }
+
+    }
+
+    @BindingAdapter("time")
+    public static void time(TextView view, String date) {
+        if (date != null) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            try {
+                Date parse = format.parse(date);
+                if (parse!=null){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", Locale.ENGLISH);
+                    simpleDateFormat.setTimeZone(TimeZone.getDefault());
+                    String t = simpleDateFormat.format(parse);
+                    view.setText(t);
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    @BindingAdapter("payInOutAmount")
+    public static void payInOutAmount(TextView view, ShiftModel.PayInOutModel model) {
+        if (model != null) {
+            String amount = String.format(Locale.US,"%.2f",model.getAmount());
+            if (model.getType().equalsIgnoreCase("out")) {
+                amount = "-" + amount;
+            }
+
+            view.setText(amount);
 
         }
 

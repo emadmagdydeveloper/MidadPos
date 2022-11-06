@@ -6,6 +6,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="enabled"
+            type="Boolean" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -109,6 +112,7 @@
                     >
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtComment"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/transparent"
@@ -122,26 +126,30 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Button
+                    android:id="@+id/btnPayIn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:backgroundTint="@null"
                     android:background="@drawable/small_rounded_stroke_primary_enable"
-                    android:enabled="false"
-                    android:textColor="@color/grey4"
+                    android:enabled="@{enabled}"
+                    android:textColor="@drawable/txt_pay_in"
                     android:textSize="15sp"
                     android:text="@string/pay_in"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginTop="16dp"
+
                     />
 
                 <Button
+                    android:id="@+id/btnPayOut"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:backgroundTint="@null"
                     android:background="@drawable/small_rounded_stroke_red_enable"
-                    android:enabled="false"
-                    android:textColor="@color/grey4"
+                    android:textColor="@drawable/txt_pay_out"
+                    android:enabled="@{enabled}"
                     android:textSize="15sp"
                     android:text="@string/pay_out"
                     android:layout_marginTop="16dp"
@@ -167,10 +175,12 @@
                     android:text="@string/pay_in_out"
                     />
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
                     />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
