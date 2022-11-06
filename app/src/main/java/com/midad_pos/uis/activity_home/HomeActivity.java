@@ -1760,6 +1760,7 @@ public class HomeActivity extends DrawerBaseActivity {
         super.onDestroy();
         disposable.clear();
 
+
     }
 
 
