@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_add_category;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -52,6 +53,7 @@ public class AddCategoryActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_category);
+        setContentView(binding.getRoot());
         getDataFromIntent();
         initView();
     }
@@ -81,7 +83,6 @@ public class AddCategoryActivity extends BaseActivity {
         }
 
 
-
         if (mvvm.getPos().getValue() != null) {
             updateCategoryCheckedColor(mvvm.getPos().getValue());
         }
@@ -90,15 +91,13 @@ public class AddCategoryActivity extends BaseActivity {
             binding.edtCategoryName.setText(mvvm.getCategoryName().getValue());
         }
 
-        mvvm.getOnCategoryAdded().observe(this,categoryModel ->{
+        mvvm.getOnCategoryAdded().observe(this, categoryModel -> {
             this.categoryModel = categoryModel;
         });
 
-        mvvm.getIsEnableToAssign().observe(this,enabled->{
+        mvvm.getIsEnableToAssign().observe(this, enabled -> {
             binding.assignDialog.setEnabled(enabled);
         });
-
-
 
 
         mvvm.getAddedSuccess().observe(this, action -> {
@@ -137,30 +136,30 @@ public class AddCategoryActivity extends BaseActivity {
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
         });
 
-        mvvm.getIsDialogShow().observe(this,show->{
-            if (show){
+        mvvm.getIsDialogShow().observe(this, show -> {
+            if (show) {
                 mvvm.getItemsData();
                 binding.flDialog.setVisibility(View.VISIBLE);
 
-            }else {
+            } else {
                 binding.flDialog.setVisibility(View.GONE);
 
             }
         });
 
-        mvvm.getIsItemsLoading().observe(this,isLoading->{
-            if (isLoading){
+        mvvm.getIsItemsLoading().observe(this, isLoading -> {
+            if (isLoading) {
                 binding.assignDialog.loader.setVisibility(View.VISIBLE);
-                if (itemAssignAdapter!=null){
+                if (itemAssignAdapter != null) {
                     itemAssignAdapter.updateList(new ArrayList<>());
                 }
-            }else {
+            } else {
                 binding.assignDialog.loader.setVisibility(View.GONE);
 
             }
         });
 
-        mvvm.getOnAssignSuccess().observe(this,aBoolean -> {
+        mvvm.getOnAssignSuccess().observe(this, aBoolean -> {
             mvvm.getIsDialogShow().setValue(false);
         });
 
@@ -186,8 +185,6 @@ public class AddCategoryActivity extends BaseActivity {
 
             }
         });
-
-
 
 
         binding.assignDialog.recView.setLayoutManager(new LinearLayoutManager(this));
@@ -509,6 +506,24 @@ public class AddCategoryActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        mvvm.showPin = true;
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mvvm.showPin){
+            showPinCodeView();
+        }else {
+            hidePinCodeView();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         if (binding.flDialog.getVisibility() == View.VISIBLE) {
             binding.flDialog.setVisibility(View.GONE);
@@ -520,6 +535,14 @@ public class AddCategoryActivity extends BaseActivity {
         }
 
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
     }
 
 

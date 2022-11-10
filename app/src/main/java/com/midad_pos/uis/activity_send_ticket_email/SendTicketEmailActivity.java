@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_send_ticket_email;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
@@ -58,4 +59,11 @@ public class SendTicketEmailActivity extends BaseActivity {
     }
 
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
+    }
 }

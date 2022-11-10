@@ -62,6 +62,7 @@ public class AddCategoryMvvm extends AndroidViewModel {
     private CategoryModel categoryModel;
     public List<String> selectedItemIds = new ArrayList<>();
     private List<ItemModel> itemModelList = new ArrayList<>();
+    public boolean showPin =false;
 
 
     private CompositeDisposable disposable = new CompositeDisposable();

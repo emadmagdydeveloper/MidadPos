@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import com.midad_pos.model.User;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.preferences.Preferences;
+import com.midad_pos.uis.activity_home.HomeActivity;
 
 import java.util.Objects;
 
@@ -41,6 +43,9 @@ public class BaseActivity extends AppCompatActivity {
     public void setContentView(View view) {
         baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_base_layout, null, false);
+        if (view.getParent()!=null){
+            ((ViewGroup)view.getParent()).removeView(view);
+        }
         binding.container.addView(view);
         super.setContentView(binding.getRoot());
         initViews();
@@ -291,8 +296,11 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(0, 0);
+        if (this instanceof HomeActivity){
+            super.onBackPressed();
+            overridePendingTransition(0, 0);
+        }
+
 
     }
 

@@ -7,6 +7,7 @@ import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.midad_pos.R;
+import com.midad_pos.adapter.ReceiptAdapter;
 import com.midad_pos.databinding.ActivityReceiptsBinding;
 import com.midad_pos.databinding.DialogSendEmailBinding;
 import com.midad_pos.mvvm.ReceiptDetailsMvvm;
@@ -32,13 +34,14 @@ import com.midad_pos.uis.activity_send_ticket_email.SendTicketEmailActivity;
 public class ReceiptsActivity extends DrawerBaseActivity {
     private ReceiptDetailsMvvm mvvm;
     private ActivityReceiptsBinding binding;
+    private ReceiptAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_receipts, null, false);
         setContentView(binding.getRoot());
-        setUpDrawer(binding.toolbarReceiptsLayout.toolbarReceipts,true);
+        setUpDrawer(binding.toolbarReceiptsLayout.toolbarReceipts, true);
         updateSelectedPos(1);
         initView();
     }
@@ -46,7 +49,21 @@ public class ReceiptsActivity extends DrawerBaseActivity {
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(ReceiptDetailsMvvm.class);
         binding.setLang(getLang());
+        binding.recView.setLayoutManager(new LinearLayoutManager(this));
+        binding.recView.setHasFixedSize(true);
+        adapter = new ReceiptAdapter(this, getLang());
+        binding.recView.setAdapter(adapter);
 
+        mvvm.getIsLoading().observe(this,loading->binding.swipeRefresh.setRefreshing(loading));
+        mvvm.getOrders().observe(this, list -> {
+            if (adapter != null) {
+                adapter.updateList(list);
+                binding.recView.postDelayed(()->binding.recView.smoothScrollToPosition(0),100);
+            }
+        });
+        
+        binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        
         mvvm.getShowTicketDetails().observe(this, show -> {
             if (show) {
                 if (binding.llReceiptDetailsPort != null) {
@@ -67,11 +84,9 @@ public class ReceiptsActivity extends DrawerBaseActivity {
 
         });
 
-        if (mvvm.getIsSearchOpen().getValue() != null&&mvvm.getIsSearchOpen().getValue()) {
-            if (binding.llSearch != null && binding.edtSearch != null) {
-                binding.llSearch.setVisibility(View.VISIBLE);
-                binding.edtSearch.setText(mvvm.getSearchQuery().getValue());
-            }
+        if (mvvm.getIsSearchOpen().getValue() != null && mvvm.getIsSearchOpen().getValue()) {
+            binding.llSearch.setVisibility(View.VISIBLE);
+            binding.edtSearch.setText(mvvm.getSearchQuery().getValue());
 
         }
 
@@ -97,63 +112,57 @@ public class ReceiptsActivity extends DrawerBaseActivity {
             mvvm.getShowTicketDetails().setValue(true);
         }
 
-        if (binding.tvOpenSearch != null &&binding.llSearch!=null&& binding.edtSearch != null) {
-            binding.tvOpenSearch.setOnClickListener(view -> {
-                binding.llSearch.setVisibility(View.VISIBLE);
-                mvvm.getIsSearchOpen().setValue(true);
-            });
-        }
+        binding.tvOpenSearch.setOnClickListener(view -> {
+            binding.llSearch.setVisibility(View.VISIBLE);
+            mvvm.getIsSearchOpen().setValue(true);
+        });
 
-        if (binding.closeSearch != null) {
-            binding.closeSearch.setOnClickListener(view -> {
-                if (mvvm.getSearchQuery().getValue()!=null){
-                    if (mvvm.getSearchQuery().getValue().isEmpty()) {
-                        mvvm.getIsSearchOpen().setValue(false);
-                        if (binding.llSearch!=null){
-                            binding.llSearch.setVisibility(View.GONE);
+        binding.closeSearch.setOnClickListener(view -> {
+            if (mvvm.getSearchQuery().getValue() != null) {
+                if (mvvm.getSearchQuery().getValue().isEmpty()) {
+                    mvvm.getIsSearchOpen().setValue(false);
+                    binding.llSearch.setVisibility(View.GONE);
 
-                        }
-                    } else {
-                        mvvm.getSearchQuery().setValue("");
-                        if (binding.edtSearch != null) {
-                            binding.edtSearch.setText("");
-                        }
-
-                    }
-                }
-
-
-
-            });
-        }
-
-        if (binding.edtSearch!=null){
-            binding.edtSearch.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                } else {
+                    mvvm.getSearchQuery().setValue("");
+                    binding.edtSearch.setText("");
 
                 }
+            }
 
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                }
+        });
 
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    String query = editable.toString().trim();
-                    mvvm.getSearchQuery().setValue(query);
-                }
-            });
-        }
+        binding.edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String query = editable.toString().trim();
+                mvvm.getSearchQuery().setValue(query);
+                binding.edtSearch.removeTextChangedListener(this);
+                mvvm.search();
+                binding.edtSearch.addTextChangedListener(this);
+            }
+        });
 
         binding.btnRefund.setOnClickListener(view -> {
             Intent intent = new Intent(this, RefundActivity.class);
             startActivity(intent);
-            overridePendingTransition(0,0);
+            overridePendingTransition(0, 0);
         });
+
         binding.toolbarLandMenu.setOnClickListener(this::createPopUpMenuSendTicket);
 
+        binding.swipeRefresh.setOnRefreshListener(()->mvvm.getOrdersData());
     }
 
     @SuppressLint("RestrictedApi")
@@ -220,5 +229,12 @@ public class ReceiptsActivity extends DrawerBaseActivity {
     }
 
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
 
+        } catch (Exception e) {
+        }
+    }
 }

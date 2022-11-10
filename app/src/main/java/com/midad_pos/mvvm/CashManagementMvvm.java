@@ -39,6 +39,7 @@ public class CashManagementMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isDataChanged;
 
     private UserModel userModel;
+    public boolean showPin =false;
 
     private CompositeDisposable disposable = new CompositeDisposable();
 

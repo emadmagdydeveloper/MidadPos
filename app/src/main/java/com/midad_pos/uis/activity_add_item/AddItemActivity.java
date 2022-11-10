@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
@@ -69,6 +70,8 @@ public class AddItemActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_item);
+        setContentView(binding.getRoot());
+
         getDataFromIntent();
         initView();
     }
@@ -634,8 +637,23 @@ public class AddItemActivity extends BaseActivity {
 
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        mvvm.showPin = true;
+
+
+    }
+
+
+    @Override
     protected void onResume() {
         super.onResume();
+        if (mvvm.showPin){
+            showPinCodeView();
+        }else {
+            hidePinCodeView();
+        }
+
         if (!forImageIntent){
             mvvm.getCategoryData(getUserModel().getData().getUser().getId());
             forImageIntent = false;
@@ -643,5 +661,12 @@ public class AddItemActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
+    }
 
 }

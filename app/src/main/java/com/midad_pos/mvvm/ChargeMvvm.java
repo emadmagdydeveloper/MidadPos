@@ -898,7 +898,9 @@ public class ChargeMvvm extends AndroidViewModel {
         dialog.setCancelable(false);
         dialog.show();
 
-        CartList cartList = getCartListInstance().getValue();
+        manageCartModel = ManageCartModel.newInstance();
+        CartList cartList = manageCartModel.getCartModel(getApplication().getApplicationContext());
+
         if (cartList != null && getPaymentType().getValue() != null && getRemaining().getValue() != null && getPaidAmount().getValue() != null) {
             String customer_id = null;
             if (cartList.getCustomerModel() != null) {
@@ -925,7 +927,7 @@ public class ChargeMvvm extends AndroidViewModel {
                     discountsItem.add(discount);
                     totalDiscount += Double.parseDouble(discountModel.getValue());
                 }
-                String variant_id = null;
+                String variant_id = "";
                 double price = Double.parseDouble(itemModel.getPrice().replace(",", ""));
                 if (itemModel.getSelectedVariant() != null) {
                     variant_id = itemModel.getSelectedVariant().getId();
@@ -939,8 +941,11 @@ public class ChargeMvvm extends AndroidViewModel {
                         double totalDataCost = itemModel.getAmount() * Double.parseDouble(data.getCost());
                         total += totalDataCost;
 
-                        CartModel.ModifierDetails details = new CartModel.ModifierDetails(data.getId(), Double.parseDouble(data.getCost()), totalDataCost);
-                        modifierDetails.add(details);
+                        if (data.isSelected()) {
+                            CartModel.ModifierDetails details = new CartModel.ModifierDetails(data.getId(), Double.parseDouble(data.getCost()), totalDataCost);
+                            modifierDetails.add(details);
+                        }
+
                     }
                     CartModel.Modifier modifier = new CartModel.Modifier(itemModel.getId(), modifierModel.getId(), total + "", modifierDetails);
 
@@ -951,6 +956,7 @@ public class ChargeMvvm extends AndroidViewModel {
                 CartModel.Detail detail = new CartModel.Detail(itemModel.getId(), variant_id, itemModel.getAmount(), price, totalDiscount + "", tax_rate + "", itemModel.getComment(), modifiers, discountsItem);
                 detailList.add(detail);
             }
+
 
             AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
             CartModel.Payment payment = new CartModel.Payment(cartList.getTotalPrice(), Double.parseDouble(getPaidAmount().getValue().replace(",", "")), getRemaining().getValue(), getPaymentType().getValue() + "");
@@ -963,11 +969,22 @@ public class ChargeMvvm extends AndroidViewModel {
                 discounts.add(discount);
             }
 
+            String sale_status = "";
+            String draft = "";
+            if (cartList.getSale_id() == null) {
+                sale_status = "1";
+                draft = "0";
+            } else {
+                sale_status = "1";
+                draft = "1";
+            }
 
-            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), "1", "0", payments, discounts, detailList);
+            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
+            Log.e("din",cartList.getDelivery_id()+"__");
+
             List<CartModel.Cart> carts = new ArrayList<>();
             carts.add(cart);
-            CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), customer_id, carts);
+            CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), customer_id, userModel.getData().getSelectedPos().getId(), carts);
 
 
             Api.getService(Tags.base_url)
@@ -986,10 +1003,13 @@ public class ChargeMvvm extends AndroidViewModel {
                             if (response.isSuccessful()) {
                                 if (response.body() != null) {
 
+                                    Log.e(TAG, response.body().getStatus() + "" + response.body().getMessage().toString());
+
                                     if (response.body().getStatus() == 200) {
                                         manageCartModel.clearCart(context);
                                         getOnTicketAddedSuccess().setValue(true);
                                     }
+
                                 }
                             } else {
 
@@ -1006,9 +1026,9 @@ public class ChargeMvvm extends AndroidViewModel {
                         @Override
                         public void onError(Throwable e) {
                             dialog.dismiss();
+                            Log.e(TAG, e.getMessage() + "");
 
                             if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
-                                Log.e("error", e.getMessage() + "");
                                 Toast.makeText(getApplication().getApplicationContext(), R.string.check_network, Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();

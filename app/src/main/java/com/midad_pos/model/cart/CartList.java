@@ -13,6 +13,7 @@ import java.util.List;
 
 
 public class CartList implements Serializable {
+    private String sale_id;
     private double net_total;
     private double total;
     private double total_discount;
@@ -600,5 +601,13 @@ public class CartList implements Serializable {
 
     public void setCustomerModel(CustomerModel customerModel) {
         this.customerModel = customerModel;
+    }
+
+    public String getSale_id() {
+        return sale_id;
+    }
+
+    public void setSale_id(String sale_id) {
+        this.sale_id = sale_id;
     }
 }

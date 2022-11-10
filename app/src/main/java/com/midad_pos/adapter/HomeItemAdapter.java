@@ -110,7 +110,6 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void updateList(List<ItemModel> list){
-        Log.e("ss",list.size()+"");
         DiffUtilsItems callback = new DiffUtilsItems(this.list,list);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
         this.list.clear();

@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_store;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
@@ -118,5 +119,12 @@ public class StoreActivity extends BaseActivity {
         popupMenu.show();
     }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
+    }
 
 }

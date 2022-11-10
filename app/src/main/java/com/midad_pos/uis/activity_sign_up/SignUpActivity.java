@@ -2,6 +2,7 @@ package com.midad_pos.uis.activity_sign_up;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
@@ -45,6 +46,14 @@ public class SignUpActivity extends BaseActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
     }
 
 }

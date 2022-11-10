@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_refund;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
@@ -29,6 +30,13 @@ public class RefundActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
+    }
 
 
 }

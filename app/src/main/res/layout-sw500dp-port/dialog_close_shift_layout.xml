@@ -2,83 +2,94 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="total"
+            type="String" />
+
+        <variable
+            name="diff"
+            type="String" />
+    </data>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black_trans"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="650dp"
-            android:orientation="vertical"
-            android:background="@color/white"
             android:layout_gravity="center"
+            android:background="@color/white"
+            android:orientation="vertical"
 
             >
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
 
 
                 >
+
                 <ImageView
                     android:id="@+id/closeDialog"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_close"
                     android:padding="5dp"
-                    app:tint="@color/grey4"
-                    />
+                    android:src="@drawable/ic_close"
+                    app:tint="@color/grey4" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
                     android:layout_marginEnd="24dp"
+                    android:text="@string/close_shift"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/close_shift"
-                    />
+                    android:textStyle="bold" />
             </LinearLayout>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
-                android:background="@color/grey3"
-                />
+                android:background="@color/grey3" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                >
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.3"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
                     android:text="@string/expected_cash_amount"
-                    />
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".7"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="-50.00"
                     android:gravity="end"
+                    android:text="@{total}"
                     android:textAlignment="viewEnd"
-                    />
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -86,43 +97,43 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                >
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.3"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
                     android:text="@string/actual_cash_amount"
-                    />
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="0dp"
-                    android:layout_weight="0.7"
                     android:layout_height="wrap_content"
+                    android:layout_weight="0.7"
                     android:hint="0.00"
-                    app:hintEnabled="true"
                     app:hintAnimationEnabled="true"
-                    app:hintTextColor="@color/colorPrimary"
-                    >
+                    app:hintEnabled="true"
+                    app:hintTextColor="@color/colorPrimary">
+
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtActualAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/transparent"
                         android:gravity="end"
-                        android:textAlignment="viewEnd"
-                        android:textSize="16sp"
-                        android:textColor="@color/black"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="0dp"
+                        android:hint="@{total}"
                         android:inputType="number"
                         android:lines="1"
-                        />
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -130,48 +141,48 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="16dp"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:orientation="horizontal"
 
                 >
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.3"
+                    android:text="@string/difference"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/difference"
-                    />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".7"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="50.00"
                     android:gravity="end"
+                    android:text="@{diff}"
                     android:textAlignment="viewEnd"
-                    />
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
             </LinearLayout>
 
             <Button
+                android:id="@+id/btnCloseShift"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:layout_marginTop="36dp"
-                app:backgroundTint="@null"
+                android:layout_marginEnd="16dp"
                 android:background="@drawable/small_rounded_stroke_primary_enable"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:textSize="16sp"
                 android:text="@string/close_shift"
-                />
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:backgroundTint="@null" />
 
         </LinearLayout>
 

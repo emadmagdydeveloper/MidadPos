@@ -14,7 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".uis.activity_cash_management.CashManagementActivity">
+
+        >
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"

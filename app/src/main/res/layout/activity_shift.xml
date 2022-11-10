@@ -183,7 +183,8 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:gravity="end"
-                                    android:text="@{model.created_at}"
+                                    shiftDate="@{model}"
+                                    lang="@{lang}"
                                     android:textAlignment="viewEnd"
                                     android:textColor="@color/black"
                                     android:textSize="12sp" />
@@ -656,6 +657,14 @@
 
         </LinearLayout>
 
+        <ProgressBar
+            android:id="@+id/loader"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+
+            />
 
         <FrameLayout
             android:id="@+id/flDialog"
@@ -670,7 +679,9 @@
                 android:layout_height="match_parent"
                 android:clickable="true"
                 android:focusable="true"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:background="@color/white"
+                >
 
                 <include
                     android:id="@+id/dialogOpenShiftLayout"
@@ -683,7 +694,9 @@
                 android:layout_height="match_parent"
                 android:clickable="true"
                 android:focusable="true"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:background="@color/white"
+                >
 
                 <include
                     android:id="@+id/shiftReportLayout"
@@ -696,22 +709,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-
+            android:background="@color/white"
+            android:clickable="true"
+            android:focusable="true"
             >
-
             <include
                 android:id="@+id/dialogCloseShiftLayout"
                 layout="@layout/dialog_close_shift_layout" />
         </FrameLayout>
 
-        <ProgressBar
-            android:id="@+id/loader"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:visibility="gone"
 
-            />
 
 
     </FrameLayout>

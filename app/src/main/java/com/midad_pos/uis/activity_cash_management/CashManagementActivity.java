@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_cash_management;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
@@ -20,19 +21,21 @@ import com.midad_pos.model.ShiftModel;
 import com.midad_pos.mvvm.CashManagementMvvm;
 import com.midad_pos.uis.activity_base.BaseActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class CashManagementActivity extends BaseActivity {
     private CashManagementMvvm mvvm;
     private ActivityCashManagementBinding binding;
-    private List<ShiftModel.PayInOutModel> list;
+    private List<ShiftModel.PayInOutModel> list = new ArrayList<>();
     private PayInOutAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cash_management);
+        setContentView(binding.getRoot());
         getDataFromIntent();
         initView();
     }
@@ -59,6 +62,7 @@ public class CashManagementActivity extends BaseActivity {
         if (mvvm.getAmount().getValue() != null) {
             binding.edtAmount.setText(mvvm.getAmount().getValue());
         }
+
         if (mvvm.getComment().getValue() != null) {
             binding.edtComment.setText(mvvm.getComment().getValue());
         }
@@ -69,7 +73,6 @@ public class CashManagementActivity extends BaseActivity {
             binding.edtAmount.setText(null);
             binding.edtComment.setText(null);
         });
-
 
         binding.edtAmount.addTextChangedListener(new TextWatcher() {
             @Override
@@ -149,6 +152,24 @@ public class CashManagementActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        mvvm.showPin = true;
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mvvm.showPin){
+            showPinCodeView();
+        }else {
+            hidePinCodeView();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         if (mvvm.getIsDataChanged().getValue() != null && mvvm.getIsDataChanged().getValue()) {
             setResult(RESULT_OK);
@@ -158,6 +179,14 @@ public class CashManagementActivity extends BaseActivity {
         overridePendingTransition(0, 0);
 
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
     }
 
 

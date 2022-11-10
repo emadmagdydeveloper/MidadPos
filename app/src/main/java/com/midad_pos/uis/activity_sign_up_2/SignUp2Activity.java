@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_sign_up_2;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -138,5 +139,13 @@ public class SignUp2Activity extends BaseActivity implements OnCountryPickerList
         mvvm.setSignUpModel(model);
     }
 
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
+    }
 
 }

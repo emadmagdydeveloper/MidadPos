@@ -12,6 +12,8 @@ public class ShiftModel implements Serializable {
     private String pos_id;
     private boolean status;
     private String created_at;
+    private String updated_at;
+
     private User user;
     private WereHouse warehouse;
     private POSModel pos;
@@ -29,6 +31,7 @@ public class ShiftModel implements Serializable {
     private double refund;
     private double net_sales;
     private double total_tendered;
+    private double actual_cash;
 
 
     public String getId() {
@@ -77,6 +80,10 @@ public class ShiftModel implements Serializable {
 
     public POSModel getPos() {
         return pos;
+    }
+
+    public double getActual_cash() {
+        return actual_cash;
     }
 
     public double getTotal_sale_amount() {
@@ -133,6 +140,10 @@ public class ShiftModel implements Serializable {
 
     public double getTotal_tendered() {
         return total_tendered;
+    }
+
+    public String getUpdated_at() {
+        return updated_at;
     }
 
     public static class Payment implements Serializable{

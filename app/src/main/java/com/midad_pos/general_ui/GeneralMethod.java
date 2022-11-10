@@ -361,6 +361,141 @@ public class GeneralMethod {
         }
 
     }
+
+    @BindingAdapter({"shiftStartEndDate","lang"})
+    public static void shiftStartDate(TextView view,ShiftModel model,String lang) {
+        if (model != null) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", new Locale(lang));
+            try {
+                Date parse = format.parse(model.getCreated_at());
+                String t ="";
+                if (parse!=null){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd", new Locale(lang));
+                     t = simpleDateFormat.format(parse);
+                }
+
+                Date parse2 = format.parse(model.getUpdated_at());
+                String t2="";
+                if (parse2!=null){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd", new Locale(lang));
+                    t2 = simpleDateFormat.format(parse2);
+                }
+
+                view.setText(t+" - "+t2);
+
+
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    @BindingAdapter({"shiftStartEndTime","lang"})
+    public static void shiftStartTime(TextView view,ShiftModel model,String lang) {
+        if (model != null) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", new Locale(lang));
+            try {
+                Date parse = format.parse(model.getCreated_at());
+                String t ="";
+                if (parse!=null){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", new Locale(lang));
+                    t = simpleDateFormat.format(parse);
+                }
+
+                Date parse2 = format.parse(model.getUpdated_at());
+                String t2="";
+                if (parse2!=null){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", new Locale(lang));
+                    t2 = simpleDateFormat.format(parse2);
+                }
+
+                view.setText(t+" - "+t2);
+
+
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    @BindingAdapter({"shiftDate","lang"})
+    public static void shiftDate(TextView view,ShiftModel model,String lang) {
+        if (model != null) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", new Locale(lang));
+            try {
+                Date parse = format.parse(model.getCreated_at());
+                String t ="";
+                if (parse!=null){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a", new Locale(lang));
+                    t = simpleDateFormat.format(parse);
+                }
+
+
+                view.setText(t);
+
+
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    @BindingAdapter({"receiptTime","lang"})
+    public static void receiptTime(TextView view,String date,String lang) {
+        if (date != null) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", new Locale(lang));
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            try {
+                Date parse = format.parse(date);
+                if (parse!=null){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", new Locale(lang));
+                    simpleDateFormat.setTimeZone(TimeZone.getDefault());
+                    String t = simpleDateFormat.format(parse);
+                    view.setText(t);
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    @BindingAdapter({"receiptDate","lang"})
+    public static void receiptDate(TextView view,String date,String lang) {
+        if (date != null&&lang!=null) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", new Locale(lang));
+            try {
+                Date parse = format.parse(date);
+                String t ="";
+                if (parse!=null){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE dd-MMM-yyy", new Locale(lang));
+                    t = simpleDateFormat.format(parse);
+                }
+
+
+                view.setText(t);
+
+
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
 }
 
 

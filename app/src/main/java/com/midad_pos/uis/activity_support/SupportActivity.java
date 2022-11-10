@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -68,6 +69,8 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.helpLayout!=null){
             binding.helpLayout.helpCenter.setOnClickListener(view -> {
+                mvvm.getForNavigation().setValue(true);
+
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
                 startActivity(intent);
@@ -76,6 +79,8 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.helpLayout!=null){
             binding.helpLayout.community.setOnClickListener(view -> {
+                mvvm.getForNavigation().setValue(true);
+
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
                 startActivity(intent);
@@ -85,6 +90,8 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.legalInformationLayout!=null){
             binding.legalInformationLayout.terms.setOnClickListener(view -> {
+                mvvm.getForNavigation().setValue(true);
+
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
                 startActivity(intent);
@@ -93,6 +100,8 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.legalInformationLayout!=null){
             binding.legalInformationLayout.privacy.setOnClickListener(view -> {
+                mvvm.getForNavigation().setValue(true);
+
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
                 startActivity(intent);
@@ -101,6 +110,8 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.helpDetailsLayout!=null){
             binding.helpDetailsLayout.helpCenter.setOnClickListener(view -> {
+                mvvm.getForNavigation().setValue(true);
+
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
                 startActivity(intent);
@@ -109,6 +120,8 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.helpDetailsLayout!=null){
             binding.helpDetailsLayout.community.setOnClickListener(view -> {
+                mvvm.getForNavigation().setValue(true);
+
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
                 startActivity(intent);
@@ -118,6 +131,8 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.LegalInformationDetailsLayout!=null){
             binding.LegalInformationDetailsLayout.terms.setOnClickListener(view -> {
+                mvvm.getForNavigation().setValue(true);
+
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
                 startActivity(intent);
@@ -126,6 +141,8 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.LegalInformationDetailsLayout!=null){
             binding.LegalInformationDetailsLayout.privacy.setOnClickListener(view -> {
+                mvvm.getForNavigation().setValue(true);
+
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
                 startActivity(intent);
@@ -196,6 +213,31 @@ public class SupportActivity extends DrawerBaseActivity {
 
     }
 
+
+    protected void onResume() {
+        super.onResume();
+        if (mvvm.getShowPin().getValue() != null && mvvm.getShowPin().getValue()) {
+            showPinCodeView();
+        } else {
+            hidePinCodeView();
+        }
+        mvvm.getForNavigation().setValue(false);
+        mvvm.getShowPin().setValue(false);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mvvm.getForNavigation().getValue() != null && mvvm.getForNavigation().getValue()) {
+            mvvm.getShowPin().setValue(false);
+        } else {
+            mvvm.getShowPin().setValue(true);
+
+        }
+
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -216,4 +258,11 @@ public class SupportActivity extends DrawerBaseActivity {
     }
 
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
+    }
 }

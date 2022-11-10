@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_charge;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.DataBindingUtil;
@@ -742,5 +743,13 @@ public class ChargeActivity extends BaseActivity {
             mvvm.getSplitList().setValue(mvvm.getSplitList().getValue());
         }
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
     }
 }

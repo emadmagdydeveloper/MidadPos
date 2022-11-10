@@ -2,6 +2,7 @@ package com.midad_pos.uis.activity_choose_signin;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
@@ -44,5 +45,13 @@ public class ChooseSignInActivity extends BaseActivity {
         launcher.launch(intent);
         overridePendingTransition(0,0);
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
     }
 }

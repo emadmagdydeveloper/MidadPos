@@ -6,8 +6,10 @@ import com.midad_pos.model.DeliveryDataModel;
 import com.midad_pos.model.DiscountDataModel;
 import com.midad_pos.model.HomeIndexModel;
 import com.midad_pos.model.ItemsDataModel;
+import com.midad_pos.model.OrderDataModel;
 import com.midad_pos.model.PaymentDataModel;
 import com.midad_pos.model.ShiftDataModel;
+import com.midad_pos.model.ShiftsDataModel;
 import com.midad_pos.model.SingleCategoryData;
 import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.SinglePayInOutData;
@@ -163,7 +165,10 @@ public interface Service {
     @FormUrlEncoded
     @POST("api/shift/closeShift")
     Single<Response<StatusResponse>> closeShift(@Field("user_id") String user_id,
-                                                @Field("shift_id") String shift_id
+                                                @Field("shift_id") String shift_id,
+                                                @Field("actual_cash") String actual_cash,
+                                                @Field("expected_cash") String expected_cash
+
 
     );
 
@@ -174,7 +179,7 @@ public interface Service {
     );
 
 
-    @POST("api/shift/closeShift")
+    @POST("api/orders/storeOrder")
     Single<Response<StatusResponse>> storeOrder(@Body CartModel cartModel);
 
     @FormUrlEncoded
@@ -185,6 +190,16 @@ public interface Service {
                                                   @Field("comment") String comment,
                                                   @Field("type") String type
 
-                                              );
+    );
+
+    @GET("api/shift/allShifts")
+    Single<Response<ShiftsDataModel>> shifts(@Query("user_id") String user_id,
+                                             @Query("warehouse_id") String warehouse_id,
+                                             @Query("pos_id") String pos_id
+    );
+
+    @GET("api/orders/orders")
+    Single<Response<OrderDataModel>> getOrders(@Query("user_id") String user_id
+    );
 
 }

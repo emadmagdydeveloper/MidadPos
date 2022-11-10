@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="model"
+            type="com.midad_pos.model.UserModel" />
     </data>
 
     <LinearLayout
@@ -259,7 +261,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="16sp"
                             android:textColor="@color/grey4"
-                            android:text="mail@gmail.com"
+                            android:text='@{model.data.selectedUser.email}'
                             android:textStyle="bold"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="14dp"

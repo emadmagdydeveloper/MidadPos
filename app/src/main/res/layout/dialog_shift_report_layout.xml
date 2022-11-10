@@ -5,6 +5,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="model"
+            type="com.midad_pos.model.ShiftModel" />
 
     </data>
     <LinearLayout
@@ -25,7 +28,7 @@
 
             >
             <ImageView
-                android:id="@+id/closeCustomerDialog"
+                android:id="@+id/closeReportDialog"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_back_arrow"
@@ -81,7 +84,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="1"
+                        android:text="@{model.shift_no}"
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -108,8 +111,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="emad magdy"
-                        android:ems="8"
+                        android:text="@{model.user.name}"
+                        android:ems="6"
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:lines="1"
@@ -121,11 +124,12 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="30-08-2022 11:00 Am"
                         android:textColor="@color/black"
                         android:textSize="13sp"
                         android:gravity="end"
                         android:textAlignment="viewEnd"
+                        shiftDate="@{model}"
+                        lang="@{lang}"
                         />
                 </LinearLayout>
                 <LinearLayout
@@ -150,8 +154,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="emad magdy"
-                        android:ems="8"
+                        android:text="@{model.user.name}"
+                        android:ems="6"
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:lines="1"
@@ -163,11 +167,12 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="30-08-2022 11:00 Am"
                         android:textColor="@color/black"
                         android:textSize="13sp"
                         android:gravity="end"
                         android:textAlignment="viewEnd"
+                        shiftDate="@{model}"
+                        lang="@{lang}"
                         />
                 </LinearLayout>
 
@@ -218,7 +223,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{model.cash_in_hand}"
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -249,7 +254,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.cash_payment)}"
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -280,7 +285,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.cash_refund)}"
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -311,7 +316,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.paid_in)}"
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -342,7 +347,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.paid_out)}"
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -375,7 +380,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.expected_cash)}"
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         />
@@ -408,9 +413,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
                         android:textColor="@color/black"
                         android:textSize="15sp"
+                        amountFormat="@{String.valueOf(model.actual_cash)}"
+
                         />
                 </LinearLayout>
 
@@ -443,10 +449,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
+                        amountFormat="@{String.valueOf(model.expected_cash-model.actual_cash)}"
+
                         />
                 </LinearLayout>
 
@@ -501,7 +508,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.gross_sales)}"
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
@@ -535,7 +542,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.refund)}"
+
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -567,7 +575,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.total_discount)}"
+
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -590,7 +599,6 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="24dp"
                     >
 
                     <TextView
@@ -612,12 +620,86 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:text="00.00"
+                        amountFormat="@{String.valueOf(model.net_sales)}"
+
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         />
                 </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tax"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+                    <androidx.legacy.widget.Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        amountFormat="@{String.valueOf(model.total_order_tax)}"
+
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tendered"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <androidx.legacy.widget.Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        amountFormat="@{String.valueOf(model.total_tendered)}"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recViewShiftPayment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    />
 
 
             </LinearLayout>

@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
@@ -127,8 +128,6 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
 
-
-
     private void initView() {
         baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         mvvm = ViewModelProviders.of(this).get(HomeMvvm.class);
@@ -148,11 +147,10 @@ public class HomeActivity extends DrawerBaseActivity {
             }
         });
 
-        baseMvvm.getOnUserRefreshed().observe(this,aBoolean -> {
+        baseMvvm.getOnUserRefreshed().observe(this, aBoolean -> {
             mvvm.loadHomeData();
         });
         binding.toolBarHomeLayout.setLang(getLang());
-
         spinnerCountryAdapter = new SpinnerCountryAdapter(this, getLang());
         binding.addCustomerDialog.addCustomerLayout.spinnerCountry.setAdapter(spinnerCountryAdapter);
         binding.addCustomerDialog.addCustomerLayout.spinnerCountry.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -176,7 +174,7 @@ public class HomeActivity extends DrawerBaseActivity {
         });
 
         mvvm.getAppSettingModel().observe(this, this::updateShiftData);
-        mvvm.getIsCustomerLoading().observe(this,isLoading-> binding.addCustomerDialog.searchDialog.loader.setVisibility(isLoading?View.VISIBLE:View.GONE));
+        mvvm.getIsCustomerLoading().observe(this, isLoading -> binding.addCustomerDialog.searchDialog.loader.setVisibility(isLoading ? View.VISIBLE : View.GONE));
 
         binding.addCustomerDialog.searchDialog.recView.setLayoutManager(new LinearLayoutManager(this));
         binding.addCustomerDialog.searchDialog.recView.setHasFixedSize(true);
@@ -184,19 +182,17 @@ public class HomeActivity extends DrawerBaseActivity {
         binding.addCustomerDialog.searchDialog.recView.setAdapter(customersAdapter);
         binding.addCustomerDialog.addCustomerLayout.btnSave.setOnClickListener(v -> mvvm.addCustomer(this));
 
-        mvvm.getCustomersInstance().observe(this,customers->{
-            binding.addCustomerDialog.searchDialog.tvNoCustomer.setVisibility(customers.size()>0?View.GONE:View.VISIBLE);
-            if (customersAdapter!=null){
+        mvvm.getCustomersInstance().observe(this, customers -> {
+            binding.addCustomerDialog.searchDialog.tvNoCustomer.setVisibility(customers.size() > 0 ? View.GONE : View.VISIBLE);
+            if (customersAdapter != null) {
                 customersAdapter.updateList(customers);
             }
         });
 
 
-
         if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
             initCodeScanner(mvvm.getCamera().getValue());
         }
-
 
 
         mvvm.getSelectedCategory().observe(this, selectedCategory -> {
@@ -248,10 +244,10 @@ public class HomeActivity extends DrawerBaseActivity {
 
         });
 
-        mvvm.getSelectedDeliveryOptions().observe(this, deliveryOption ->{
+        mvvm.getSelectedDeliveryOptions().observe(this, deliveryOption -> {
             binding.setDeliveryOption(deliveryOption);
 
-        } );
+        });
 
         mvvm.getTicketCount().observe(this, ticketCount -> {
             if (binding.toolBarHomeLayout.tvTicketCount != null) {
@@ -271,11 +267,11 @@ public class HomeActivity extends DrawerBaseActivity {
 
         mvvm.getIsLoading().observe(this, isLoading -> {
 
-            if (getAppSetting().getIsShiftOpen()==0){
+            if (getAppSetting().getIsShiftOpen() == 0) {
                 binding.llNoItems.setVisibility(View.GONE);
                 binding.loader.setVisibility(View.GONE);
 
-            }else {
+            } else {
                 if (isLoading) {
                     binding.llNoItems.setVisibility(View.GONE);
                     binding.loader.setVisibility(View.VISIBLE);
@@ -288,7 +284,6 @@ public class HomeActivity extends DrawerBaseActivity {
         });
 
         mvvm.getItems().observe(this, items -> {
-
             if (adapter != null) {
                 adapter.updateList(items);
             }
@@ -296,10 +291,10 @@ public class HomeActivity extends DrawerBaseActivity {
                 binding.llNoItems.setVisibility(View.GONE);
             } else {
                 if (mvvm.getIsLoading().getValue() != null && !mvvm.getIsLoading().getValue()) {
-                    if (getAppSetting().getIsShiftOpen()==0){
+                    if (getAppSetting().getIsShiftOpen() == 0) {
                         binding.llNoItems.setVisibility(View.GONE);
 
-                    }else {
+                    } else {
                         binding.llNoItems.setVisibility(View.VISIBLE);
 
                     }
@@ -314,10 +309,10 @@ public class HomeActivity extends DrawerBaseActivity {
             }
 
 
-            if (discounts.size()>0){
+            if (discounts.size() > 0) {
                 binding.llNoItems.setVisibility(View.GONE);
 
-            }else {
+            } else {
                 binding.llNoItems.setVisibility(View.VISIBLE);
 
             }
@@ -436,7 +431,7 @@ public class HomeActivity extends DrawerBaseActivity {
             }
         });
 
-        mvvm.getOnCustomerUpdatedSuccess().observe(this,aBoolean -> {
+        mvvm.getOnCustomerUpdatedSuccess().observe(this, aBoolean -> {
             binding.addCustomerDialog.flAddCustomerLayout.setVisibility(View.GONE);
 
         });
@@ -840,11 +835,11 @@ public class HomeActivity extends DrawerBaseActivity {
                 cartAdapter.updateList(cartList.getItems());
             }
 
-            if (binding.toolbarLandAddUser!=null){
-                if (cartList.getCustomerModel()==null){
+            if (binding.toolbarLandAddUser != null) {
+                if (cartList.getCustomerModel() == null) {
                     binding.toolbarLandAddUser.setImageResource(R.drawable.ic_add_user);
 
-                }else {
+                } else {
                     binding.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
 
                 }
@@ -858,11 +853,11 @@ public class HomeActivity extends DrawerBaseActivity {
         cartDiscountAdapter = new CartDiscountAdapter(this);
         binding.dialogCartDiscount.recViewDiscounts.setAdapter(cartDiscountAdapter);
 
-        mvvm.getCartDiscounts().observe(this,discounts ->{
-            if (cartDiscountAdapter!=null){
+        mvvm.getCartDiscounts().observe(this, discounts -> {
+            if (cartDiscountAdapter != null) {
                 cartDiscountAdapter.updateList(discounts);
             }
-        } );
+        });
 
 
         if (binding.toolBarHomeLayout.tvTicketCount != null && binding.toolBarHomeLayout.tv != null && binding.toolBarHomeLayout.arrowCloseTicket != null) {
@@ -926,7 +921,7 @@ public class HomeActivity extends DrawerBaseActivity {
         binding.dialogItemExtras.save.setOnClickListener(v -> {
             String comment = binding.dialogItemExtras.edtComment.getText().toString().trim();
 
-            if (mvvm.getItemForPrice().getValue()!=null){
+            if (mvvm.getItemForPrice().getValue() != null) {
                 mvvm.getItemForPrice().getValue().setComment(comment);
             }
 
@@ -972,63 +967,69 @@ public class HomeActivity extends DrawerBaseActivity {
         binding.dialogCartDiscount.close.setOnClickListener(v -> mvvm.getIsDialogDiscountsOpened().setValue(false));
 
 
-        if (binding.llCharge!=null){
+        if (binding.llCharge != null) {
             binding.llCharge.setOnClickListener(v -> {
 
                 if (mvvm.getCart().getValue() != null) {
                     CartList cartList = mvvm.getCart().getValue();
-                    if (cartList.getTotalPrice()>0){
+                    if (cartList.getTotalPrice() > 0) {
                         navigateToChargeActivity();
                     }
                 }
             });
         }
-        if (binding.charge!=null){
+        if (binding.charge != null) {
             binding.charge.setOnClickListener(v -> {
                 if (mvvm.getCart().getValue() != null) {
                     CartList cartList = mvvm.getCart().getValue();
-                    if (cartList.getTotalPrice()>0){
+                    if (cartList.getTotalPrice() > 0) {
                         navigateToChargeActivity();
                     }
                 }
             });
         }
+
+        binding.btnSave.setOnClickListener(v -> {
+            mvvm.saveTicket(this);
+        });
+
+
 
     }
 
     private void updateShiftData(AppSettingModel appSetting) {
 
-        if (getAppSetting().getIsShiftOpen()==0){
+        if (getAppSetting().getIsShiftOpen() == 0) {
             binding.llOpenShift.setVisibility(View.VISIBLE);
             mvvm.clearCart();
-            if (binding.recView!=null){
+            if (binding.recView != null) {
                 binding.recView.setVisibility(View.GONE);
                 binding.llNoItems.setVisibility(View.GONE);
             }
 
-            if (binding.recViewLand!=null){
+            if (binding.recViewLand != null) {
                 binding.recViewLand.setVisibility(View.GONE);
                 binding.llNoItems.setVisibility(View.GONE);
 
             }
 
-            if (binding.recViewPort!=null){
+            if (binding.recViewPort != null) {
                 binding.recViewPort.setVisibility(View.GONE);
                 binding.llNoItems.setVisibility(View.GONE);
 
             }
-        }else if (getAppSetting().getIsShiftOpen()==1){
+        } else if (getAppSetting().getIsShiftOpen() == 1) {
             binding.llOpenShift.setVisibility(View.GONE);
-            if (binding.recView!=null){
+            if (binding.recView != null) {
                 binding.recView.setVisibility(View.VISIBLE);
 
             }
 
-            if (binding.recViewLand!=null){
+            if (binding.recViewLand != null) {
                 binding.recViewLand.setVisibility(View.VISIBLE);
             }
 
-            if (binding.recViewPort!=null){
+            if (binding.recViewPort != null) {
                 binding.recViewPort.setVisibility(View.VISIBLE);
             }
         }
@@ -1139,7 +1140,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
     private void createDeliveryOptionPopupMenu(View view) {
-        if (mvvm.getDeliveryOptions().getValue()!=null){
+        if (mvvm.getDeliveryOptions().getValue() != null) {
             PopupMenu popupMenu = new PopupMenu(this, view);
             int pos = 0;
 
@@ -1149,11 +1150,11 @@ public class HomeActivity extends DrawerBaseActivity {
             }
 
             popupMenu.setOnMenuItemClickListener(item -> {
-               if (mvvm.getDeliveryOptions().getValue()!=null){
-                   DeliveryModel deliveryModel = mvvm.getDeliveryOptions().getValue().get(item.getItemId());
-                   mvvm.getSelectedDeliveryOptions().setValue(deliveryModel);
-                   mvvm.addDeliveryOption(deliveryModel.getId(),deliveryModel.getName());
-               }
+                if (mvvm.getDeliveryOptions().getValue() != null) {
+                    DeliveryModel deliveryModel = mvvm.getDeliveryOptions().getValue().get(item.getItemId());
+                    mvvm.getSelectedDeliveryOptions().setValue(deliveryModel);
+                    mvvm.addDeliveryOption(deliveryModel.getId(), deliveryModel.getName());
+                }
                 return true;
             });
             popupMenu.show();
@@ -1249,12 +1250,12 @@ public class HomeActivity extends DrawerBaseActivity {
         MenuItem menuItemCameraSwitch = menu.findItem(R.id.cameraSwitch);
         menuItemCameraSwitch.setVisible(false);
 
-        if(mvvm.getCart().getValue()!=null){
-            if (mvvm.getCart().getValue().getCustomerModel()!=null){
+        if (mvvm.getCart().getValue() != null) {
+            if (mvvm.getCart().getValue().getCustomerModel() != null) {
 
                 menuItemAddUser.setIcon(R.drawable.ic_checked_user);
 
-            }else {
+            } else {
 
                 menuItemAddUser.setIcon(R.drawable.ic_add_user);
 
@@ -1483,6 +1484,7 @@ public class HomeActivity extends DrawerBaseActivity {
             modifierModel.setModifiers_data(dataa);
             modifierList.add(modifierModel);
         }
+
         ItemModel itemModel = new ItemModel(model.getId(), model.getType(), model.getName(), model.getImage(), model.getImage_type(), model.getColor(), model.getShape(), model.getPrice(), model.getCost(), model.getCode(), model.getBarcode_symbology(), model.getBrand_id(), model.getBrand(), model.getCategory_id(), model.getCategory(), model.isIs_variant(), model.getQty(), variants, modifierList, model.getTax(), model.isSelected(), 0.0, null, new ArrayList<>(), 1, new ArrayList<>());
         if (variants.size() > 0) {
             itemModel.setSelectedVariant(variants.get(0));
@@ -1602,11 +1604,11 @@ public class HomeActivity extends DrawerBaseActivity {
 
     }
 
-    private void showDialogClearCart(){
+    private void showDialogClearCart() {
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .create();
         dialog.setCanceledOnTouchOutside(false);
-        DialogClearTicketLayoutBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),R.layout.dialog_clear_ticket_layout,null,false);
+        DialogClearTicketLayoutBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_clear_ticket_layout, null, false);
         dialog.setView(dialogBinding.getRoot());
         dialogBinding.cancel.setOnClickListener(v -> dialog.dismiss());
         dialogBinding.clear.setOnClickListener(v -> {
@@ -1650,13 +1652,11 @@ public class HomeActivity extends DrawerBaseActivity {
         binding.dialogCustomer.setVisibility(View.GONE);
         mvvm.getIsOpenedCustomerDialog().setValue(false);
         invalidateOptionsMenu();
-        if (binding.toolbarLandAddUser!=null){
-            if (customerModel.isAddedToCart()){
+        if (binding.toolbarLandAddUser != null) {
+            if (customerModel.isAddedToCart()) {
                 binding.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
-
-            }else {
+            } else {
                 binding.toolbarLandAddUser.setImageResource(R.drawable.ic_add_user);
-
             }
         }
     }
@@ -1685,8 +1685,7 @@ public class HomeActivity extends DrawerBaseActivity {
                 binding.recViewLand.setLayoutManager(new GridLayoutManager(this, 5));
 
             }
-        }
-        else {
+        } else {
             if (binding.recView != null) {
                 binding.recView.setLayoutManager(new LinearLayoutManager(this));
             }
@@ -1705,15 +1704,18 @@ public class HomeActivity extends DrawerBaseActivity {
             initCodeScanner(mvvm.getCamera().getValue());
         }
 
-        if (App.showHomePin){
+        Log.e("show",mvvm.showPin+"__"+App.showHomePin+"__"+App.saleSelected);
+
+
+        if (App.showHomePin) {
             showPinCodeView();
 
-        }else {
-            if (App.saleSelected){
+        } else {
+            if (App.saleSelected) {
                 hidePinCodeView();
 
 
-            }else {
+            } else {
                 if (mvvm.showPin) {
                     showPinCodeView();
 
@@ -1727,6 +1729,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
         mvvm.loadHomeData();
         App.showHomePin = true;
+        App.saleSelected = true;
 
 
     }
@@ -1737,7 +1740,6 @@ public class HomeActivity extends DrawerBaseActivity {
         if (codeScanner != null) {
             codeScanner.releaseResources();
         }
-
         super.onPause();
 
 
@@ -1748,21 +1750,39 @@ public class HomeActivity extends DrawerBaseActivity {
         super.onStop();
         mvvm.showPin = true;
 
+
     }
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.e("c",mvvm.showPin+"");
+        App.showHomePin = false;
+        App.saleSelected = false;
+        outState.putBoolean("state",mvvm.showPin);
+
+
+    }
 
 
 
     @Override
     protected void onDestroy() {
-        mvvm.showPin = false;
-        App.showHomePin = false;
+
         super.onDestroy();
         disposable.clear();
-
-
     }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("state");
+        App.showHomePin = false;
+        Log.e("cs",mvvm.showPin+"");
 
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
+    }
 
 }

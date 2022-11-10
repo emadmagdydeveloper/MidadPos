@@ -17,8 +17,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -46,8 +46,7 @@
                         android:layout_marginEnd="24dp"
                         android:text="@string/shift"
                         android:textColor="@color/white"
-                        android:textSize="16sp"
-                        />
+                        android:textSize="16sp" />
 
                     <ImageView
                         android:id="@+id/imageShift"
@@ -57,8 +56,7 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:src="@drawable/ic_history"
-                        app:tint="@color/white"
-                        />
+                        app:tint="@color/white" />
 
                 </androidx.appcompat.widget.Toolbar>
 
@@ -68,12 +66,11 @@
                 android:id="@+id/flOpenShift"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="visible"
-                >
+                android:visibility="visible">
+
                 <include
                     android:id="@+id/openShiftLayout"
-                    layout="@layout/open_shift_layout"
-                    />
+                    layout="@layout/open_shift_layout" />
 
             </FrameLayout>
 
@@ -82,8 +79,8 @@
                 android:id="@+id/flData"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"
-                >
+                android:visibility="gone">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -98,10 +95,10 @@
                         <androidx.cardview.widget.CardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:cardElevation="3dp"
-                            app:cardBackgroundColor="@color/white"
                             android:layout_margin="16dp"
-                            >
+                            app:cardBackgroundColor="@color/white"
+                            app:cardElevation="3dp">
+
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -110,38 +107,36 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical"
                                     android:layout_marginTop="24dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
                                     <Button
                                         android:id="@+id/btnCashManagement"
                                         android:layout_width="0dp"
-                                        android:layout_weight="1"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginStart="16dp"
+                                        android:layout_marginEnd="16dp"
+                                        android:layout_weight="1"
                                         android:background="@drawable/small_rounded_stroke_primary"
                                         android:text="@string/cash_management"
                                         android:textColor="@color/colorPrimary"
                                         android:textSize="16sp"
-                                        app:backgroundTint="@null"
-                                        android:layout_marginStart="16dp"
-                                        android:layout_marginEnd="16dp"
-                                        />
+                                        app:backgroundTint="@null" />
 
                                     <Button
                                         android:id="@+id/btnCloseShift"
 
                                         android:layout_width="0dp"
-                                        android:layout_weight="1"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginStart="16dp"
+                                        android:layout_marginEnd="16dp"
+                                        android:layout_weight="1"
                                         android:background="@drawable/small_rounded_stroke_primary"
                                         android:text="@string/close_shift"
                                         android:textColor="@color/colorPrimary"
                                         android:textSize="16sp"
-                                        app:backgroundTint="@null"
-                                        android:layout_marginStart="16dp"
-                                        android:layout_marginEnd="16dp"
-                                        />
+                                        app:backgroundTint="@null" />
                                 </LinearLayout>
 
 
@@ -202,10 +197,11 @@
                                         android:textSize="15sp" />
 
                                     <TextView
+                                        lang="@{lang}"
+                                        shiftDate="@{model}"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:gravity="end"
-                                        android:text="@{model.created_at}"
                                         android:textAlignment="viewEnd"
                                         android:textColor="@color/black"
                                         android:textSize="13sp" />
@@ -411,11 +407,11 @@
                                         android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.expected_cash)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        amountFormat="@{String.valueOf(model.expected_cash)}"
 
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
@@ -466,11 +462,11 @@
                                         android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.gross_sales)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        amountFormat="@{String.valueOf(model.gross_sales)}"
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
                                         android:textStyle="bold" />
@@ -498,11 +494,11 @@
                                         android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.refund)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        amountFormat="@{String.valueOf(model.refund)}"
 
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
@@ -530,11 +526,11 @@
                                         android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.total_discount)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        amountFormat="@{String.valueOf(model.total_discount)}"
 
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
@@ -553,12 +549,12 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical"
                                     android:layout_marginStart="16dp"
                                     android:layout_marginTop="16dp"
                                     android:layout_marginEnd="16dp"
-                                    >
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
@@ -568,20 +564,21 @@
                                         android:textStyle="bold"
 
                                         />
+
                                     <androidx.legacy.widget.Space
                                         android:layout_width="0dp"
                                         android:layout_height="0dp"
-                                        android:layout_weight="1"
-                                        />
+                                        android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.net_sales)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_marginEnd="8dp"
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
-                                        android:textStyle="bold"
-                                        amountFormat="@{String.valueOf(model.net_sales)}"
-                                        />
+                                        android:textStyle="bold" />
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -606,11 +603,11 @@
                                         android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.total_order_tax)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        amountFormat="@{String.valueOf(model.total_order_tax)}"
 
                                         android:textColor="@color/black"
                                         android:textSize="15sp" />
@@ -649,11 +646,11 @@
                                         android:layout_weight="1" />
 
                                     <TextView
+                                        amountFormat="@{String.valueOf(model.total_tendered)}"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="8dp"
                                         android:layout_marginEnd="8dp"
-                                        amountFormat="@{String.valueOf(model.total_tendered)}"
                                         android:textColor="@color/black"
                                         android:textSize="15sp"
                                         android:textStyle="bold" />
@@ -662,7 +659,7 @@
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/recViewShiftPayment"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"/>
+                                    android:layout_height="wrap_content" />
 
 
                             </LinearLayout>
@@ -677,7 +674,6 @@
 
         </LinearLayout>
 
-
         <FrameLayout
             android:id="@+id/flDialog"
             android:layout_width="match_parent"
@@ -685,23 +681,22 @@
             android:background="@color/black_trans"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
+
             <FrameLayout
                 android:id="@+id/flShift"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clickable="true"
                 android:focusable="true"
-                android:visibility="gone"
-                >
+                android:visibility="gone">
+
                 <include
                     android:id="@+id/dialogOpenShiftLayout"
                     layout="@layout/dialog_shifts_layout"
                     android:layout_width="match_parent"
                     android:layout_height="650dp"
-                    android:layout_gravity="center"
-                    />
+                    android:layout_gravity="center" />
             </FrameLayout>
 
             <FrameLayout
@@ -713,13 +708,13 @@
                 android:visibility="gone"
 
                 >
+
                 <include
-                    android:layout_width="match_parent"
-                    android:layout_height="650dp"
-                    android:layout_gravity="center"
                     android:id="@+id/shiftReportLayout"
                     layout="@layout/dialog_shift_report_layout"
-                    />
+                    android:layout_width="match_parent"
+                    android:layout_height="650dp"
+                    android:layout_gravity="center" />
             </FrameLayout>
         </FrameLayout>
 
@@ -730,10 +725,10 @@
             android:visibility="gone"
 
             >
+
             <include
                 android:id="@+id/dialogCloseShiftLayout"
-                layout="@layout/dialog_close_shift_layout"
-                />
+                layout="@layout/dialog_close_shift_layout" />
         </FrameLayout>
 
         <ProgressBar
@@ -744,6 +739,7 @@
             android:visibility="gone"
 
             />
+
 
     </FrameLayout>
 

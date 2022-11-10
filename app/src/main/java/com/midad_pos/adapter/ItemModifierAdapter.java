@@ -41,19 +41,20 @@ public class ItemModifierAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
         myHolder.itemView.setOnClickListener(v -> {
-            if (list.size()>1){
-                ModifierModel.Data model = list.get(myHolder.getAdapterPosition());
+            /*if (list.size()>1){
 
-                model.setSelected(!model.isSelected());
-                list.set(myHolder.getAdapterPosition(), model);
-                myHolder.binding.setModel(model);
+            }*/
 
-                if (context instanceof HomeActivity){
-                    HomeActivity activity = (HomeActivity) context;
-                    activity.setItemModifier(mainPos,myHolder.getAdapterPosition(),model);
-                }
+            ModifierModel.Data model = list.get(myHolder.getAdapterPosition());
+
+            model.setSelected(!model.isSelected());
+            list.set(myHolder.getAdapterPosition(), model);
+            myHolder.binding.setModel(model);
+
+            if (context instanceof HomeActivity){
+                HomeActivity activity = (HomeActivity) context;
+                activity.setItemModifier(mainPos,myHolder.getAdapterPosition(),model);
             }
-
 
 
         });

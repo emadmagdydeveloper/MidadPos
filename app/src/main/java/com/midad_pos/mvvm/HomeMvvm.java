@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -16,10 +17,12 @@ import com.midad_pos.model.CustomerDataModel;
 import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DeliveryDataModel;
 import com.midad_pos.model.DeliveryModel;
+import com.midad_pos.model.ModifierModel;
 import com.midad_pos.model.ShiftDataModel;
 import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.cart.CartList;
+import com.midad_pos.model.cart.CartModel;
 import com.midad_pos.model.cart.ManageCartModel;
 import com.midad_pos.model.AddCustomerModel;
 import com.midad_pos.model.CategoryDataModel;
@@ -39,8 +42,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeMap;
@@ -120,44 +125,42 @@ public class HomeMvvm extends AndroidViewModel {
         getAddCustomerModel();
     }
 
-
-    public void loadHomeData(){
+    public void loadHomeData() {
+        disposable.clear();
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
 
-        if (userModel!=null&&userModel.getData()!=null&&userModel.getData().getSelectedUser()!=null&&userModel.getData().getSelectedWereHouse()!=null&&userModel.getData().getSelectedPos()!=null){
+        if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null && userModel.getData().getSelectedWereHouse() != null && userModel.getData().getSelectedPos() != null) {
             getCurrentShift();
         }
 
-        if (userModel!=null&&userModel.getData()!=null) {
+        if (userModel != null && userModel.getData() != null) {
 
-            if (userModel.getData().getSelectedUser() != null){
+            if (userModel.getData().getSelectedUser() != null) {
                 getCategoryData(userModel.getData().getSelectedUser().getId());
 
-            }else {
+            } else {
                 getCategoryData(userModel.getData().getUser().getId());
 
             }
 
         }
 
-        if (userModel!=null&&userModel.getData()!=null&&userModel.getData().getSelectedUser()!=null){
+        if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null) {
             getDining();
         }
 
-
-        getDiscountsData();
         getItemsData();
+        getDiscountsData();
         getCustomers();
         getCartData();
 
 
     }
 
-    public void getCartData(){
+    public void getCartData() {
         getCart().setValue(manageCartModel.getCartModel(getApplication().getApplicationContext()));
 
     }
-
 
     public MutableLiveData<CartList> getCart() {
         if (cart == null) {
@@ -174,6 +177,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return isTicketModel;
     }
+
     public MutableLiveData<List<DeliveryModel>> getDeliveryOptions() {
         if (deliveryOptions == null) {
             deliveryOptions = new MutableLiveData<>();
@@ -181,6 +185,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return deliveryOptions;
     }
+
     public MutableLiveData<List<CategoryModel>> getCategories() {
         if (categories == null) {
             categories = new MutableLiveData<>();
@@ -188,6 +193,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return categories;
     }
+
     public MutableLiveData<CategoryModel> getSelectedCategory() {
         if (selectedCategory == null) {
             selectedCategory = new MutableLiveData<>();
@@ -196,6 +202,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return selectedCategory;
     }
+
     public MutableLiveData<DeliveryModel> getSelectedDeliveryOptions() {
         if (selectedDeliveryOptions == null) {
             selectedDeliveryOptions = new MutableLiveData<>();
@@ -203,12 +210,14 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return selectedDeliveryOptions;
     }
+
     public MutableLiveData<Boolean> getIsOpenedCustomerDialog() {
         if (isOpenedCustomerDialog == null) {
             isOpenedCustomerDialog = new MutableLiveData<>();
         }
         return isOpenedCustomerDialog;
     }
+
     public MutableLiveData<String> getPrice() {
         if (price == null) {
             price = new MutableLiveData<>();
@@ -216,24 +225,28 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return price;
     }
+
     public MutableLiveData<Boolean> getIsAddCustomerDialogShow() {
         if (isAddCustomerDialogShow == null) {
             isAddCustomerDialogShow = new MutableLiveData<>();
         }
         return isAddCustomerDialogShow;
     }
+
     public MutableLiveData<Boolean> getIsLoading() {
         if (isLoading == null) {
             isLoading = new MutableLiveData<>();
         }
         return isLoading;
     }
+
     public MutableLiveData<List<ItemModel>> getItems() {
         if (items == null) {
             items = new MutableLiveData<>();
         }
         return items;
     }
+
 
     public MutableLiveData<List<DiscountModel>> getDiscounts() {
         if (discounts == null) {
@@ -394,7 +407,7 @@ public class HomeMvvm extends AndroidViewModel {
 
     public void getCurrentShift() {
         Api.getService(Tags.base_url)
-                .currentShift(userModel.getData().getSelectedUser().getId(),userModel.getData().getSelectedWereHouse().getId(),userModel.getData().getSelectedPos().getId())
+                .currentShift(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), userModel.getData().getSelectedPos().getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<ShiftDataModel>>() {
@@ -412,17 +425,17 @@ public class HomeMvvm extends AndroidViewModel {
                                 if (response.body().getStatus() == 200) {
                                     settingModel.setIsShiftOpen(1);
                                     settingModel.setShift_id(response.body().getData().getId());
-                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(),settingModel);
+                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(), settingModel);
                                     getAppSettingModel().setValue(settingModel);
 
-                                }else if (response.body().getStatus()==201){
+                                } else if (response.body().getStatus() == 201) {
                                     settingModel.setIsShiftOpen(0);
                                     settingModel.setShift_id(null);
-                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(),settingModel);
+                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(), settingModel);
                                     getAppSettingModel().setValue(settingModel);
                                     clearCart();
 
-                                }else {
+                                } else {
 
                                 }
                             } else {
@@ -459,7 +472,7 @@ public class HomeMvvm extends AndroidViewModel {
 
     public void getDining() {
         Api.getService(Tags.base_url)
-                .getDining(userModel.getData().getSelectedUser().getId(),userModel.getData().getSelectedWereHouse().getId())
+                .getDining(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<DeliveryDataModel>>() {
@@ -474,13 +487,13 @@ public class HomeMvvm extends AndroidViewModel {
                             if (response.body() != null) {
                                 if (response.body().getStatus() == 200) {
                                     getDeliveryOptions().setValue(response.body().getData());
-                                    if (response.body().getData().size()>0){
-                                        if (getSelectedDeliveryOptions().getValue()==null){
+                                    if (response.body().getData().size() > 0) {
+                                        if (getSelectedDeliveryOptions().getValue() == null) {
                                             getSelectedDeliveryOptions().setValue(response.body().getData().get(0));
 
                                         }
-                                        addDeliveryOption(response.body().getData().get(0).getId(),response.body().getData().get(0).getName());
-                                    }else {
+                                        addDeliveryOption(response.body().getData().get(0).getId(), response.body().getData().get(0).getName());
+                                    } else {
                                         getSelectedDeliveryOptions().setValue(null);
                                     }
 
@@ -585,7 +598,7 @@ public class HomeMvvm extends AndroidViewModel {
             Observable.fromIterable(mainCustomerList)
                     .filter(customerModel -> {
 
-                        if (getCart().getValue()!=null&&getCart().getValue().getCustomerModel()!=null&&getCart().getValue().getCustomerModel().getId().equals(customerModel.getId())){
+                        if (getCart().getValue() != null && getCart().getValue().getCustomerModel() != null && getCart().getValue().getCustomerModel().getId().equals(customerModel.getId())) {
                             customerModel.setAddedToCart(true);
                         }
 
@@ -621,8 +634,7 @@ public class HomeMvvm extends AndroidViewModel {
             Observable.fromIterable(mainCustomerList)
                     .filter(customerModel -> {
 
-                        if (getCart().getValue()!=null&&getCart().getValue().getCustomerModel()!=null&&getCart().getValue().getCustomerModel().getId().equals(customerModel.getId())){
-                            Log.e("bb","bb");
+                        if (getCart().getValue() != null && getCart().getValue().getCustomerModel() != null && getCart().getValue().getCustomerModel().getId().equals(customerModel.getId())) {
                             customerModel.setAddedToCart(true);
                         }
 
@@ -765,7 +777,7 @@ public class HomeMvvm extends AndroidViewModel {
 
                                 }
                             } else {
-                               // list.add(itemModel);
+                                // list.add(itemModel);
 
                             }
                         }
@@ -800,7 +812,7 @@ public class HomeMvvm extends AndroidViewModel {
                         List<ItemModel> list = new ArrayList<>();
                         for (ItemModel itemModel : mainItemList) {
                             if (itemModel.getCategory() != null) {
-                                if (getSelectedCategory().getValue() != null && getSelectedCategory().getValue().getId() == -1&&getSelectedCategory().getValue().getId() == -2) {
+                                if (getSelectedCategory().getValue() != null && getSelectedCategory().getValue().getId() == -1 && getSelectedCategory().getValue().getId() == -2) {
                                     if (itemModel.getName().toLowerCase().startsWith(query.toLowerCase())) {
                                         list.add(itemModel);
                                     }
@@ -1023,7 +1035,7 @@ public class HomeMvvm extends AndroidViewModel {
             if ((price.equals("0.00") && p.equals("00")) || price.isEmpty()) {
                 getPrice().setValue("0.00");
 
-            } else if (price.length() >=9) {
+            } else if (price.length() >= 9) {
                 getPrice().setValue("999,999.99");
             } else {
                 price = price.replace(".", "");
@@ -1032,9 +1044,9 @@ public class HomeMvvm extends AndroidViewModel {
                 float pr = Float.parseFloat(price) / 100.00f;
                 price = String.format(Locale.US, "%.2f", pr);
 
-                if (price.length()==7||price.length()==8){
+                if (price.length() == 7 || price.length() == 8) {
                     StringBuilder builder = new StringBuilder(price);
-                    builder.insert(price.length()-6,",");
+                    builder.insert(price.length() - 6, ",");
                     price = builder.toString();
 
                 }
@@ -1057,9 +1069,9 @@ public class HomeMvvm extends AndroidViewModel {
                 float pr = Float.parseFloat(price) / 100.00f;
                 price = String.format(Locale.US, "%.2f", pr);
 
-                if (price.length()==7||price.length()==8){
+                if (price.length() == 7 || price.length() == 8) {
                     StringBuilder builder = new StringBuilder(price);
-                    builder.insert(price.length()-6,",");
+                    builder.insert(price.length() - 6, ",");
                     price = builder.toString();
 
                 }
@@ -1160,23 +1172,172 @@ public class HomeMvvm extends AndroidViewModel {
     }
 
     public void assignCustomerToCart(CustomerModel customerModel) {
-        if (customerModel.isAddedToCart()){
-            if (getCart().getValue()!=null){
+        if (customerModel.isAddedToCart()) {
+            if (getCart().getValue() != null) {
                 getCart().getValue().setCustomerModel(customerModel);
             }
-            manageCartModel.assignCustomerToCart(customerModel,getApplication().getApplicationContext());
+            manageCartModel.assignCustomerToCart(customerModel, getApplication().getApplicationContext());
 
-        }else {
+        } else {
             removeCustomerFromCart();
         }
     }
 
     public void removeCustomerFromCart() {
-        if (getCart().getValue()!=null){
+        if (getCart().getValue() != null) {
             getCart().getValue().setCustomerModel(null);
         }
         manageCartModel.removeCustomerFromCart(getApplication().getApplicationContext());
     }
+
+    public void saveTicket(Context context) {
+        ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+        CartList cartList = manageCartModel.getCartModel(getApplication().getApplicationContext());
+
+        if (cartList != null) {
+            String customer_id = null;
+            if (cartList.getCustomerModel() != null) {
+                customer_id = cartList.getCustomerModel().getId();
+            }
+            List<CartModel.Detail> detailList = new ArrayList<>();
+
+
+            for (ItemModel itemModel : cartList.getItems()) {
+                double totalDiscount = 0.0;
+                List<CartModel.Discount> discountsItem = new ArrayList<>();
+                List<CartModel.Modifier> modifiers = new ArrayList<>();
+
+
+                double tax_rate = 0.0;
+                if (itemModel.getTax() != null) {
+
+                    tax_rate = Double.parseDouble(itemModel.getTax().getRate());
+
+                }
+
+                for (DiscountModel discountModel : itemModel.getDiscounts()) {
+                    CartModel.Discount discount = new CartModel.Discount(discountModel.getId());
+                    discountsItem.add(discount);
+                    totalDiscount += Double.parseDouble(discountModel.getValue());
+                }
+                String variant_id = "";
+                double price = Double.parseDouble(itemModel.getPrice().replace(",", ""));
+                if (itemModel.getSelectedVariant() != null) {
+                    variant_id = itemModel.getSelectedVariant().getId();
+                    price = Double.parseDouble(itemModel.getSelectedVariant().getPrice().replace(",", ""));
+                }
+
+                for (ModifierModel modifierModel : itemModel.getModifiers()) {
+                    double total = 0.0;
+                    List<CartModel.ModifierDetails> modifierDetails = new ArrayList<>();
+                    for (ModifierModel.Data data : modifierModel.getModifiers_data()) {
+                        double totalDataCost = itemModel.getAmount() * Double.parseDouble(data.getCost());
+                        total += totalDataCost;
+
+                        if (data.isSelected()) {
+                            CartModel.ModifierDetails details = new CartModel.ModifierDetails(data.getId(), Double.parseDouble(data.getCost()), totalDataCost);
+                            modifierDetails.add(details);
+                        }
+
+                    }
+                    CartModel.Modifier modifier = new CartModel.Modifier(itemModel.getId(), modifierModel.getId(), total + "", modifierDetails);
+
+                    modifiers.add(modifier);
+                }
+
+
+                CartModel.Detail detail = new CartModel.Detail(itemModel.getId(), variant_id, itemModel.getAmount(), price, totalDiscount + "", tax_rate + "", itemModel.getComment(), modifiers, discountsItem);
+                detailList.add(detail);
+            }
+
+
+            AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
+            List<CartModel.Payment> payments = new ArrayList<>();
+
+
+            List<CartModel.Discount> discounts = new ArrayList<>();
+            for (DiscountModel discountModel : cartList.getDiscounts()) {
+                CartModel.Discount discount = new CartModel.Discount(discountModel.getId());
+                discounts.add(discount);
+            }
+
+            String sale_status = "";
+            String draft = "";
+            if (cartList.getSale_id() == null) {
+                sale_status = "3";
+                draft = "0";
+            } else {
+                sale_status = "3";
+                draft = "1";
+            }
+
+            Log.e("din",cartList.getDelivery_id()+"__");
+            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
+            List<CartModel.Cart> carts = new ArrayList<>();
+            carts.add(cart);
+            CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), customer_id, userModel.getData().getSelectedPos().getId(), carts);
+
+
+            Api.getService(Tags.base_url)
+                    .storeOrder(cartModel)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new SingleObserver<Response<StatusResponse>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            disposable.add(d);
+                        }
+
+                        @Override
+                        public void onSuccess(Response<StatusResponse> response) {
+                            dialog.dismiss();
+                            if (response.isSuccessful()) {
+                                if (response.body() != null) {
+
+                                    Log.e(TAG, response.body().getStatus() + "");
+
+                                    if (response.body().getStatus() == 200) {
+                                        clearCart();
+                                    }
+
+                                }
+                            } else {
+
+
+                                try {
+                                    Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dialog.dismiss();
+                            Log.e(TAG, e.getMessage() + "");
+
+                            if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                                Toast.makeText(getApplication().getApplicationContext(), R.string.check_network, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    });
+        }
+    }
+
+    private String getDate() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        return format.format(new Date());
+    }
+
 
     @Override
     protected void onCleared() {

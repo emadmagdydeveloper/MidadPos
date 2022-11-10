@@ -32,35 +32,99 @@
                     android:id="@+id/toolbarReceiptsLayout"
                     layout="@layout/toolbar_receipts_layout"
                     />
-                <androidx.core.widget.NestedScrollView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:fillViewport="true"
-                    android:scrollbars="none"
+                    android:orientation="vertical"
                     >
                     <LinearLayout
                         android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        >
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_search"
+                            app:tint="@color/grey3"
+
+                            />
+                        <LinearLayout
+                            android:id="@+id/llSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:visibility="gone"
+                            >
+                            <EditText
+                                android:id="@+id/edtSearch"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:background="@color/transparent"
+                                android:hint="@string/search"
+                                android:textColorHint="@color/grey4"
+                                android:textSize="14sp"
+                                android:lines="1"
+                                />
+                            <ImageView
+                                android:id="@+id/closeSearch"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/ic_close"
+                                android:tint="@color/grey4"
+                                android:padding="5dp"
+                                />
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/tvOpenSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="15sp"
+                            android:textColor="@color/grey4"
+                            android:text="@string/search"
+                            android:gravity="center_vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            />
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:background="@color/grey3"
+                        />
+
+                    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                        android:id="@+id/swipeRefresh"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="vertical"
                         >
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             />
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@color/transparent"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_marginTop="24dp"
-                            android:layout_marginBottom="24dp"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="14sp"
-                            android:text="@string/show_all_tickets"
-                            />
-                    </LinearLayout>
-                </androidx.core.widget.NestedScrollView>
+                    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/transparent"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="24dp"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="14sp"
+                        android:text="@string/show_all_tickets"
+                        android:visibility="gone"
+                        />
+                </LinearLayout>
 
             </LinearLayout>
 

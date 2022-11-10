@@ -443,13 +443,13 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/openTicket"
+                            android:id="@+id/btnSave"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:enabled="false"
                             android:gravity="center"
-                            android:text="@string/open_ticket"
+                            android:text="@string/save"
                             android:textAllCaps="true"
                             android:textColor="@drawable/disable_text_color"
                             android:textSize="14sp" />

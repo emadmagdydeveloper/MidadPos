@@ -52,6 +52,7 @@ public class AddItemMvvm extends AndroidViewModel {
     private MutableLiveData<List<String>> barcodeTypes;
     private CompositeDisposable disposable = new CompositeDisposable();
     private UserModel userModel;
+    public boolean showPin =false;
 
     public AddItemMvvm(@NonNull Application application) {
         super(application);

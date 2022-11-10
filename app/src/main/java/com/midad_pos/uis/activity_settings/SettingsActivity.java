@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
@@ -38,15 +39,19 @@ public class SettingsActivity extends DrawerBaseActivity {
 
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(SettingsMvvm.class);
+        binding.setModel(getUserModel());
+
         if (mvvm.getPositions().getValue() != null) {
             updateSelections(mvvm.getPositions().getValue());
 
         }
+
         if (mvvm.getIsDialogTypeVisible().getValue()!=null){
             if (mvvm.getIsDialogTypeVisible().getValue()){
                 showLayoutDialog();
             }
         }
+
         if (binding.flPrintersLayout != null && binding.printersLayout != null && binding.printersLayout.arrowBack != null) {
             binding.printersLayout.setLang(getLang());
             binding.printersLayout.arrowBack.setOnClickListener(view -> binding.flPrintersLayout.setVisibility(View.GONE));
@@ -62,10 +67,43 @@ public class SettingsActivity extends DrawerBaseActivity {
             binding.generalSettingsLayout.arrowBack.setOnClickListener(view -> binding.flGeneralSettingsLayout.setVisibility(View.GONE));
         }
 
-
         if (binding.flPrintersDetailsLand != null) {
             mvvm.getPositions().setValue(mvvm.getPositions().getValue() != -1 ? mvvm.getPositions().getValue() : 0);
             updateSelections(mvvm.getPositions().getValue() != -1 ? mvvm.getPositions().getValue() : 0);
+        }
+
+        if (binding.generalSettingsLayout != null) {
+            binding.generalSettingsLayout.btnSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                AppSettingModel appSetting = getAppSetting();
+                if (appSetting == null) {
+                    appSetting = new AppSettingModel();
+                }
+                appSetting.setScan(isChecked);
+                setAppSettingModel(appSetting);
+            });
+
+
+            binding.generalSettingsLayout.layoutType.setOnClickListener(v -> {
+                showLayoutDialog();
+            });
+
+        }
+
+        if (binding.generalSettingsDetailsLayout != null) {
+            binding.generalSettingsDetailsLayout.btnSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                AppSettingModel appSetting = getAppSetting();
+                if (appSetting == null) {
+                    appSetting = new AppSettingModel();
+                }
+                appSetting.setScan(isChecked);
+                setAppSettingModel(appSetting);
+            });
+
+            binding.generalSettingsDetailsLayout.layoutType.setOnClickListener(v -> {
+                showLayoutDialog();
+            });
+
+
         }
 
         if (getAppSetting() != null) {
@@ -101,40 +139,6 @@ public class SettingsActivity extends DrawerBaseActivity {
             }
 
         }
-        if (binding.generalSettingsLayout != null) {
-            binding.generalSettingsLayout.btnSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                AppSettingModel appSetting = getAppSetting();
-                if (appSetting == null) {
-                    appSetting = new AppSettingModel();
-                }
-                appSetting.setScan(isChecked);
-                setAppSettingModel(appSetting);
-            });
-
-
-            binding.generalSettingsLayout.layoutType.setOnClickListener(v -> {
-                showLayoutDialog();
-            });
-
-        }
-
-        if (binding.generalSettingsDetailsLayout != null) {
-            binding.generalSettingsDetailsLayout.btnSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                AppSettingModel appSetting = getAppSetting();
-                if (appSetting == null) {
-                    appSetting = new AppSettingModel();
-                }
-                appSetting.setScan(isChecked);
-                setAppSettingModel(appSetting);
-            });
-
-            binding.generalSettingsDetailsLayout.layoutType.setOnClickListener(v -> {
-                showLayoutDialog();
-            });
-
-
-        }
-
 
         binding.printers.setOnClickListener(view -> {
             mvvm.getPositions().setValue(0);
@@ -414,7 +418,6 @@ public class SettingsActivity extends DrawerBaseActivity {
 
     }
 
-
     private void updateSelections(int pos) {
         if (pos == 0) {
             binding.printers.setBackgroundResource(R.color.grey1);
@@ -536,5 +539,12 @@ public class SettingsActivity extends DrawerBaseActivity {
 
     }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        }catch (Exception e){}
+    }
 
 }
