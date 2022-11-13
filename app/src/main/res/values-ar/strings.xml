@@ -54,7 +54,7 @@
     <string name="note">ملاحظة</string>
     <string name="create_customer">إنشاء عميل جديد</string>
     <string name="show_all_tickets">اظهار جميع التذاكر</string>
-    <string name="cashier">Cashier :</string>
+    <string name="cashier">الكاشير :</string>
     <string name="refund">المبلغ المسترد</string>
     <string name="pos">نقطة البيع :</string>
     <string name="card">بطاقة</string>
@@ -215,6 +215,8 @@
     <string name="remove_from_ticket">إزالة من التزكرة</string>
     <string name="barcode_unique">الباركود موج</string>
     <string name="tendered">القيمة الإجمالية</string>
+    <string name="inv_date">تاريخ التذكرة :</string>
+    <string name="receipt">التذكرة #:</string>
 
 
     <string-array name="delivery_options">

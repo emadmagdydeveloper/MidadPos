@@ -25,6 +25,7 @@ import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
+import com.midad_pos.model.OrderModel;
 import com.midad_pos.model.ShiftModel;
 
 import java.text.DecimalFormat;
@@ -451,15 +452,14 @@ public class GeneralMethod {
 
     @BindingAdapter({"receiptTime","lang"})
     public static void receiptTime(TextView view,String date,String lang) {
-        if (date != null) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", new Locale(lang));
-            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        if (date != null&&lang!=null) {
+            String t ="";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", new Locale(lang));
             try {
-                Date parse = format.parse(date);
-                if (parse!=null){
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", new Locale(lang));
-                    simpleDateFormat.setTimeZone(TimeZone.getDefault());
-                    String t = simpleDateFormat.format(parse);
+                Date parse = simpleDateFormat.parse(date);
+                SimpleDateFormat format = new SimpleDateFormat("hh:mm a", new Locale(lang));
+                if (parse != null) {
+                    t = format.format(parse);
                     view.setText(t);
                 }
 
@@ -467,34 +467,165 @@ public class GeneralMethod {
                 e.printStackTrace();
             }
 
+
+            view.setText(t);
+
+
         }
+
+
 
     }
 
     @BindingAdapter({"receiptDate","lang"})
     public static void receiptDate(TextView view,String date,String lang) {
         if (date != null&&lang!=null) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", new Locale(lang));
+            String t ="";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", new Locale(lang));
             try {
-                Date parse = format.parse(date);
-                String t ="";
-                if (parse!=null){
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE dd-MMM-yyy", new Locale(lang));
-                    t = simpleDateFormat.format(parse);
+                Date parse = simpleDateFormat.parse(date);
+                String pattern= "";
+                if (lang.equals("ar")){
+                    pattern = "EEE ،dd MMM ،yyyy";
+                }else {
+                    pattern = "EEE ,dd MMM ,yyyy";
+
                 }
-
-
-                view.setText(t);
-
-
+                SimpleDateFormat format = new SimpleDateFormat(pattern, new Locale(lang));
+                if (parse != null) {
+                    t = format.format(parse);
+                    view.setText(t);
+                }
 
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
+
+            view.setText(t);
+
+
         }
 
     }
+
+    @BindingAdapter("paymentIcon")
+    public static void paymentIcon(ImageView view, OrderModel.Sale model) {
+        if (model !=null) {
+            if (model.getPayments().size()==1){
+                if (model.getPayments().get(0).getPayment().getType().equalsIgnoreCase("cash")){
+                    view.setImageResource(R.drawable.ic_cash);
+                }else if (model.getPayments().get(0).getPayment().getType().equals("card")){
+                    view.setImageResource(R.drawable.ic_card);
+
+                }else {
+                    view.setImageResource(R.drawable.ic_pay_other);
+                }
+            }else if (model.getPayments().size()>1){
+                view.setImageResource(R.drawable.ic_cash_card);
+
+
+            }
+
+
+        }
+
+    }
+
+    @BindingAdapter({"timeStampDate","lang"})
+    public static void timeStampDate(TextView view,String date,String lang) {
+        if (date != null&&lang!=null) {
+            String t ="";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a", new Locale(lang));
+            t = simpleDateFormat.format(new Date(Long.parseLong(date)));
+
+
+            view.setText(t);
+
+
+        }
+
+    }
+
+    @BindingAdapter({"timeStampDate2","lang"})
+    public static void timeStampDate2(TextView view,String date,String lang) {
+        if (date != null&&lang!=null) {
+            String t ="";
+            String format = "";
+            if (lang.equals("ar")){
+                format ="EEE، dd MMM،yyyy";
+            }else {
+                format ="EEE, dd MMM,yyyy";
+
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, new Locale(lang));
+            t = simpleDateFormat.format(new Date(Long.parseLong(date)));
+
+
+            view.setText(t);
+
+
+        }
+
+    }
+
+    @BindingAdapter({"timeStampTime","lang"})
+    public static void timeStampTime(TextView view,String date,String lang) {
+        if (date != null&&lang!=null) {
+            String t ="";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", new Locale(lang));
+            t = simpleDateFormat.format(new Date(Long.parseLong(date)));
+
+
+            view.setText(t);
+
+
+        }
+
+    }
+
+    @BindingAdapter({"timeStamp","lang"})
+    public static void timeStamp(TextView view,String date,String lang) {
+        if (date != null&&lang!=null) {
+            String t ="";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a", new Locale(lang));
+            t = simpleDateFormat.format(new Date(Long.parseLong(date)));
+
+
+            view.setText(t);
+
+
+        }
+
+    }
+
+    @BindingAdapter("orderExtras")
+    public static void orderExtras(TextView view,OrderModel.Detail detail) {
+        if (detail!=null){
+            StringBuilder text = new StringBuilder();
+            for (OrderModel.SaleModifierData data:detail.getSale_modifiers()){
+                for (OrderModel.SaleModifier modifier: data.getSale_modifier_data()){
+                    text.append("+").append(modifier.getModifier_data().getTitle()).append("(").append(String.format(Locale.US,"%.2f",Double.parseDouble(modifier.getModifier_data().getCost()))).append(")\n");
+                }
+            }
+
+            view.setText(text);
+        }
+
+    }
+
+    @BindingAdapter("orderItemAmount")
+    public static void orderItemAmount(TextView view,OrderModel.Detail detail) {
+        if (detail!=null){
+            String price = String.format(Locale.US,"%.2f",Double.parseDouble(detail.getNet_unit_price()));
+            String amount = detail.getQty()+" X "+price;
+            view.setText(amount);
+        }
+
+    }
+
+
+
 
 }
 

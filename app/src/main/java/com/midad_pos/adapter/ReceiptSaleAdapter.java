@@ -7,15 +7,13 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.midad_pos.R;
-import com.midad_pos.databinding.MainReceiptRowBinding;
 import com.midad_pos.databinding.RecieptRowBinding;
 import com.midad_pos.model.OrderModel;
+import com.midad_pos.uis.activity_receipts.ReceiptsActivity;
 import com.midad_pos.utils.DiffUtilsOrderSale;
-import com.midad_pos.utils.DiffUtilsOrders;
 
 import java.util.List;
 
@@ -23,8 +21,10 @@ public class ReceiptSaleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private List<OrderModel.Sale> list;
     private Context context;
     private String lang;
+    private boolean showSelected = false;
+    private Holder oldHolder;
 
-    public ReceiptSaleAdapter(Context context,String lang) {
+    public ReceiptSaleAdapter(Context context, String lang) {
         this.context = context;
         this.lang = lang;
     }
@@ -40,7 +40,40 @@ public class ReceiptSaleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Holder myHolder = (Holder) holder;
         myHolder.binding.setLang(lang);
+        myHolder.binding.setCanShowSelect(showSelected);
         myHolder.binding.setModel(list.get(position));
+        if (list.get(position).isSelected()){
+            oldHolder = myHolder;
+
+        }
+
+
+        myHolder.binding.getRoot().setOnClickListener(v -> {
+            OrderModel.Sale model = list.get(myHolder.getAdapterPosition());
+            if (!model.isSelected()){
+                model.setSelected(true);
+                myHolder.binding.setModel(model);
+                if (oldHolder!=null){
+                    try {
+                        list.get(oldHolder.getAdapterPosition()).setSelected(false);
+                        oldHolder.binding.setModel(list.get(oldHolder.getAdapterPosition()));
+
+                    }catch (Exception e){
+
+                    }
+                   }
+                ReceiptsActivity activity = (ReceiptsActivity) context;
+                activity.setItemReceipt(model);
+                oldHolder = myHolder;
+            }
+
+
+
+
+
+
+
+        });
 
 
     }
@@ -60,11 +93,16 @@ public class ReceiptSaleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    public void updateList(List<OrderModel.Sale> list){
-        DiffUtilsOrderSale callback = new DiffUtilsOrderSale(this.list,list);
+    public void updateList(List<OrderModel.Sale> list) {
+        DiffUtilsOrderSale callback = new DiffUtilsOrderSale(this.list, list);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
         this.list = list;
         diffResult.dispatchUpdatesTo(this);
 
+    }
+
+    public void updateSelected(boolean showSelected) {
+        this.showSelected = showSelected;
+        notifyDataSetChanged();
     }
 }

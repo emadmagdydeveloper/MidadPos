@@ -42,10 +42,10 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isSearchOpen;
     private MutableLiveData<String> searchQuery;
 
-    private MutableLiveData<List<OrderModel>> mainOrders;
-    private MutableLiveData<List<OrderModel>> orders;
+    private MutableLiveData<List<OrderModel.Sale>> mainOrders;
+    private MutableLiveData<List<OrderModel.Sale>> orders;
     private final CompositeDisposable disposable = new CompositeDisposable();
-
+    private MutableLiveData<OrderModel.Sale> selectedOrder;
 
 
     public ReceiptDetailsMvvm(@NonNull Application application) {
@@ -60,24 +60,25 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
 
         return isLoading;
     }
-    public MutableLiveData<Boolean> getShowTicketDetails(){
-        if (showTicketDetails==null){
+
+    public MutableLiveData<Boolean> getShowTicketDetails() {
+        if (showTicketDetails == null) {
             showTicketDetails = new MutableLiveData<>();
         }
 
         return showTicketDetails;
     }
 
-    public MutableLiveData<Boolean> getIsSearchOpen(){
-        if (isSearchOpen==null){
+    public MutableLiveData<Boolean> getIsSearchOpen() {
+        if (isSearchOpen == null) {
             isSearchOpen = new MutableLiveData<>();
         }
 
         return isSearchOpen;
     }
 
-    public MutableLiveData<String> getSearchQuery(){
-        if (searchQuery==null){
+    public MutableLiveData<String> getSearchQuery() {
+        if (searchQuery == null) {
             searchQuery = new MutableLiveData<>();
             searchQuery.setValue("");
         }
@@ -85,8 +86,8 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
         return searchQuery;
     }
 
-    public MutableLiveData<String> getShowSendEmailDialog(){
-        if (showSendEmailDialog==null){
+    public MutableLiveData<String> getShowSendEmailDialog() {
+        if (showSendEmailDialog == null) {
             showSendEmailDialog = new MutableLiveData<>();
             showSendEmailDialog.setValue("");
         }
@@ -94,16 +95,16 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
         return showSendEmailDialog;
     }
 
-    public MutableLiveData<Boolean> getIsDialogShown(){
-        if (isDialogShown==null){
+    public MutableLiveData<Boolean> getIsDialogShown() {
+        if (isDialogShown == null) {
             isDialogShown = new MutableLiveData<>();
         }
 
         return isDialogShown;
     }
 
-    public MutableLiveData<List<OrderModel>> getMainOrders(){
-        if (mainOrders==null){
+    public MutableLiveData<List<OrderModel.Sale>> getMainOrders() {
+        if (mainOrders == null) {
             mainOrders = new MutableLiveData<>();
             mainOrders.setValue(new ArrayList<>());
         }
@@ -111,21 +112,30 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
         return mainOrders;
     }
 
-    public MutableLiveData<List<OrderModel>> getOrders(){
-        if (orders==null){
+    public MutableLiveData<List<OrderModel.Sale>> getOrders() {
+        if (orders == null) {
             orders = new MutableLiveData<>();
         }
 
         return orders;
     }
 
-    public void getOrdersData(){
+    public MutableLiveData<OrderModel.Sale> getSelectedOrder() {
+        if (selectedOrder == null) {
+            selectedOrder = new MutableLiveData<>();
+        }
+
+        return selectedOrder;
+    }
+
+    public void getOrdersData() {
         getIsLoading().setValue(true);
         UserModel userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
         Api.getService(Tags.base_url)
                 .getOrders(userModel.getData().getSelectedUser().getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+
                 .subscribe(new SingleObserver<Response<OrderDataModel>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -138,8 +148,8 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
                         if (response.isSuccessful()) {
                             if (response.body() != null) {
                                 if (response.body().getStatus() == 200) {
-                                    getMainOrders().setValue(response.body().getData());
-                                    search();
+                                    updateData(response.body().getData());
+
                                 }
                             }
                         } else {
@@ -172,41 +182,125 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
 
     }
 
+    private void updateData(List<OrderModel> data) {
+        List<OrderModel.Sale> sales = new ArrayList<>();
+        for (OrderModel model : data) {
+            List<OrderModel.Sale> list = new ArrayList<>();
+            for (OrderModel.Sale sale: model.getSales()){
+                sale.setOrder_date(model.getDate());
+                list.add(sale);
+            }
+            if (list.size() > 0) {
+                list.get(0).setShow(true);
+            }
+
+            sales.addAll(list);
+        }
+
+        getMainOrders().setValue(sales);
+        search();
+
+
+    }
+
     public void search() {
-        Log.e("q",getSearchQuery().getValue()+"__");
-        if (getSearchQuery().getValue()!=null){
-            if (getSearchQuery().getValue().isEmpty()){
+        if (getSearchQuery().getValue() != null) {
+            if (getSearchQuery().getValue().isEmpty()) {
+                if (getMainOrders().getValue() != null && getMainOrders().getValue().size() > 0) {
+                    List<OrderModel.Sale> sales = new ArrayList<>();
+                    for (OrderModel.Sale sale : getMainOrders().getValue()) {
+                        if (getSelectedOrder().getValue()!=null){
+                            if (getSelectedOrder().getValue().getId().equals(sale.getId())){
+                                sale.setSelected(true);
+                                getSelectedOrder().setValue(sale);
+
+                            }else {
+                                sale.setSelected(false);
+
+                            }
+                        }else {
+                            if (sales.size()>0){
+                                sales.get(0).setSelected(true);
+                                getSelectedOrder().setValue(sales.get(0));
+                            }
+                        }
+
+
+                        sales.add(sale);
+
+                    }
+
+
+                    getMainOrders().setValue(sales);
+
+                }
                 getOrders().setValue(getMainOrders().getValue());
 
-            }else {
+            } else {
 
                 if (getMainOrders().getValue() != null) {
-                    List<OrderModel> orders = new ArrayList<>();
-                    for (OrderModel orderModel:getMainOrders().getValue()){
-                        OrderModel model = new OrderModel();
-                        List<OrderModel.Sale> sales = new ArrayList<>();
+                    List<OrderModel.Sale> orders = new ArrayList<>();
+                    for (OrderModel.Sale sale : getMainOrders().getValue()) {
 
-                        for (OrderModel.Sale sale:orderModel.getSales()){
-                            if (sale.getId().contains(getSearchQuery().getValue())){
-                                model.setDate(orderModel.getDate());
-                                sales.add(sale);
+                        if (sale.getId().startsWith(getSearchQuery().getValue())) {
+                            if (getSelectedOrder().getValue()!=null){
+                                if (getSelectedOrder().getValue().getId().equals(sale.getId())){
+                                    sale.setSelected(true);
+
+                                    getSelectedOrder().setValue(sale);
+
+
+                                }else {
+                                    sale.setSelected(false);
+
+                                }
+                            }else {
+                               if (orders.size()>0){
+                                   orders.get(0).setSelected(true);
+                                   getSelectedOrder().setValue(orders.get(0));
+                               }
                             }
-                            model.setSales(sales);
-
-
-                        }
-                        if (model.getSales().size()>0){
-                            orders.add(model);
+                            orders.add(sale);
                         }
 
                     }
+
                     getOrders().setValue(orders);
 
                 }
 
             }
-        }else {
-            getOrders().setValue(getMainOrders().getValue());
+        } else {
+            if (getMainOrders().getValue() != null && getMainOrders().getValue().size() > 0) {
+                List<OrderModel.Sale> sales = new ArrayList<>();
+                for (OrderModel.Sale sale : getMainOrders().getValue()) {
+                    if (getSelectedOrder().getValue()!=null){
+                        if (getSelectedOrder().getValue().getId().equals(sale.getId())){
+                            sale.setSelected(true);
+                            getSelectedOrder().setValue(sale);
+
+                        }else {
+                            sale.setSelected(false);
+
+                        }
+
+
+                    }else {
+                        if (sales.size()>0){
+                            sales.get(0).setSelected(true);
+                            getSelectedOrder().setValue(sales.get(0));
+                        }
+                    }
+
+                    sales.add(sale);
+
+
+                }
+
+
+                getMainOrders().setValue(sales);
+
+            }
         }
     }
 

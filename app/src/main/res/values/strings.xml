@@ -215,6 +215,8 @@
     <string name="remove_from_ticket">Remove from ticket</string>
     <string name="barcode_unique">barcode must be unique</string>
     <string name="tendered">Total tendered</string>
+    <string name="inv_date">Invoice date :</string>
+    <string name="receipt">Receipt #:</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

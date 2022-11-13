@@ -798,7 +798,6 @@ public class ChargeMvvm extends AndroidViewModel {
         }
     }
 
-
     public void updatePayments(PaymentDataModel.Data data, boolean isEnable) {
         if (getPayment().getValue() == null) {
             List<PaymentModel> list = new ArrayList<>();
@@ -1042,8 +1041,7 @@ public class ChargeMvvm extends AndroidViewModel {
 
 
     private String getDate() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        return format.format(new Date());
+       return String.valueOf(new Date().getTime());
     }
 
 }

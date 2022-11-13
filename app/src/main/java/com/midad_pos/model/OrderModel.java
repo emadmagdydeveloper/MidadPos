@@ -29,6 +29,7 @@ public class OrderModel implements Serializable {
         private String warehouse_id;
         private String biller_id;
         private String customer_id;
+        private String date;
         private String total_qty;
         private String total_discount;
         private String total_tax;
@@ -36,6 +37,7 @@ public class OrderModel implements Serializable {
         private String item;
         private String order_tax;
         private String grand_total;
+        private DeliveryModel dining;
         private String coupon_discount;
         private String sale_status;
         private String coupon_id;
@@ -52,9 +54,13 @@ public class OrderModel implements Serializable {
         private String reference_no;
         private User user;
         private WereHouse warehouse;
+        private POSModel pos;
         private List<Detail> details;
         private List<Payment> payments;
         private List<OrderDiscount> discounts;
+        private boolean isSelected;
+        private boolean show;
+        private String order_date;
 
         public String getId() {
             return id;
@@ -78,6 +84,14 @@ public class OrderModel implements Serializable {
 
         public String getTotal_qty() {
             return total_qty;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public DeliveryModel getDining() {
+            return dining;
         }
 
         public String getTotal_discount() {
@@ -144,6 +158,14 @@ public class OrderModel implements Serializable {
             return order_tax_rate;
         }
 
+        public String getOrder_date() {
+            return order_date;
+        }
+
+        public void setOrder_date(String order_date) {
+            this.order_date = order_date;
+        }
+
         public String getShipping_cost() {
             return shipping_cost;
         }
@@ -160,12 +182,24 @@ public class OrderModel implements Serializable {
             return reference_no;
         }
 
+        public boolean isShow() {
+            return show;
+        }
+
+        public void setShow(boolean show) {
+            this.show = show;
+        }
+
         public User getUser() {
             return user;
         }
 
         public WereHouse getWarehouse() {
             return warehouse;
+        }
+
+        public POSModel getPos() {
+            return pos;
         }
 
         public List<Detail> getDetails() {
@@ -178,6 +212,14 @@ public class OrderModel implements Serializable {
 
         public List<OrderDiscount> getDiscounts() {
             return discounts;
+        }
+
+        public boolean isSelected() {
+            return isSelected;
+        }
+
+        public void setSelected(boolean selected) {
+            isSelected = selected;
         }
     }
 
@@ -196,13 +238,15 @@ public class OrderModel implements Serializable {
         private String tax_rate;
         private String tax;
         private String total;
+        private String grand_total;
         private String comment;
         private String created_at;
         private String updated_at;
         private String category_id;
         private String total_cost;
-        private List<Object> sale_modifiers;
-        private List<Object> discounts;
+        private List<SaleModifierData> sale_modifiers;
+        private List<OrderDiscount> discounts;
+        private VariantModel variant;
         private Product product;
 
         public String getId() {
@@ -231,6 +275,10 @@ public class OrderModel implements Serializable {
 
         public String getQty() {
             return qty;
+        }
+
+        public String getGrand_total() {
+            return grand_total;
         }
 
         public String getSale_unit_id() {
@@ -277,16 +325,20 @@ public class OrderModel implements Serializable {
             return total_cost;
         }
 
-        public List<Object> getSale_modifiers() {
+        public List<SaleModifierData> getSale_modifiers() {
             return sale_modifiers;
         }
 
-        public List<Object> getDiscounts() {
+        public List<OrderDiscount> getDiscounts() {
             return discounts;
         }
 
         public Product getProduct() {
             return product;
+        }
+
+        public VariantModel getVariant() {
+            return variant;
         }
     }
 
@@ -724,6 +776,7 @@ public class OrderModel implements Serializable {
         private String pay_id;
         private String created_at;
         private String updated_at;
+        private PaymentModel payment;
 
         public String getId() {
             return id;
@@ -756,6 +809,10 @@ public class OrderModel implements Serializable {
         public String getUpdated_at() {
             return updated_at;
         }
+
+        public PaymentModel getPayment() {
+            return payment;
+        }
     }
 
     public static class OrderDiscount implements Serializable {
@@ -765,8 +822,8 @@ public class OrderModel implements Serializable {
         private String product_sale_id;
         private String product_id;
         private String type;
-        private Product value;
-        private Product grand_total;
+        private String value;
+        private String grand_total;
         private String created_at;
         private String updated_at;
         private DiscountModel discount;
@@ -795,11 +852,11 @@ public class OrderModel implements Serializable {
             return type;
         }
 
-        public Product getValue() {
+        public String getValue() {
             return value;
         }
 
-        public Product getGrand_total() {
+        public String getGrand_total() {
             return grand_total;
         }
 
@@ -815,5 +872,59 @@ public class OrderModel implements Serializable {
             return discount;
         }
     }
+
+    public static class SaleModifierData implements Serializable {
+        private String id;
+        private String product_id;
+        private String sale_id;
+        private String product_sale_id;
+        private String modifier_id;
+        private String total;
+        private String created_at;
+        private String updated_at;
+        private Modifier modifier;
+        private List<SaleModifier> sale_modifier_data;
+
+        public String getId() {
+            return id;
+        }
+
+        public String getProduct_id() {
+            return product_id;
+        }
+
+        public String getSale_id() {
+            return sale_id;
+        }
+
+        public String getProduct_sale_id() {
+            return product_sale_id;
+        }
+
+        public String getModifier_id() {
+            return modifier_id;
+        }
+
+        public String getTotal() {
+            return total;
+        }
+
+        public String getCreated_at() {
+            return created_at;
+        }
+
+        public String getUpdated_at() {
+            return updated_at;
+        }
+
+        public Modifier getModifier() {
+            return modifier;
+        }
+
+        public List<SaleModifier> getSale_modifier_data() {
+            return sale_modifier_data;
+        }
+    }
+
 
 }

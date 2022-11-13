@@ -1274,8 +1274,13 @@ public class HomeMvvm extends AndroidViewModel {
                 draft = "1";
             }
 
-            Log.e("din",cartList.getDelivery_id()+"__");
-            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
+            String dining_id = null;
+            if (getSelectedDeliveryOptions().getValue()!=null){
+                dining_id = getSelectedDeliveryOptions().getValue().getId();
+            }
+            cartList.setDelivery_id(dining_id);
+
+            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(),dining_id, userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
             List<CartModel.Cart> carts = new ArrayList<>();
             carts.add(cart);
             CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), customer_id, userModel.getData().getSelectedPos().getId(), carts);
@@ -1334,8 +1339,8 @@ public class HomeMvvm extends AndroidViewModel {
     }
 
     private String getDate() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        return format.format(new Date());
+        return String.valueOf(new Date().getTime());
+
     }
 
 

@@ -4,9 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
-            name="ticketId"
+            name="model"
+            type="com.midad_pos.model.OrderModel.Sale" />
+        <variable
+            name="lang"
             type="String" />
+        <import type="android.view.View"/>
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -106,7 +111,7 @@
                         android:layout_height="match_parent"
                         >
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/recView"
+                            android:id="@+id/recViewLand"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             />
@@ -152,8 +157,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{ticketId}"
-                        android:textColor="@color/black"
+                        android:text='@{model!=null?("#"+model.id):""}'
+                        android:textColor="@color/white"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:layout_marginStart="24dp"
@@ -176,7 +181,10 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:tint="@color/white" />
+                            app:tint="@color/white"
+                            android:visibility="@{model!=null?View.VISIBLE:View.GONE,default=gone}"
+
+                            />
 
                         <Button
                             android:id="@+id/btnRefund"
@@ -191,6 +199,7 @@
                             android:background="@color/transparent"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="16dp"
+                            android:visibility="@{model!=null?View.VISIBLE:View.GONE,default=gone}"
                             />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -200,22 +209,29 @@
 
             </com.google.android.material.appbar.AppBarLayout>
 
-            <androidx.cardview.widget.CardView
+            <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            >
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="3dp"
-                app:cardBackgroundColor="@color/white"
-                app:contentPadding="16dp"
-                android:layout_marginStart="100dp"
-                android:layout_marginEnd="100dp"
-                android:layout_marginBottom="36dp"
-                android:layout_marginTop="24dp"
                 >
-                <androidx.core.widget.NestedScrollView
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fillViewport="true"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:contentPadding="16dp"
+                    android:layout_marginStart="100dp"
+                    android:layout_marginEnd="100dp"
+                    android:layout_marginBottom="36dp"
+                    android:layout_marginTop="24dp"
+                    android:visibility="@{model!=null?View.VISIBLE:View.GONE,default=gone}"
+
                     >
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -227,7 +243,8 @@
                             android:layout_gravity="center_horizontal"
                             android:textSize="28sp"
                             android:textColor="@color/black"
-                            android:text="10.00"
+                            numberFormat="@{model.grand_total}"
+                            type="@{null}"
                             />
 
                         <TextView
@@ -248,7 +265,73 @@
                             />
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+
+                            >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:text="@string/receipt"
+                                />
+
+
+                            <androidx.legacy.widget.Space
+                                android:layout_width="12dp"
+                                android:layout_height="0dp"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="18sp"
+                                android:textColor="@color/black"
+                                android:text="@{model.id}"
+
+                                />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="5dp"
+                            >
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:text="@string/inv_date"
+
+                                />
+                            <androidx.legacy.widget.Space
+                                android:layout_width="12dp"
+                                android:layout_height="0dp"/>
+
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                android:textColor="@color/black"
+                                timeStamp="@{model.date}"
+                                lang="@{lang}"
+                                />
+
+
+
+
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
@@ -269,17 +352,20 @@
                                 android:layout_height="wrap_content"
                                 android:textSize="18sp"
                                 android:textColor="@color/black"
-                                android:text="Emad"
+                                android:text="@{model.user.name}"
 
                                 />
+
+
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
                             android:layout_marginTop="3dp"
+                            android:layout_marginBottom="36dp"
                             >
                             <TextView
                                 android:layout_width="wrap_content"
@@ -297,10 +383,14 @@
                                 android:layout_height="wrap_content"
                                 android:textSize="18sp"
                                 android:textColor="@color/black"
-                                android:text="POS"
+                                android:text="@{model.pos.title}"
 
                                 />
+
+
                         </LinearLayout>
+
+
 
                         <View
                             android:layout_width="match_parent"
@@ -315,8 +405,10 @@
                             android:layout_height="wrap_content"
                             android:textSize="16sp"
                             android:textColor="@color/black"
-                            android:text="@string/in_place"
+                            android:text="@{model.dining.name}"
                             android:textStyle="bold"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
                             />
 
                         <View
@@ -328,6 +420,7 @@
                             />
 
                         <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recViewItems"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             />
@@ -363,80 +456,27 @@
                                 android:textStyle="bold"
                                 android:textSize="16sp"
                                 android:textColor="@color/black"
-                                android:text="10.00"
+                                numberFormat="@{model.grand_total}"
+                                type="@{null}"
                                 />
                         </LinearLayout>
 
-                        <LinearLayout
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recViewPayment"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginTop="3dp"
-                            >
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textStyle="bold"
-                                android:textSize="16sp"
-                                android:textColor="@color/black"
-                                android:text="@string/card"
-                                />
-                            <androidx.legacy.widget.Space
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"/>
+                            android:layout_marginBottom="36dp"
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textStyle="bold"
-                                android:textSize="16sp"
-                                android:textColor="@color/black"
-                                android:text="10.00"
-                                />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1px"
-                            android:background="@color/grey3"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
                             />
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginBottom="16dp"
-                            >
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="14sp"
-                                android:textColor="@color/grey4"
-                                android:text="22/08/2022 7:44 AM"
-                                />
-                            <androidx.legacy.widget.Space
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"/>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="14sp"
-                                android:textColor="@color/grey4"
-                                android:text="#1-1002"
-                                />
-                        </LinearLayout>
+
 
 
                     </LinearLayout>
-                </androidx.core.widget.NestedScrollView>
-            </androidx.cardview.widget.CardView>
+                </androidx.cardview.widget.CardView>
+
+            </FrameLayout>
+        </androidx.core.widget.NestedScrollView>
         </LinearLayout>
     </LinearLayout>
 

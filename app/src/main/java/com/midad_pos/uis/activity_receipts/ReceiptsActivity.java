@@ -23,18 +23,26 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.midad_pos.R;
+import com.midad_pos.adapter.OrderItemAdapter;
+import com.midad_pos.adapter.OrderPaymentAdapter;
 import com.midad_pos.adapter.ReceiptAdapter;
+import com.midad_pos.adapter.ReceiptSaleAdapter;
 import com.midad_pos.databinding.ActivityReceiptsBinding;
 import com.midad_pos.databinding.DialogSendEmailBinding;
+import com.midad_pos.model.OrderModel;
 import com.midad_pos.mvvm.ReceiptDetailsMvvm;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_refund.RefundActivity;
 import com.midad_pos.uis.activity_send_ticket_email.SendTicketEmailActivity;
 
+import java.util.List;
+
 public class ReceiptsActivity extends DrawerBaseActivity {
     private ReceiptDetailsMvvm mvvm;
     private ActivityReceiptsBinding binding;
-    private ReceiptAdapter adapter;
+    private ReceiptSaleAdapter adapter;
+    private OrderPaymentAdapter paymentAdapter;
+    private OrderItemAdapter orderItemAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,16 +57,38 @@ public class ReceiptsActivity extends DrawerBaseActivity {
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(ReceiptDetailsMvvm.class);
         binding.setLang(getLang());
-        binding.recView.setLayoutManager(new LinearLayoutManager(this));
-        binding.recView.setHasFixedSize(true);
-        adapter = new ReceiptAdapter(this, getLang());
-        binding.recView.setAdapter(adapter);
+        if (binding.recView!=null){
+            binding.recView.setLayoutManager(new LinearLayoutManager(this));
+            binding.recView.setHasFixedSize(true);
+            adapter = new ReceiptSaleAdapter(this, getLang());
+            adapter.updateSelected(false);
+            binding.recView.setAdapter(adapter);
+        }else if (binding.recViewLand!=null){
+            binding.recViewLand.setLayoutManager(new LinearLayoutManager(this));
+            binding.recViewLand.setHasFixedSize(true);
+            adapter = new ReceiptSaleAdapter(this, getLang());
+            adapter.updateSelected(true);
+
+            binding.recViewLand.setAdapter(adapter);
+        }
+
+        binding.recViewPayment.setLayoutManager(new LinearLayoutManager(this));
+        binding.recViewPayment.setHasFixedSize(true);
+        paymentAdapter = new OrderPaymentAdapter(this);
+        binding.recViewPayment.setAdapter(paymentAdapter);
+
+        binding.recViewItems.setLayoutManager(new LinearLayoutManager(this));
+        binding.recViewItems.setHasFixedSize(true);
+        orderItemAdapter = new OrderItemAdapter(this);
+        binding.recViewItems.setAdapter(orderItemAdapter);
+
 
         mvvm.getIsLoading().observe(this,loading->binding.swipeRefresh.setRefreshing(loading));
+
         mvvm.getOrders().observe(this, list -> {
             if (adapter != null) {
                 adapter.updateList(list);
-                binding.recView.postDelayed(()->binding.recView.smoothScrollToPosition(0),100);
+
             }
         });
         
@@ -90,10 +120,21 @@ public class ReceiptsActivity extends DrawerBaseActivity {
 
         }
 
+        mvvm.getSelectedOrder().observe(this,model->{
+            binding.setModel(model);
+            if (paymentAdapter!=null){
+                paymentAdapter.updateList(model.getPayments());
+            }
+
+            if (orderItemAdapter!=null){
+                orderItemAdapter.updateList(model.getDetails());
+            }
+        });
 
         if (mvvm.getIsDialogShown().getValue() != null && mvvm.getIsDialogShown().getValue()) {
             createDialogEmail(mvvm.getShowSendEmailDialog().getValue());
         }
+
         if (binding.btnShowAllTickets != null) {
             binding.btnShowAllTickets.setOnClickListener(view -> {
                 mvvm.getShowTicketDetails().setValue(true);
@@ -237,4 +278,14 @@ public class ReceiptsActivity extends DrawerBaseActivity {
         } catch (Exception e) {
         }
     }
+
+    public void setItemReceipt(OrderModel.Sale model) {
+        mvvm.getSelectedOrder().setValue(model);
+        if (binding.recView!=null){
+            mvvm.getShowTicketDetails().setValue(true);
+
+        }
+    }
+
+
 }

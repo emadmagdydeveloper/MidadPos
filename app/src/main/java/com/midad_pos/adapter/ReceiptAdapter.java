@@ -25,10 +25,13 @@ public class ReceiptAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<OrderModel> list;
     private Context context;
     private String lang;
+    private boolean showSelected;
 
-    public ReceiptAdapter(Context context,String lang) {
+
+    public ReceiptAdapter(Context context,String lang,boolean showSelected) {
         this.context = context;
         this.lang = lang;
+        this.showSelected = showSelected;
     }
 
     @NonNull
@@ -45,9 +48,10 @@ public class ReceiptAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         myHolder.binding.setDate(list.get(position).getDate());
         myHolder.binding.recView.setLayoutManager(new LinearLayoutManager(context));
         myHolder.binding.recView.setHasFixedSize(true);
-        ReceiptSaleAdapter adapter = new ReceiptSaleAdapter(context,lang);
+        /*ReceiptSaleAdapter adapter = new ReceiptSaleAdapter(context,position,lang);
+        adapter.updateSelected(showSelected);
         adapter.updateList(list.get(position).getSales());
-        myHolder.binding.recView.setAdapter(adapter);
+        myHolder.binding.recView.setAdapter(adapter);*/
 
     }
 

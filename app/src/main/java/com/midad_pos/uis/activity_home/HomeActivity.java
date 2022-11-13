@@ -1037,6 +1037,11 @@ public class HomeActivity extends DrawerBaseActivity {
 
     private void navigateToChargeActivity() {
 
+        String dining_id = null;
+        if (mvvm.getSelectedDeliveryOptions().getValue()!=null&&mvvm.getCart().getValue()!=null){
+            dining_id = mvvm.getSelectedDeliveryOptions().getValue().getId();
+            mvvm.addDeliveryOption(dining_id,mvvm.getSelectedDeliveryOptions().getValue().getName());
+        }
         Intent intent = new Intent(this, ChargeActivity.class);
         startActivity(intent);
 
