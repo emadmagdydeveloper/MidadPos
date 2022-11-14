@@ -217,6 +217,12 @@
     <string name="tendered">Total tendered</string>
     <string name="inv_date">Invoice date :</string>
     <string name="receipt">Receipt #:</string>
+    <string name="open_tickets">Open tickets</string>
+    <string name="my_tickets">My tickets</string>
+    <string name="sort_name">NAME</string>
+    <string name="sort_amount">AMOUNT</string>
+    <string name="sort_time">TIME</string>
+    <string name="sort_employee">EMPLOYEE</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

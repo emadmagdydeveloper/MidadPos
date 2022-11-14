@@ -447,7 +447,7 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:enabled="false"
+                            android:enabled="true"
                             android:gravity="center"
                             android:text="@string/save"
                             android:textAllCaps="true"
@@ -524,6 +524,18 @@
                 android:id="@+id/dialogCartDiscount"
                 layout="@layout/dialog_cart_discounts" />
         </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/flDialogOpenedTickets"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/dialogOpenedTickets"
+                layout="@layout/dialog_opened_ticket" />
+        </FrameLayout>
+
 
 
     </FrameLayout>

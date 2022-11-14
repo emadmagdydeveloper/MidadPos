@@ -86,6 +86,7 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isDialogPriceOpened;
     private MutableLiveData<Boolean> isDialogExtrasOpened;
     private MutableLiveData<Boolean> isDialogDiscountsOpened;
+    private MutableLiveData<Boolean> isDialogOpenedTicketsOpened;
 
     private MutableLiveData<Integer> itemForPricePos;
     private MutableLiveData<ItemModel> itemForPrice;
@@ -100,6 +101,12 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isCustomerLoading;
     private MutableLiveData<Boolean> onCustomerUpdatedSuccess;
     private MutableLiveData<List<DeliveryModel>> deliveryOptions;
+
+    /////////////////////////////////////////////////////////////////
+    private MutableLiveData<Integer> ticketSortPos;
+    private MutableLiveData<Boolean> isOpenedTicketSearchOpened;
+    private MutableLiveData<String> queryMyOpenedTickets;
+    private MutableLiveData<Boolean> isLoadingOpenedTickets;
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -328,6 +335,14 @@ public class HomeMvvm extends AndroidViewModel {
         return isDialogDiscountsOpened;
     }
 
+    public MutableLiveData<Boolean> getIsDialogOpenedTicketsOpened() {
+        if (isDialogOpenedTicketsOpened == null) {
+            isDialogOpenedTicketsOpened = new MutableLiveData<>();
+            isDialogOpenedTicketsOpened.setValue(false);
+        }
+        return isDialogOpenedTicketsOpened;
+    }
+
 
     public MutableLiveData<Integer> getItemForPricePos() {
         if (itemForPricePos == null) {
@@ -403,6 +418,37 @@ public class HomeMvvm extends AndroidViewModel {
 
         }
         return appSettingModel;
+    }
+
+    public MutableLiveData<Integer> getTicketSortPos() {
+        if (ticketSortPos == null) {
+            ticketSortPos = new MutableLiveData<>();
+            ticketSortPos.setValue(0);
+        }
+        return ticketSortPos;
+    }
+
+    public MutableLiveData<Boolean> getIsOpenedTicketSearchOpened() {
+        if (isOpenedTicketSearchOpened == null) {
+            isOpenedTicketSearchOpened = new MutableLiveData<>();
+            isOpenedTicketSearchOpened.setValue(false);
+        }
+        return isOpenedTicketSearchOpened;
+    }
+
+    public MutableLiveData<String> getQueryMyOpenedTickets() {
+        if (queryMyOpenedTickets == null) {
+            queryMyOpenedTickets = new MutableLiveData<>();
+            queryMyOpenedTickets.setValue("");
+        }
+        return queryMyOpenedTickets;
+    }
+
+    public MutableLiveData<Boolean> getIsLoadingOpenedTickets() {
+        if (isLoadingOpenedTickets == null) {
+            isLoadingOpenedTickets = new MutableLiveData<>();
+        }
+        return isLoadingOpenedTickets;
     }
 
     public void getCurrentShift() {
@@ -531,7 +577,6 @@ public class HomeMvvm extends AndroidViewModel {
                     }
                 });
     }
-
 
     public void getCustomers() {
         getIsCustomerLoading().setValue(true);
@@ -835,6 +880,10 @@ public class HomeMvvm extends AndroidViewModel {
             }
 
         }
+
+    }
+
+    public void searchMyTicket() {
 
     }
 
@@ -1275,12 +1324,12 @@ public class HomeMvvm extends AndroidViewModel {
             }
 
             String dining_id = null;
-            if (getSelectedDeliveryOptions().getValue()!=null){
+            if (getSelectedDeliveryOptions().getValue() != null) {
                 dining_id = getSelectedDeliveryOptions().getValue().getId();
             }
             cartList.setDelivery_id(dining_id);
 
-            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(),dining_id, userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
+            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), dining_id, userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
             List<CartModel.Cart> carts = new ArrayList<>();
             carts.add(cart);
             CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), customer_id, userModel.getData().getSelectedPos().getId(), carts);

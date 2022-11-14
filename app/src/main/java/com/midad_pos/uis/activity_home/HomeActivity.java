@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.budiyev.android.codescanner.CodeScanner;
+import com.google.android.material.tabs.TabLayout;
 import com.midad_pos.R;
 import com.midad_pos.adapter.CartAdapter;
 import com.midad_pos.adapter.CartDiscountAdapter;
@@ -47,6 +48,7 @@ import com.midad_pos.adapter.HomeItemAdapter;
 import com.midad_pos.adapter.ItemDiscountAdapter;
 import com.midad_pos.adapter.ItemMainModifierAdapter;
 import com.midad_pos.adapter.ItemVariantAdapter;
+import com.midad_pos.adapter.OpenedTicketsAdapter;
 import com.midad_pos.adapter.SpinnerCountryAdapter;
 import com.midad_pos.databinding.ActivityHomeBinding;
 import com.midad_pos.databinding.DialogClearTicketLayoutBinding;
@@ -97,6 +99,8 @@ public class HomeActivity extends DrawerBaseActivity {
     private CartAdapter cartAdapter;
     private CartDiscountAdapter cartDiscountAdapter;
     private CustomersAdapter customersAdapter;
+    private OpenedTicketsAdapter openedTicketsAdapter;
+
 
 
     @Override
@@ -150,7 +154,64 @@ public class HomeActivity extends DrawerBaseActivity {
         baseMvvm.getOnUserRefreshed().observe(this, aBoolean -> {
             mvvm.loadHomeData();
         });
+
         binding.toolBarHomeLayout.setLang(getLang());
+
+        if (binding.dialogOpenedTickets.tab != null) {
+            TabLayout.Tab tab1 = binding.dialogOpenedTickets.tab.newTab();
+            TabLayout.Tab tab2 = binding.dialogOpenedTickets.tab.newTab();
+            TabLayout.Tab tab3 = binding.dialogOpenedTickets.tab.newTab();
+            TabLayout.Tab tab4 = binding.dialogOpenedTickets.tab.newTab();
+
+            tab1.setText(R.string.sort_name);
+            tab2.setText(R.string.sort_amount);
+            tab3.setText(R.string.sort_time);
+            tab4.setText(R.string.sort_employee);
+
+            binding.dialogOpenedTickets.tab.addTab(tab1);
+            binding.dialogOpenedTickets.tab.addTab(tab2);
+            binding.dialogOpenedTickets.tab.addTab(tab3);
+            binding.dialogOpenedTickets.tab.addTab(tab4);
+
+            if (mvvm.getTicketSortPos().getValue() != null) {
+                int pos = mvvm.getTicketSortPos().getValue();
+                if (pos == 0) {
+                    tab1.select();
+                } else if (pos == 1) {
+                    tab2.select();
+                } else if (pos == 2) {
+                    tab3.select();
+                } else {
+                    tab4.select();
+                }
+            }
+
+
+            binding.dialogOpenedTickets.tab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    mvvm.getTicketSortPos().setValue(tab.getPosition());
+                    mvvm.searchMyTicket();
+
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+
+        }
+
+
+
+
+
         spinnerCountryAdapter = new SpinnerCountryAdapter(this, getLang());
         binding.addCustomerDialog.addCustomerLayout.spinnerCountry.setAdapter(spinnerCountryAdapter);
         binding.addCustomerDialog.addCustomerLayout.spinnerCountry.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -173,6 +234,8 @@ public class HomeActivity extends DrawerBaseActivity {
             }
         });
 
+
+
         mvvm.getAppSettingModel().observe(this, this::updateShiftData);
         mvvm.getIsCustomerLoading().observe(this, isLoading -> binding.addCustomerDialog.searchDialog.loader.setVisibility(isLoading ? View.VISIBLE : View.GONE));
 
@@ -181,6 +244,59 @@ public class HomeActivity extends DrawerBaseActivity {
         customersAdapter = new CustomersAdapter(this);
         binding.addCustomerDialog.searchDialog.recView.setAdapter(customersAdapter);
         binding.addCustomerDialog.addCustomerLayout.btnSave.setOnClickListener(v -> mvvm.addCustomer(this));
+
+
+        ////////////////////////////////////////////////////////////////////////////////
+
+        binding.dialogOpenedTickets.recView.setLayoutManager(new LinearLayoutManager(this));
+        binding.dialogOpenedTickets.recView.setHasFixedSize(true);
+        openedTicketsAdapter = new OpenedTicketsAdapter(this);
+        binding.dialogOpenedTickets.recView.setAdapter(openedTicketsAdapter);
+
+
+        mvvm.getIsOpenedTicketSearchOpened().observe(this,isOpened->{
+            binding.dialogOpenedTickets.llSearch.setVisibility(isOpened?View.VISIBLE:View.GONE);
+        });
+        mvvm.getIsLoadingOpenedTickets().observe(this,isLoading->{
+            binding.dialogOpenedTickets.progBar.setVisibility(isLoading?View.VISIBLE:View.GONE);
+        });
+
+        binding.dialogOpenedTickets.imageSearch.setOnClickListener(v -> mvvm.getIsOpenedTicketSearchOpened().setValue(true));
+
+        binding.dialogOpenedTickets.closeSearch.setOnClickListener(v -> {
+            mvvm.getIsOpenedTicketSearchOpened().setValue(false);
+            binding.dialogOpenedTickets.edtSearch.setText(null);
+        });
+
+
+        if (mvvm.getQueryMyOpenedTickets().getValue()!=null){
+            binding.dialogOpenedTickets.edtSearch.setText(mvvm.getQueryMyOpenedTickets().getValue());
+        }
+
+        binding.dialogOpenedTickets.edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                binding.dialogOpenedTickets.edtSearch.removeTextChangedListener(this);
+                mvvm.getQueryMyOpenedTickets().setValue(s.toString().trim());
+                mvvm.searchMyTicket();
+                binding.dialogOpenedTickets.edtSearch.addTextChangedListener(this);
+            }
+        });
+
+        if (binding.dialogOpenedTickets.filter!=null){
+            binding.dialogOpenedTickets.filter.setOnClickListener(this::createSortOpenedTicketsPopupMenu);
+        }
+        ///////////////////////////////////////////////////////////////////////////////
 
         mvvm.getCustomersInstance().observe(this, customers -> {
             binding.addCustomerDialog.searchDialog.tvNoCustomer.setVisibility(customers.size() > 0 ? View.GONE : View.VISIBLE);
@@ -425,6 +541,9 @@ public class HomeActivity extends DrawerBaseActivity {
             }
         });
 
+        mvvm.getIsDialogOpenedTicketsOpened().observe(this, isOpened -> {
+            binding.flDialogOpenedTickets.setVisibility(isOpened ? View.VISIBLE : View.GONE);
+        });
         mvvm.getItemForPricePos().observe(this, pos -> {
             if (pos != -1 && mvvm.getItems().getValue() != null) {
                 binding.dialogAddPrice.setItem(mvvm.getItems().getValue().get(pos));
@@ -478,6 +597,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
             });
         }
+
 
         if (binding.barcode != null) {
             if (getAppSetting() != null && getAppSetting().isScan()) {
@@ -646,6 +766,10 @@ public class HomeActivity extends DrawerBaseActivity {
         binding.btnGoToItems.setOnClickListener(view -> navigation(ItemsActivity.class));
 
         binding.openShift.setOnClickListener(view -> navigation(ShiftActivity.class));
+
+        binding.dialogOpenedTickets.closeDialogOpenedTicket.setOnClickListener(v -> {
+            mvvm.getIsDialogOpenedTicketsOpened().setValue(false);
+        });
 
         if (binding.barcode != null && binding.llData != null) {
             binding.barcode.setOnClickListener(v -> {
@@ -989,10 +1113,11 @@ public class HomeActivity extends DrawerBaseActivity {
             });
         }
 
-        binding.btnSave.setOnClickListener(v -> {
-            mvvm.saveTicket(this);
-        });
 
+        binding.btnSave.setOnClickListener(v -> {
+            mvvm.getIsDialogOpenedTicketsOpened().setValue(true);
+            //mvvm.saveTicket(this);
+        });
 
 
     }
@@ -1038,9 +1163,9 @@ public class HomeActivity extends DrawerBaseActivity {
     private void navigateToChargeActivity() {
 
         String dining_id = null;
-        if (mvvm.getSelectedDeliveryOptions().getValue()!=null&&mvvm.getCart().getValue()!=null){
+        if (mvvm.getSelectedDeliveryOptions().getValue() != null && mvvm.getCart().getValue() != null) {
             dining_id = mvvm.getSelectedDeliveryOptions().getValue().getId();
-            mvvm.addDeliveryOption(dining_id,mvvm.getSelectedDeliveryOptions().getValue().getName());
+            mvvm.addDeliveryOption(dining_id, mvvm.getSelectedDeliveryOptions().getValue().getName());
         }
         Intent intent = new Intent(this, ChargeActivity.class);
         startActivity(intent);
@@ -1123,6 +1248,34 @@ public class HomeActivity extends DrawerBaseActivity {
         codeScanner.startPreview();
 
 
+    }
+
+    private void createSortOpenedTicketsPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.inflate(R.menu.filter_ticket_menu);
+
+        if (mvvm.getTicketSortPos().getValue()!=null){
+            popupMenu.getMenu().getItem(mvvm.getTicketSortPos().getValue()).setChecked(true);
+        }
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int pos = 0;
+            if (item.getItemId()==R.id.sortName){
+                pos = 0;
+            }else if (item.getItemId()==R.id.sortAmount){
+                pos = 1;
+            }else if (item.getItemId()==R.id.sortTime){
+                pos = 2;
+            }else if (item.getItemId()==R.id.sortEmployee){
+                pos = 3;
+            }
+
+            mvvm.getTicketSortPos().setValue(pos);
+            mvvm.searchMyTicket();
+            return true;
+        });
+
+        popupMenu.show();
     }
 
     private void createFilterPopupMenu(View view, List<CategoryModel> categories) {
@@ -1642,6 +1795,8 @@ public class HomeActivity extends DrawerBaseActivity {
             mvvm.getIsDialogExtrasOpened().setValue(false);
         } else if (binding.flDialogCartDiscount.getVisibility() == View.VISIBLE) {
             mvvm.getIsDialogDiscountsOpened().setValue(false);
+        }else if (binding.flDialogOpenedTickets.getVisibility() == View.VISIBLE) {
+            mvvm.getIsDialogOpenedTicketsOpened().setValue(false);
         } else {
             super.onBackPressed();
         }
@@ -1709,7 +1864,7 @@ public class HomeActivity extends DrawerBaseActivity {
             initCodeScanner(mvvm.getCamera().getValue());
         }
 
-        Log.e("show",mvvm.showPin+"__"+App.showHomePin+"__"+App.saleSelected);
+        Log.e("show", mvvm.showPin + "__" + App.showHomePin + "__" + App.saleSelected);
 
 
         if (App.showHomePin) {
@@ -1761,14 +1916,13 @@ public class HomeActivity extends DrawerBaseActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.e("c",mvvm.showPin+"");
+        Log.e("c", mvvm.showPin + "");
         App.showHomePin = false;
         App.saleSelected = false;
-        outState.putBoolean("state",mvvm.showPin);
+        outState.putBoolean("state", mvvm.showPin);
 
 
     }
-
 
 
     @Override
@@ -1782,12 +1936,12 @@ public class HomeActivity extends DrawerBaseActivity {
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         mvvm.showPin = savedInstanceState.getBoolean("state");
         App.showHomePin = false;
-        Log.e("cs",mvvm.showPin+"");
 
         try {
             super.onRestoreInstanceState(savedInstanceState);
 
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
 }

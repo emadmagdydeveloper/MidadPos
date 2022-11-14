@@ -588,7 +588,6 @@ public class ChargeMvvm extends AndroidViewModel {
             double totalPrice = 0.0;
             if (getUnPaidUnEdited().size() > 0) {
                 totalPrice = (Double.parseDouble(getPaidAmount().getValue()) - getTotalEditedPrice(-1)) / (getUnPaidUnEdited().size() + 1);
-                Log.e("pr", getRemaining().getValue() + "__" + getTotalEditedPrice(-1) + "__" + getUnPaidUnEdited().size() + "___" + totalPrice);
                 for (ChargeModel chargeModel : getSplitList().getValue()) {
                     if (!chargeModel.isEdited()) {
                         chargeModel.setPrice(String.format(Locale.US, "%.2f", totalPrice));
@@ -649,6 +648,10 @@ public class ChargeMvvm extends AndroidViewModel {
     public void removeAdditionalSplit(int adapterPos) {
         if (getCartListInstance().getValue() != null) {
             if (getSplitList().getValue() != null) {
+                ChargeModel chargeModel = getSplitList().getValue().get(adapterPos);
+                if (chargeModel.isPaid()&&getRemaining().getValue()!=null){
+                    getRemaining().setValue((getRemaining().getValue()+Double.parseDouble(chargeModel.getPrice())));
+                }
                 getSplitList().getValue().remove(adapterPos);
                 getSplitList().setValue(getSplitList().getValue());
                 getSplitAmount().setValue(getSplitList().getValue().size());
@@ -891,7 +894,7 @@ public class ChargeMvvm extends AndroidViewModel {
 
     }
 
-    public void addTicket(Context context) {
+    public void addTicket(Context context,boolean withSplit) {
         ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
@@ -958,9 +961,24 @@ public class ChargeMvvm extends AndroidViewModel {
 
 
             AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
-            CartModel.Payment payment = new CartModel.Payment(cartList.getTotalPrice(), Double.parseDouble(getPaidAmount().getValue().replace(",", "")), getRemaining().getValue(), getPaymentType().getValue() + "");
             List<CartModel.Payment> payments = new ArrayList<>();
-            payments.add(payment);
+
+            if (withSplit){
+                if (getSplitList().getValue()!=null&&getSplitList().getValue().size()>0){
+                    for (ChargeModel chargeModel:getSplitList().getValue()){
+
+                        double remaining = chargeModel.getPaidAmount()-Double.parseDouble(chargeModel.getPrice().replace(",",""));
+
+                        CartModel.Payment payment = new CartModel.Payment(Double.parseDouble(chargeModel.getPrice().replace(",","")), chargeModel.getPaidAmount(),remaining,chargeModel.getPaymentModel().getId());
+                        payments.add(payment);
+                    }
+                }
+            }else {
+                CartModel.Payment payment = new CartModel.Payment(cartList.getTotalPrice(), Double.parseDouble(getPaidAmount().getValue().replace(",", "")), getRemaining().getValue(), getPaymentType().getValue() + "");
+                payments.add(payment);
+            }
+
+
 
             List<CartModel.Discount> discounts = new ArrayList<>();
             for (DiscountModel discountModel : cartList.getDiscounts()) {
@@ -979,7 +997,6 @@ public class ChargeMvvm extends AndroidViewModel {
             }
 
             CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
-            Log.e("din",cartList.getDelivery_id()+"__");
 
             List<CartModel.Cart> carts = new ArrayList<>();
             carts.add(cart);

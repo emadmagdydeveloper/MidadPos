@@ -23,6 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.midad_pos.R;
+import com.midad_pos.adapter.DiscountAdapter;
+import com.midad_pos.adapter.OrderDiscountAdapter;
 import com.midad_pos.adapter.OrderItemAdapter;
 import com.midad_pos.adapter.OrderPaymentAdapter;
 import com.midad_pos.adapter.ReceiptAdapter;
@@ -35,6 +37,7 @@ import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_refund.RefundActivity;
 import com.midad_pos.uis.activity_send_ticket_email.SendTicketEmailActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReceiptsActivity extends DrawerBaseActivity {
@@ -43,6 +46,7 @@ public class ReceiptsActivity extends DrawerBaseActivity {
     private ReceiptSaleAdapter adapter;
     private OrderPaymentAdapter paymentAdapter;
     private OrderItemAdapter orderItemAdapter;
+    private OrderDiscountAdapter discountAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +61,13 @@ public class ReceiptsActivity extends DrawerBaseActivity {
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(ReceiptDetailsMvvm.class);
         binding.setLang(getLang());
-        if (binding.recView!=null){
+        if (binding.recView != null) {
             binding.recView.setLayoutManager(new LinearLayoutManager(this));
             binding.recView.setHasFixedSize(true);
             adapter = new ReceiptSaleAdapter(this, getLang());
             adapter.updateSelected(false);
             binding.recView.setAdapter(adapter);
-        }else if (binding.recViewLand!=null){
+        } else if (binding.recViewLand != null) {
             binding.recViewLand.setLayoutManager(new LinearLayoutManager(this));
             binding.recViewLand.setHasFixedSize(true);
             adapter = new ReceiptSaleAdapter(this, getLang());
@@ -82,8 +86,13 @@ public class ReceiptsActivity extends DrawerBaseActivity {
         orderItemAdapter = new OrderItemAdapter(this);
         binding.recViewItems.setAdapter(orderItemAdapter);
 
+        binding.recViewDiscounts.setLayoutManager(new LinearLayoutManager(this));
+        binding.recViewDiscounts.setHasFixedSize(true);
+        discountAdapter = new OrderDiscountAdapter(this);
+        binding.recViewDiscounts.setAdapter(discountAdapter);
 
-        mvvm.getIsLoading().observe(this,loading->binding.swipeRefresh.setRefreshing(loading));
+
+        mvvm.getIsLoading().observe(this, loading -> binding.swipeRefresh.setRefreshing(loading));
 
         mvvm.getOrders().observe(this, list -> {
             if (adapter != null) {
@@ -91,9 +100,9 @@ public class ReceiptsActivity extends DrawerBaseActivity {
 
             }
         });
-        
+
         binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-        
+
         mvvm.getShowTicketDetails().observe(this, show -> {
             if (show) {
                 if (binding.llReceiptDetailsPort != null) {
@@ -120,14 +129,29 @@ public class ReceiptsActivity extends DrawerBaseActivity {
 
         }
 
-        mvvm.getSelectedOrder().observe(this,model->{
+        mvvm.getSelectedOrder().observe(this, model -> {
             binding.setModel(model);
-            if (paymentAdapter!=null){
+            if (paymentAdapter != null) {
                 paymentAdapter.updateList(model.getPayments());
             }
 
-            if (orderItemAdapter!=null){
+            if (orderItemAdapter != null) {
                 orderItemAdapter.updateList(model.getDetails());
+            }
+
+
+            List<OrderModel.OrderDiscount> list = new ArrayList<>();
+
+            for (OrderModel.Detail detail : model.getDetails()) {
+
+                list.addAll(detail.getDiscounts());
+            }
+
+            list.addAll(model.getDiscounts());
+
+            binding.setIsDiscount(list.size() > 0);
+            if (discountAdapter != null) {
+                discountAdapter.updateList(list);
             }
         });
 
@@ -203,7 +227,7 @@ public class ReceiptsActivity extends DrawerBaseActivity {
 
         binding.toolbarLandMenu.setOnClickListener(this::createPopUpMenuSendTicket);
 
-        binding.swipeRefresh.setOnRefreshListener(()->mvvm.getOrdersData());
+        binding.swipeRefresh.setOnRefreshListener(() -> mvvm.getOrdersData());
     }
 
     @SuppressLint("RestrictedApi")
@@ -281,7 +305,7 @@ public class ReceiptsActivity extends DrawerBaseActivity {
 
     public void setItemReceipt(OrderModel.Sale model) {
         mvvm.getSelectedOrder().setValue(model);
-        if (binding.recView!=null){
+        if (binding.recView != null) {
             mvvm.getShowTicketDetails().setValue(true);
 
         }

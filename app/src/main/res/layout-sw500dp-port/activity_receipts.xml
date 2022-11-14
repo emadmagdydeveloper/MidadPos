@@ -9,6 +9,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="isDiscount"
+            type="Boolean" />
 
     </data>
     <FrameLayout
@@ -410,24 +413,27 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginBottom="8dp"
                             />
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recViewDiscounts"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="@{isDiscount?View.VISIBLE:View.GONE,default=gone}"
+                            />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1px"
+                            android:background="@color/grey3"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:visibility="@{isDiscount?View.VISIBLE:View.GONE,default=gone}"
+                            />
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
                             >
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textStyle="bold"
-                                android:textSize="16sp"
-                                android:textColor="@color/black"
-                                android:text="@string/total"
-                                />
-                            <androidx.legacy.widget.Space
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -438,6 +444,19 @@
                                 numberFormat="@{model.grand_total}"
                                 type="@{null}"
                                 />
+                            <androidx.legacy.widget.Space
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:text="@string/total"
+                                />
+
                         </LinearLayout>
 
                         <androidx.recyclerview.widget.RecyclerView

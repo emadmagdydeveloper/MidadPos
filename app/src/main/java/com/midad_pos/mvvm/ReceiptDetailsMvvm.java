@@ -210,7 +210,8 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
                     List<OrderModel.Sale> sales = new ArrayList<>();
                     for (OrderModel.Sale sale : getMainOrders().getValue()) {
                         if (getSelectedOrder().getValue()!=null){
-                            if (getSelectedOrder().getValue().getId().equals(sale.getId())){
+                            if (getSelectedOrder().getValue().getId().equals(sale.getId()))
+                            {
                                 sale.setSelected(true);
                                 getSelectedOrder().setValue(sale);
 
@@ -218,15 +219,15 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
                                 sale.setSelected(false);
 
                             }
+                            sales.add(sale);
                         }else {
-                            if (sales.size()>0){
-                                sales.get(0).setSelected(true);
-                                getSelectedOrder().setValue(sales.get(0));
-                            }
+                            sales.add(sale);
+                            sales.get(0).setSelected(true);
+                            getSelectedOrder().setValue(sales.get(0));
                         }
 
 
-                        sales.add(sale);
+
 
                     }
 

@@ -217,6 +217,12 @@
     <string name="tendered">القيمة الإجمالية</string>
     <string name="inv_date">تاريخ التذكرة :</string>
     <string name="receipt">التذكرة #:</string>
+    <string name="open_tickets">التذاكر المفتوحة</string>
+    <string name="my_tickets">تذاكري</string>
+    <string name="sort_name">الإسم</string>
+    <string name="sort_amount">القيمة</string>
+    <string name="sort_time">الوقت</string>
+    <string name="sort_employee">الموظف</string>
 
 
     <string-array name="delivery_options">

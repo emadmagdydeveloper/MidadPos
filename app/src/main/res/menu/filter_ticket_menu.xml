@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/sortName"
+            android:title="@string/sort_name"
+            />
+        <item
+            android:id="@+id/sortAmount"
+            android:title="@string/sort_amount"
+            />
+        <item
+            android:id="@+id/sortTime"
+            android:title="@string/sort_time"
+            />
+        <item
+            android:id="@+id/sortEmployee"
+            android:title="@string/sort_employee"
+            />
+
+    </group>
+</menu>

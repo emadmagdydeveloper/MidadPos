@@ -106,8 +106,8 @@ public class ChargeActivity extends BaseActivity {
 
         });
 
-        if (mvvm.getItemSplitPrice().getValue()!=null){
-            binding.layout.edtCashSplitItem.setText(mvvm.getItemSplitPrice().getValue().replace(",",""));
+        if (mvvm.getItemSplitPrice().getValue() != null) {
+            binding.layout.edtCashSplitItem.setText(mvvm.getItemSplitPrice().getValue().replace(",", ""));
 
         }
         mvvm.getPayment().observe(this, payments -> {
@@ -159,14 +159,14 @@ public class ChargeActivity extends BaseActivity {
         mvvm.getSplitAmount().observe(this, splitAmount -> {
             binding.layout.ticketSplit.setCount(String.valueOf(splitAmount));
         });
-        mvvm.getSplitList().observe(this,list -> {
+        mvvm.getSplitList().observe(this, list -> {
             if (splitAdapter != null) {
                 splitAdapter.updateList(list);
             }
-            if (binding.layout.ticketSplit.llDone!=null){
-                binding.layout.ticketSplit.llDone.setVisibility((mvvm.getRemaining().getValue()!=null&&mvvm.getRemaining().getValue()==0)?View.VISIBLE:View.GONE);
+            if (binding.layout.ticketSplit.llDone != null) {
+                binding.layout.ticketSplit.llDone.setVisibility((mvvm.getRemaining().getValue() != null && mvvm.getRemaining().getValue() == 0) ? View.VISIBLE : View.GONE);
             }
-            binding.layout.ticketSplit.setEnable(mvvm.getRemaining().getValue()!=null&&mvvm.getRemaining().getValue()==0);
+            binding.layout.ticketSplit.setEnable(mvvm.getRemaining().getValue() != null && mvvm.getRemaining().getValue() == 0);
         });
         mvvm.getIsPaidShown().observe(this, isShown -> {
             binding.layout.flPayment.setVisibility(isShown ? View.VISIBLE : View.GONE);
@@ -188,12 +188,12 @@ public class ChargeActivity extends BaseActivity {
 
         mvvm.getSplitPrice().observe(this, price -> binding.dialogAddPrice.setPrice(price));
 
-        mvvm.getShowItemPaid().observe(this,show -> {
-            binding.layout.llSplitItemPayment.setVisibility(show?View.VISIBLE:View.GONE);
-            binding.layout.setItemDueAmount(Double.parseDouble(mvvm.itemForPaid.getPrice().replace(",","")));
+        mvvm.getShowItemPaid().observe(this, show -> {
+            binding.layout.llSplitItemPayment.setVisibility(show ? View.VISIBLE : View.GONE);
+            binding.layout.setItemDueAmount(Double.parseDouble(mvvm.itemForPaid.getPrice().replace(",", "")));
         });
 
-        mvvm.getOnTicketAddedSuccess().observe(this,aBoolean -> {
+        mvvm.getOnTicketAddedSuccess().observe(this, aBoolean -> {
             finish();
             if (getLang().equals("ar")) {
                 overridePendingTransition(R.anim.from_left, R.anim.to_right);
@@ -322,7 +322,7 @@ public class ChargeActivity extends BaseActivity {
 
                     }
 
-                    binding.layout.setEnabledSplitItem(Double.parseDouble(num.replace(",",""))>=Double.parseDouble(mvvm.itemForPaid.getPrice()));
+                    binding.layout.setEnabledSplitItem(Double.parseDouble(num.replace(",", "")) >= Double.parseDouble(mvvm.itemForPaid.getPrice()));
 
                 }
                 mvvm.getItemSplitPrice().setValue(num);
@@ -443,8 +443,6 @@ public class ChargeActivity extends BaseActivity {
             }
 
 
-
-
             binding.layout.addCustomerDialog.addCustomerLayout.arrow.setOnClickListener(view -> onBackPressed());
 
             binding.layout.addCustomerDialog.searchDialog.addCustomer.setOnClickListener(view -> {
@@ -535,8 +533,8 @@ public class ChargeActivity extends BaseActivity {
         binding.dialogAddPrice.btnOk.setOnClickListener(v -> {
             if (mvvm.getSplitPrice().getValue() != null) {
 
-                if (mvvm.getSplitPrice().getValue()!=null&&mvvm.splitPos!=-1){
-                    mvvm.updateList(Double.parseDouble(mvvm.getSplitPrice().getValue().replace(",","")),mvvm.splitPos);
+                if (mvvm.getSplitPrice().getValue() != null && mvvm.splitPos != -1) {
+                    mvvm.updateList(Double.parseDouble(mvvm.getSplitPrice().getValue().replace(",", "")), mvvm.splitPos);
 
                 }
                 mvvm.getIsDialogPriceOpened().setValue(false);
@@ -552,10 +550,15 @@ public class ChargeActivity extends BaseActivity {
             mvvm.getIsDialogPriceOpened().setValue(false);
         });
 
-        if (binding.layout.btnChargeSplitItem!=null){
+        if (binding.layout.btnChargeSplitItem != null) {
             binding.layout.btnChargeSplitItem.setOnClickListener(v -> {
                 mvvm.itemForPaid.setPaid(true);
                 mvvm.itemForPaid.setEdited(true);
+                if (mvvm.getItemSplitPrice().getValue() != null && !mvvm.getItemSplitPrice().getValue().isEmpty()) {
+                    mvvm.itemForPaid.setPaidAmount(Double.parseDouble(mvvm.getItemSplitPrice().getValue()));
+
+                }
+
                 mvvm.getShowItemPaid().setValue(false);
                 mvvm.getRemainingPrice();
                 mvvm.getSplitList().setValue(mvvm.getSplitList().getValue());
@@ -563,7 +566,7 @@ public class ChargeActivity extends BaseActivity {
             });
         }
 
-        if (binding.layout.flCashSplitItem!=null){
+        if (binding.layout.flCashSplitItem != null) {
             binding.layout.flCashSplitItem.setOnClickListener(v -> {
                 mvvm.itemForPaid.setPaid(true);
                 mvvm.itemForPaid.setEdited(true);
@@ -573,8 +576,9 @@ public class ChargeActivity extends BaseActivity {
             });
         }
 
-        binding.layout.payment.newSale.setOnClickListener(v -> mvvm.addTicket(this));
+        binding.layout.payment.newSale.setOnClickListener(v -> mvvm.addTicket(this,false));
 
+        binding.layout.ticketSplit.done.setOnClickListener(v -> mvvm.addTicket(this,true));
     }
 
     private void updateEnableIcons(boolean enable) {
@@ -599,8 +603,8 @@ public class ChargeActivity extends BaseActivity {
 
     }
 
-    public void updatePriceChange(ChargeModel model ,int pos) {
-        if (!model.isPaid()){
+    public void updatePriceChange(ChargeModel model, int pos) {
+        if (!model.isPaid()) {
             mvvm.splitPos = pos;
             mvvm.getSplitPrice().setValue(model.getPrice());
             mvvm.getIsDialogPriceOpened().setValue(true);
@@ -616,11 +620,11 @@ public class ChargeActivity extends BaseActivity {
             mvvm.getIsOpenedCustomerDialog().setValue(false);
             invalidateOptionsMenu();
 
-            if (customerModel.isAddedToCart()){
+            if (customerModel.isAddedToCart()) {
                 if (binding.layout.toolbarLandAddUser != null) {
                     binding.layout.toolbarLandAddUser.setImageResource(R.drawable.ic_checked_user);
                 }
-            }else {
+            } else {
                 if (binding.layout.toolbarLandAddUser != null) {
                     binding.layout.toolbarLandAddUser.setImageResource(R.drawable.ic_add_user);
                 }
@@ -635,18 +639,23 @@ public class ChargeActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (binding.layout.dialogCustomer != null && binding.layout.addCustomerDialog != null) {
+
             if (binding.layout.dialogCustomer.getVisibility() == View.VISIBLE) {
+
                 if (binding.layout.addCustomerDialog.flAddCustomerLayout.getVisibility() == View.VISIBLE) {
                     binding.layout.addCustomerDialog.flAddCustomerLayout.setVisibility(View.GONE);
                     mvvm.getIsAddCustomerDialogShow().setValue(false);
+
                 } else {
                     binding.layout.dialogCustomer.setVisibility(View.GONE);
                     mvvm.getIsOpenedCustomerDialog().setValue(false);
+
                 }
 
 
             } else {
-                super.onBackPressed();
+                finish();
+
                 if (getLang().equals("ar")) {
                     overridePendingTransition(R.anim.from_left, R.anim.to_right);
 
@@ -659,7 +668,7 @@ public class ChargeActivity extends BaseActivity {
             }
         } else if (binding.layout.flPayment.getVisibility() != View.VISIBLE) {
 
-            super.onBackPressed();
+            finish();
             if (getLang().equals("ar")) {
                 overridePendingTransition(R.anim.from_left, R.anim.to_right);
 
@@ -689,7 +698,7 @@ public class ChargeActivity extends BaseActivity {
     }
 
     public void chooseSplitPayment(ChargeModel chargeModel, int adapterPosition, View view) {
-        if (!chargeModel.isPaid()){
+        if (!chargeModel.isPaid()) {
             createMenu(view, chargeModel, adapterPosition);
 
         }
@@ -730,15 +739,16 @@ public class ChargeActivity extends BaseActivity {
 
     public void itemSplitPay(ChargeModel chargeModel) {
         mvvm.itemForPaid = chargeModel;
-        if (chargeModel.getPaymentModel().getType().equalsIgnoreCase("cash")){
+        if (chargeModel.getPaymentModel().getType().equalsIgnoreCase("cash")) {
             mvvm.getItemSplitPrice().setValue(chargeModel.getPrice());
-            binding.layout.edtCashSplitItem.setText(chargeModel.getPrice().replace(",",""));
+            binding.layout.edtCashSplitItem.setText(chargeModel.getPrice().replace(",", ""));
 
-            binding.layout.setItemDueAmount(Double.parseDouble(chargeModel.getPrice().replace(",","")));
+            binding.layout.setItemDueAmount(Double.parseDouble(chargeModel.getPrice().replace(",", "")));
             mvvm.getShowItemPaid().setValue(true);
-        }else {
+        } else {
             mvvm.itemForPaid.setPaid(true);
             mvvm.itemForPaid.setEdited(true);
+            mvvm.itemForPaid.setPaidAmount(Double.parseDouble(mvvm.itemForPaid.getPrice()));
             mvvm.getRemainingPrice();
             mvvm.getSplitList().setValue(mvvm.getSplitList().getValue());
         }
@@ -750,6 +760,7 @@ public class ChargeActivity extends BaseActivity {
         try {
             super.onRestoreInstanceState(savedInstanceState);
 
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 }

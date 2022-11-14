@@ -18,6 +18,11 @@
         <item name="android:textSize">17sp</item>
     </style>
 
+    <style name="tab_appearance" parent="android:TextAppearance.Widget.TabWidget">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 
 
 

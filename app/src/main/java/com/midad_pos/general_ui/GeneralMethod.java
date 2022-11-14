@@ -569,6 +569,28 @@ public class GeneralMethod {
 
     }
 
+    @BindingAdapter({"timeStampTicketOwner","lang"})
+    public static void timeStampTicketOwner(TextView view,OrderModel.Sale model,String lang) {
+        if (model != null&&lang!=null) {
+            String t ="";
+            String format = "";
+            if (lang.equals("ar")){
+                format ="EEE، dd MMM،yyyy";
+            }else {
+                format ="EEE, dd MMM,yyyy";
+
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, new Locale(lang));
+            t = simpleDateFormat.format(new Date(Long.parseLong(model.getDate())))+", "+model.getUser().getName();
+
+
+            view.setText(t);
+
+
+        }
+
+    }
+
     @BindingAdapter({"timeStampTime","lang"})
     public static void timeStampTime(TextView view,String date,String lang) {
         if (date != null&&lang!=null) {
@@ -605,11 +627,14 @@ public class GeneralMethod {
             StringBuilder text = new StringBuilder();
             for (OrderModel.SaleModifierData data:detail.getSale_modifiers()){
                 for (OrderModel.SaleModifier modifier: data.getSale_modifier_data()){
-                    text.append("+").append(modifier.getModifier_data().getTitle()).append("(").append(String.format(Locale.US,"%.2f",Double.parseDouble(modifier.getModifier_data().getCost()))).append(")\n");
+                    text.append("+ ").append(modifier.getModifier_data().getTitle()).append("(").append(String.format(Locale.US,"%.2f",Double.parseDouble(modifier.getModifier_data().getCost()))).append(")\n");
                 }
             }
-
-            view.setText(text);
+            String data = text.toString();
+            if (text.lastIndexOf("\n")!=-1&&text.lastIndexOf("\n")==(text.length()-1)){
+                data = text.substring(0,text.length()-1);
+            }
+            view.setText(data);
         }
 
     }
@@ -619,6 +644,16 @@ public class GeneralMethod {
         if (detail!=null){
             String price = String.format(Locale.US,"%.2f",Double.parseDouble(detail.getNet_unit_price()));
             String amount = detail.getQty()+" X "+price;
+            view.setText(amount);
+        }
+
+    }
+
+    @BindingAdapter("discount")
+    public static void discount(TextView view,OrderModel.OrderDiscount model) {
+        if (model!=null){
+            String price = String.format(Locale.US,"%.2f",Double.parseDouble(model.getGrand_total()));
+            String amount =price+"-";
             view.setText(amount);
         }
 
