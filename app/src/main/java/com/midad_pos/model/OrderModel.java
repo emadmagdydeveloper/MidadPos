@@ -26,6 +26,7 @@ public class OrderModel implements Serializable {
     public static class Sale implements Serializable {
         private String id;
         private String user_id;
+        private String name;
         private String warehouse_id;
         private String biller_id;
         private String customer_id;
@@ -55,6 +56,7 @@ public class OrderModel implements Serializable {
         private User user;
         private WereHouse warehouse;
         private POSModel pos;
+        private CustomerModel customer;
         private List<Detail> details;
         private List<Payment> payments;
         private List<OrderDiscount> discounts;
@@ -76,6 +78,10 @@ public class OrderModel implements Serializable {
 
         public String getBiller_id() {
             return biller_id;
+        }
+
+        public String getName() {
+            return name;
         }
 
         public String getCustomer_id() {
@@ -221,7 +227,12 @@ public class OrderModel implements Serializable {
         public void setSelected(boolean selected) {
             isSelected = selected;
         }
+
+        public CustomerModel getCustomer() {
+            return customer;
+        }
     }
+
 
 
     public static class Detail implements Serializable {
@@ -247,7 +258,7 @@ public class OrderModel implements Serializable {
         private List<SaleModifierData> sale_modifiers;
         private List<OrderDiscount> discounts;
         private VariantModel variant;
-        private Product product;
+        private ItemModel product;
 
         public String getId() {
             return id;
@@ -333,7 +344,7 @@ public class OrderModel implements Serializable {
             return discounts;
         }
 
-        public Product getProduct() {
+        public ItemModel getProduct() {
             return product;
         }
 
@@ -342,286 +353,6 @@ public class OrderModel implements Serializable {
         }
     }
 
-    public static class Product implements Serializable {
-        private String id;
-        private String user_id;
-        private String name;
-        private String code;
-        private String type;
-        private String barcode_symbology;
-        private String brand_id;
-        private String category_id;
-        private String unit_id;
-        private String purchase_unit_id;
-        private String sale_unit_id;
-        private String cost;
-        private String price;
-        private String qty;
-        private String alert_quantity;
-        private String daily_sale_objective;
-        private String promotion;
-        private String promotion_price;
-        private String starting_date;
-        private String last_date;
-        private String tax_id;
-        private String tax_method;
-        private String image_type;
-        private String image;
-        private String shape;
-        private String color;
-        private String file;
-        private String is_embeded;
-        private String is_variant;
-        private String is_modifier;
-        private String is_batch;
-        private String is_diffPrice;
-        private String is_imei;
-        private String featured;
-        private String product_list;
-        private String variant_list;
-        private String qty_list;
-        private String price_list;
-        private String product_details;
-        private String variant_option;
-        private String variant_value;
-        private String is_active;
-        private String created_at;
-        private String updated_at;
-        private List<OrderModifier> modifiers;
-
-        public String getId() {
-            return id;
-        }
-
-        public String getUser_id() {
-            return user_id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getBarcode_symbology() {
-            return barcode_symbology;
-        }
-
-        public String getBrand_id() {
-            return brand_id;
-        }
-
-        public String getCategory_id() {
-            return category_id;
-        }
-
-        public String getUnit_id() {
-            return unit_id;
-        }
-
-        public String getPurchase_unit_id() {
-            return purchase_unit_id;
-        }
-
-        public String getSale_unit_id() {
-            return sale_unit_id;
-        }
-
-        public String getCost() {
-            return cost;
-        }
-
-        public String getPrice() {
-            return price;
-        }
-
-        public String getQty() {
-            return qty;
-        }
-
-        public String getAlert_quantity() {
-            return alert_quantity;
-        }
-
-        public String getDaily_sale_objective() {
-            return daily_sale_objective;
-        }
-
-        public String getPromotion() {
-            return promotion;
-        }
-
-        public String getPromotion_price() {
-            return promotion_price;
-        }
-
-        public String getStarting_date() {
-            return starting_date;
-        }
-
-        public String getLast_date() {
-            return last_date;
-        }
-
-        public String getTax_id() {
-            return tax_id;
-        }
-
-        public String getTax_method() {
-            return tax_method;
-        }
-
-        public String getImage_type() {
-            return image_type;
-        }
-
-        public String getImage() {
-            return image;
-        }
-
-        public String getShape() {
-            return shape;
-        }
-
-        public String getColor() {
-            return color;
-        }
-
-        public String getFile() {
-            return file;
-        }
-
-        public String getIs_embeded() {
-            return is_embeded;
-        }
-
-        public String getIs_variant() {
-            return is_variant;
-        }
-
-        public String getIs_modifier() {
-            return is_modifier;
-        }
-
-        public String getIs_batch() {
-            return is_batch;
-        }
-
-        public String getIs_diffPrice() {
-            return is_diffPrice;
-        }
-
-        public String getIs_imei() {
-            return is_imei;
-        }
-
-        public String getFeatured() {
-            return featured;
-        }
-
-        public String getProduct_list() {
-            return product_list;
-        }
-
-        public String getVariant_list() {
-            return variant_list;
-        }
-
-        public String getQty_list() {
-            return qty_list;
-        }
-
-        public String getPrice_list() {
-            return price_list;
-        }
-
-        public String getProduct_details() {
-            return product_details;
-        }
-
-        public String getVariant_option() {
-            return variant_option;
-        }
-
-        public String getVariant_value() {
-            return variant_value;
-        }
-
-        public String getIs_active() {
-            return is_active;
-        }
-
-        public String getCreated_at() {
-            return created_at;
-        }
-
-        public String getUpdated_at() {
-            return updated_at;
-        }
-
-        public List<OrderModifier> getModifiers() {
-            return modifiers;
-        }
-    }
-
-    public static class OrderModifier implements Serializable {
-        private String id;
-        private String product_id;
-        private String sale_id;
-        private String product_sale_id;
-        private String modifier_id;
-        private String total;
-        private String created_at;
-        private String updated_at;
-        private Modifier modifier;
-        private List<SaleModifier> sale_modifier_data;
-
-        public String getId() {
-            return id;
-        }
-
-        public String getProduct_id() {
-            return product_id;
-        }
-
-        public String getSale_id() {
-            return sale_id;
-        }
-
-        public String getProduct_sale_id() {
-            return product_sale_id;
-        }
-
-        public String getModifier_id() {
-            return modifier_id;
-        }
-
-        public String getTotal() {
-            return total;
-        }
-
-        public String getCreated_at() {
-            return created_at;
-        }
-
-        public String getUpdated_at() {
-            return updated_at;
-        }
-
-        public Modifier getModifier() {
-            return modifier;
-        }
-
-        public List<SaleModifier> getSale_modifier_data() {
-            return sale_modifier_data;
-        }
-    }
 
     public static class Modifier implements Serializable {
         private String id;
@@ -656,48 +387,6 @@ public class OrderModel implements Serializable {
         }
     }
 
-    public static class ModifierData implements Serializable {
-        private String id;
-        private String user_id;
-        private String modifier_id;
-        private String title;
-        private String sort;
-        private String cost;
-        private String created_at;
-        private String updated_at;
-
-        public String getId() {
-            return id;
-        }
-
-        public String getUser_id() {
-            return user_id;
-        }
-
-        public String getModifier_id() {
-            return modifier_id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getSort() {
-            return sort;
-        }
-
-        public String getCost() {
-            return cost;
-        }
-
-        public String getCreated_at() {
-            return created_at;
-        }
-
-        public String getUpdated_at() {
-            return updated_at;
-        }
-    }
 
     public static class SaleModifier implements Serializable {
         private String id;
@@ -712,7 +401,7 @@ public class OrderModel implements Serializable {
         private String total_cost;
         private String created_at;
         private String updated_at;
-        private ModifierData modifier_data;
+        private ModifierModel.Data modifier_data;
 
         public String getId() {
             return id;
@@ -762,7 +451,7 @@ public class OrderModel implements Serializable {
             return updated_at;
         }
 
-        public ModifierData getModifier_data() {
+        public ModifierModel.Data getModifier_data() {
             return modifier_data;
         }
     }

@@ -59,6 +59,7 @@ public class CartModel implements Serializable {
     }
 
     public static class Cart implements Serializable{
+        private String name;
         private String cash_register_id;
         private String date;
         private double total_price;
@@ -74,7 +75,8 @@ public class CartModel implements Serializable {
         private List<Discount> discounts;
         private List<Detail> details;
 
-        public Cart(String cash_register_id, String date, double total_price, double order_tax, double order_discount, double grand_total, String dining_id, String pos_id,String sale_id, String sale_status, String draft, List<Payment> payments, List<Discount> discounts, List<Detail> details) {
+        public Cart(String name,String cash_register_id, String date, double total_price, double order_tax, double order_discount, double grand_total, String dining_id, String pos_id,String sale_id, String sale_status, String draft, List<Payment> payments, List<Discount> discounts, List<Detail> details) {
+            this.name = name;
             this.cash_register_id = cash_register_id;
             this.date = date;
             this.total_price = total_price;
@@ -89,6 +91,14 @@ public class CartModel implements Serializable {
             this.payments = payments;
             this.discounts = discounts;
             this.details = details;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
 
         public String getCash_register_id() {

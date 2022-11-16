@@ -13,6 +13,7 @@ import com.midad_pos.R;
 import com.midad_pos.databinding.MyTicketRowBinding;
 import com.midad_pos.databinding.OrderDiscountRowBinding;
 import com.midad_pos.model.OrderModel;
+import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.utils.DiffUtilsOpenedTickets;
 import com.midad_pos.utils.DiffUtilsOrderDiscount;
 
@@ -20,11 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OpenedTicketsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<OrderModel.Sale> list;
+    private List<OrderModel.Sale> list = new ArrayList<>();
     private Context context;
+    private String lang;
 
-    public OpenedTicketsAdapter(Context context) {
+    public OpenedTicketsAdapter(Context context,String lang) {
         this.context = context;
+        this.lang = lang;
     }
 
     @NonNull
@@ -37,7 +40,12 @@ public class OpenedTicketsAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Holder myHolder = (Holder) holder;
+        myHolder.binding.setLang(lang);
         myHolder.binding.setModel(list.get(position));
+        myHolder.itemView.setOnClickListener(v -> {
+            HomeActivity activity = (HomeActivity) context;
+            activity.addOpenTicketToCart(list.get(myHolder.getAdapterPosition()));
+        });
 
 
     }

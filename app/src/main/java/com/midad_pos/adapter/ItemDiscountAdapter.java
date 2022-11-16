@@ -1,6 +1,7 @@
 package com.midad_pos.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -16,6 +17,7 @@ import com.midad_pos.model.TaxModel;
 import com.midad_pos.uis.activity_add_item.AddItemActivity;
 import com.midad_pos.uis.activity_home.HomeActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemDiscountAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -72,6 +74,10 @@ public class ItemDiscountAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void updateList(List<DiscountModel> list) {
+        if (this.list!=null){
+            this.list.clear();
+        }
+
         this.list = list;
         notifyDataSetChanged();
     }

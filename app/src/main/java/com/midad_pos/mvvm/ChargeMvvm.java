@@ -996,7 +996,7 @@ public class ChargeMvvm extends AndroidViewModel {
                 draft = "1";
             }
 
-            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
+            CartModel.Cart cart = new CartModel.Cart(getTicketName(),settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
 
             List<CartModel.Cart> carts = new ArrayList<>();
             carts.add(cart);
@@ -1059,6 +1059,11 @@ public class ChargeMvvm extends AndroidViewModel {
 
     private String getDate() {
        return String.valueOf(new Date().getTime());
+    }
+
+    private String getTicketName() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm aa",Locale.ENGLISH);
+        return "Ticket - "+simpleDateFormat.format(new Date());
     }
 
 }

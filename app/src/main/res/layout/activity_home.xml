@@ -275,7 +275,8 @@
                             android:background="@color/transparent"
                             android:gravity="center"
                             android:text="@string/save"
-                            android:textColor="@color/white"
+                            android:enabled="false"
+                            android:textColor="@drawable/disable_text_color"
                             android:textSize="16sp" />
 
                         <View

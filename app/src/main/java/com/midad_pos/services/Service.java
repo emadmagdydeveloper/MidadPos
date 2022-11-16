@@ -202,4 +202,8 @@ public interface Service {
     Single<Response<OrderDataModel>> getOrders(@Query("user_id") String user_id
     );
 
+    @GET("api/orders/draftOrders")
+    Single<Response<OrderDataModel>> getDraftOrders(@Query("user_id") String user_id
+    );
+
 }

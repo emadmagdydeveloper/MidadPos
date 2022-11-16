@@ -18,9 +18,12 @@ import com.midad_pos.model.CustomerModel;
 import com.midad_pos.model.DeliveryDataModel;
 import com.midad_pos.model.DeliveryModel;
 import com.midad_pos.model.ModifierModel;
+import com.midad_pos.model.OrderDataModel;
+import com.midad_pos.model.OrderModel;
 import com.midad_pos.model.ShiftDataModel;
 import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.StatusResponse;
+import com.midad_pos.model.VariantModel;
 import com.midad_pos.model.cart.CartList;
 import com.midad_pos.model.cart.CartModel;
 import com.midad_pos.model.cart.ManageCartModel;
@@ -45,13 +48,19 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -107,6 +116,8 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isOpenedTicketSearchOpened;
     private MutableLiveData<String> queryMyOpenedTickets;
     private MutableLiveData<Boolean> isLoadingOpenedTickets;
+    private MutableLiveData<List<OrderModel.Sale>> mainOrders;
+    private MutableLiveData<List<OrderModel.Sale>> orders;
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -115,6 +126,7 @@ public class HomeMvvm extends AndroidViewModel {
     public boolean isItemForUpdate = false;
     private MutableLiveData<List<DiscountModel>> cartDiscounts;
     private List<DiscountModel> deletedCartDiscounts = new ArrayList<>();
+
     ///////////////////////////////////////////////////////////////////////////
     private MutableLiveData<AppSettingModel> appSettingModel;
 
@@ -133,7 +145,7 @@ public class HomeMvvm extends AndroidViewModel {
     }
 
     public void loadHomeData() {
-        disposable.clear();
+
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
 
         if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null && userModel.getData().getSelectedWereHouse() != null && userModel.getData().getSelectedPos() != null) {
@@ -156,11 +168,19 @@ public class HomeMvvm extends AndroidViewModel {
             getDining();
         }
 
-        getItemsData();
-        getDiscountsData();
-        getCustomers();
-        getCartData();
+        if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null) {
+            getDraftTickets();
+        }
 
+        getItemsData();
+
+        if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null) {
+            getCustomers();
+        }
+
+
+        getDiscountsData();
+        getCartData();
 
     }
 
@@ -343,7 +363,6 @@ public class HomeMvvm extends AndroidViewModel {
         return isDialogOpenedTicketsOpened;
     }
 
-
     public MutableLiveData<Integer> getItemForPricePos() {
         if (itemForPricePos == null) {
             itemForPricePos = new MutableLiveData<>();
@@ -450,6 +469,24 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return isLoadingOpenedTickets;
     }
+
+    public MutableLiveData<List<OrderModel.Sale>> getMainOrders() {
+        if (mainOrders == null) {
+            mainOrders = new MutableLiveData<>();
+            mainOrders.setValue(new ArrayList<>());
+        }
+
+        return mainOrders;
+    }
+
+    public MutableLiveData<List<OrderModel.Sale>> getOrders() {
+        if (orders == null) {
+            orders = new MutableLiveData<>();
+        }
+
+        return orders;
+    }
+
 
     public void getCurrentShift() {
         Api.getService(Tags.base_url)
@@ -883,8 +920,193 @@ public class HomeMvvm extends AndroidViewModel {
 
     }
 
-    public void searchMyTicket() {
+    public void getDraftTickets() {
+        getIsLoadingOpenedTickets().setValue(true);
+        UserModel userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
+        Api.getService(Tags.base_url)
+                .getDraftOrders(userModel.getData().getSelectedUser().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
 
+                .subscribe(new SingleObserver<Response<OrderDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<OrderDataModel> response) {
+                        getIsLoadingOpenedTickets().setValue(false);
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    updateData(response.body().getData());
+                                }
+                            }
+                        } else {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
+
+                            try {
+                                if (response.errorBody() != null) {
+                                    Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        getIsLoadingOpenedTickets().setValue(false);
+                        Log.e("error", e.getMessage() + "");
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.check_network, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
+
+    }
+
+    private void updateData(List<OrderModel> data) {
+        List<OrderModel.Sale> sales = new ArrayList<>();
+        for (OrderModel model : data) {
+            List<OrderModel.Sale> list = new ArrayList<>();
+            for (OrderModel.Sale sale : model.getSales()) {
+                sale.setOrder_date(model.getDate());
+                list.add(sale);
+            }
+
+
+            sales.addAll(list);
+        }
+        getMainOrders().setValue(sales);
+        searchMyTicket();
+    }
+
+    public void searchMyTicket() {
+        String query = getQueryMyOpenedTickets().getValue();
+        if (query == null) {
+            List<OrderModel.Sale> list = new ArrayList<>();
+            if (getMainOrders().getValue() != null) {
+                list.addAll(getMainOrders().getValue());
+                if (getTicketSortPos().getValue() != null) {
+                    int pos = getTicketSortPos().getValue();
+                    Collections.sort(list, (o2, o1) -> {
+                        if (pos == 1) {
+                            if (Double.parseDouble(o1.getGrand_total()) > Double.parseDouble(o2.getGrand_total())) {
+                                return 1;
+                            } else if (Double.parseDouble(o1.getGrand_total()) < Double.parseDouble(o2.getGrand_total())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 2) {
+                            if (Long.parseLong(o1.getDate()) > Long.parseLong(o2.getDate())) {
+                                return 1;
+                            } else if (Long.parseLong(o1.getDate()) < Long.parseLong(o2.getDate())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 3) {
+                            return o1.getUser().getName().compareToIgnoreCase(o2.getUser().getName());
+
+                        } else {
+                            return o1.getName().compareToIgnoreCase(o2.getName());
+
+                        }
+                    });
+                } else {
+                    getOrders().setValue(list);
+
+                }
+            } else {
+                getOrders().setValue(list);
+            }
+        } else if (query.isEmpty()) {
+
+            List<OrderModel.Sale> list = new ArrayList<>();
+            if (getMainOrders().getValue() != null) {
+                list.addAll(getMainOrders().getValue());
+                if (getTicketSortPos().getValue() != null) {
+                    int pos = getTicketSortPos().getValue();
+                    Collections.sort(list, (o2, o1) -> {
+                        if (pos == 1) {
+                            if (Double.parseDouble(o1.getGrand_total()) > Double.parseDouble(o2.getGrand_total())) {
+                                return 1;
+                            } else if (Double.parseDouble(o1.getGrand_total()) < Double.parseDouble(o2.getGrand_total())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 2) {
+                            if (Long.parseLong(o1.getDate()) > Long.parseLong(o2.getDate())) {
+                                return 1;
+                            } else if (Long.parseLong(o1.getDate()) < Long.parseLong(o2.getDate())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 3) {
+                            return o1.getUser().getName().compareToIgnoreCase(o2.getUser().getName());
+
+                        } else {
+                            return o1.getName().compareToIgnoreCase(o2.getName());
+
+                        }
+                    });
+
+                }
+            }
+
+            getOrders().setValue(list);
+        } else {
+
+            List<OrderModel.Sale> list = new ArrayList<>();
+            if (getMainOrders().getValue() != null) {
+                for (OrderModel.Sale sale : getMainOrders().getValue()) {
+                    if (sale.getName() != null && !sale.getName().isEmpty() && sale.getName().toLowerCase().startsWith(query.toLowerCase())) {
+                        list.add(sale);
+                    }
+                }
+                if (getTicketSortPos().getValue() != null) {
+                    int pos = getTicketSortPos().getValue();
+                    Collections.sort(list, (o2, o1) -> {
+                        if (pos == 1) {
+                            if (Double.parseDouble(o1.getGrand_total()) > Double.parseDouble(o2.getGrand_total())) {
+                                return 1;
+                            } else if (Double.parseDouble(o1.getGrand_total()) < Double.parseDouble(o2.getGrand_total())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 2) {
+                            if (Long.parseLong(o1.getDate()) > Long.parseLong(o2.getDate())) {
+                                return 1;
+                            } else if (Long.parseLong(o1.getDate()) < Long.parseLong(o2.getDate())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 3) {
+                            return o1.getUser().getName().compareToIgnoreCase(o2.getUser().getName());
+
+                        } else {
+                            return o1.getName().compareToIgnoreCase(o2.getName());
+
+                        }
+                    });
+
+                }
+            }
+            getOrders().setValue(list);
+        }
     }
 
     public void getItemsData() {
@@ -1158,6 +1380,7 @@ public class HomeMvvm extends AndroidViewModel {
 
     public void clearCart() {
         manageCartModel.clearCart(getApplication().getApplicationContext());
+        itemForPrice = null;
         getCart().setValue(new CartList());
     }
 
@@ -1315,9 +1538,11 @@ public class HomeMvvm extends AndroidViewModel {
 
             String sale_status = "";
             String draft = "";
+            String name = "";
             if (cartList.getSale_id() == null) {
                 sale_status = "3";
                 draft = "0";
+
             } else {
                 sale_status = "3";
                 draft = "1";
@@ -1329,7 +1554,7 @@ public class HomeMvvm extends AndroidViewModel {
             }
             cartList.setDelivery_id(dining_id);
 
-            CartModel.Cart cart = new CartModel.Cart(settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), dining_id, userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
+            CartModel.Cart cart = new CartModel.Cart(getTicketName(), settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), dining_id, userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
             List<CartModel.Cart> carts = new ArrayList<>();
             carts.add(cart);
             CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), customer_id, userModel.getData().getSelectedPos().getId(), carts);
@@ -1350,10 +1575,10 @@ public class HomeMvvm extends AndroidViewModel {
                             dialog.dismiss();
                             if (response.isSuccessful()) {
                                 if (response.body() != null) {
-
-                                    Log.e(TAG, response.body().getStatus() + "");
+                                    Log.e(TAG, response.body().getStatus() + "" + response.body().getMessage().toString());
 
                                     if (response.body().getStatus() == 200) {
+                                        getDraftTickets();
                                         clearCart();
                                     }
 
@@ -1392,6 +1617,142 @@ public class HomeMvvm extends AndroidViewModel {
 
     }
 
+    private String getTicketName() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
+        return "Ticket - " + simpleDateFormat.format(new Date());
+    }
+
+    public void addFromDraftToCart(OrderModel.Sale sale) {
+        CartList cartListModel = manageCartModel.getCartModel(getApplication().getApplicationContext());
+
+        Observable.just(cartListModel)
+                .map(cartList -> {
+                    cartList.setSale_id(sale.getId());
+                    List<DiscountModel> discounts = new ArrayList<>();
+                    List<ItemModel> items = new ArrayList<>();
+
+                    for (OrderModel.OrderDiscount orderDiscount : sale.getDiscounts()) {
+
+                        discounts.add(orderDiscount.getDiscount());
+                    }
+                    cartList.setDiscounts(discounts);
+                    for (OrderModel.Detail detail : sale.getDetails()) {
+                        ItemModel itemModel = detail.getProduct();
+                        itemModel.setComment(detail.getComment());
+                        VariantModel variant = detail.getVariant();
+
+                        List<VariantModel> variantModelList = new ArrayList<>();
+                        for (VariantModel variantModel : detail.getProduct().getVariants()) {
+                            variantModel.setCode(variantModel.getPivot().getItem_code());
+                            variantModel.setPrice(variantModel.getPivot().getAdditional_price());
+                            if (variant != null && variantModel.getId().equals(variant.getId())) {
+                                variantModel.setSelected(true);
+                            } else {
+                                variantModel.setSelected(false);
+                            }
+                            variantModelList.add(variantModel);
+                        }
+                        itemModel.setVariants(variantModelList);
+
+                        if (variant != null) {
+                            variant.setPrice(detail.getNet_unit_price());
+
+                        }
+                        itemModel.setSelectedVariant(variant);
+
+
+                        List<DiscountModel> discs = new ArrayList<>();
+                        for (OrderModel.OrderDiscount discount : detail.getDiscounts()) {
+                            discs.add(discount.getDiscount());
+                        }
+
+
+                        List<ModifierModel.Data> selectedModifiers = new ArrayList<>();
+                        for (OrderModel.SaleModifierData mod : detail.getSale_modifiers()) {
+                            for (OrderModel.SaleModifier saleModifier : mod.getSale_modifier_data()) {
+                                ModifierModel.Data modifier_data = saleModifier.getModifier_data();
+                                modifier_data.setSelected(true);
+                                selectedModifiers.add(modifier_data);
+                            }
+                        }
+
+
+                        if (itemModel.getPrice().equals("0")) {
+                            itemModel.setPrice(detail.getNet_unit_price());
+                        }
+                        itemModel.setSelectedModifiers(selectedModifiers);
+
+                        List<ModifierModel> modifiers = new ArrayList<>();
+                        for (ModifierModel model : detail.getProduct().getModifiers()) {
+
+                            for (ModifierModel.Data data : model.getModifiers_data()) {
+                                if (isModifierExist(data, selectedModifiers)) {
+
+                                    data.setSelected(true);
+                                } else {
+                                    data.setSelected(false);
+                                }
+
+                            }
+                            modifiers.add(model);
+
+                        }
+
+
+                        itemModel.setModifiers(modifiers);
+                        itemModel.setDiscounts(discs);
+                        itemModel.setAmount(Integer.parseInt(detail.getQty()));
+
+                        items.add(detail.getProduct());
+                    }
+                    cartList.setItems(items);
+
+                    cartList.setCustomerModel(sale.getCustomer());
+                    manageCartModel.assignCustomerToCart(sale.getCustomer(), getApplication().getApplicationContext());
+                    if (sale.getDining() != null) {
+                        manageCartModel.addDeliveryToCart(sale.getDining().getId(), sale.getDining().getName(), getApplication().getApplicationContext());
+
+
+                    }
+
+
+                    return cartList;
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<CartList>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(CartList cartList) {
+                        manageCartModel.updateCartModel(getApplication().getApplicationContext(), cartList);
+                        getCart().setValue(cartList);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+    }
+
+    private boolean isModifierExist(ModifierModel.Data data, List<ModifierModel.Data> selectedModifiers) {
+        for (ModifierModel.Data modifierModel : selectedModifiers) {
+            if (modifierModel.getId().equals(data.getId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     @Override
     protected void onCleared() {

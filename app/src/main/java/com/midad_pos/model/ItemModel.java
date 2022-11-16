@@ -204,8 +204,8 @@ public class ItemModel implements Serializable {
 
     public void calculateTotal() {
         double price = Double.parseDouble(getPrice());
-        if (selectedVariant!=null){
-            price = Double.parseDouble(selectedVariant.getPrice());
+        if (getSelectedVariant()!=null){
+            price = Double.parseDouble(getSelectedVariant().getPrice());
         }
         double totalPrice =  price* amount;
         double totalModifiers = 0.0;
@@ -299,5 +299,13 @@ public class ItemModel implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public void setDiscounts(List<DiscountModel> discounts) {
+        this.discounts = discounts;
+    }
+
+    public void setVariants(List<VariantModel> variants) {
+        this.variants = variants;
     }
 }

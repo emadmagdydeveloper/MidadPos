@@ -92,9 +92,12 @@ public class CartList implements Serializable {
             } else {
 
                 ItemModel itemModel = getItems().get(itemIndex);
-                if (model.getSelectedVariant() != null) {
-                    if (model.getSelectedModifiers().size() > 0) {
-                        if (itemModel.getSelectedModifiers().size() > 0) {
+                if (model.getSelectedVariant() != null)
+                {
+                    if (model.getSelectedModifiers().size() > 0)
+                    {
+                        if (itemModel.getSelectedModifiers().size() > 0)
+                        {
                             if (model.getSelectedModifiers().size() == itemModel.getSelectedModifiers().size()) {
                                 for (int index = 0; index < model.getSelectedModifiers().size(); index++) {
                                     ModifierModel.Data modifierModel = model.getSelectedModifiers().get(index);
@@ -121,10 +124,19 @@ public class CartList implements Serializable {
 
 
                             } else {
-                                getItems().add(model);
+                                if (isAddOrUpdate==1){
+                                    getItems().add(model);
+
+                                }else {
+                                    getItems().set(itemIndex, model);
+
+
+                                }
                             }
-                        } else {
-                            if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())) {
+                        }
+                        else {
+                            if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId()))
+                            {
 
                                 int amount;
                                 if (isAddOrUpdate==1){
@@ -143,14 +155,26 @@ public class CartList implements Serializable {
 
 
 
-                            } else {
-                                getItems().add(model);
+                            }
+                            else {
+                                if (isAddOrUpdate==1){
+                                    getItems().add(model);
+
+                                }else {
+                                    getItems().set(itemIndex, model);
+
+
+                                }
                             }
                         }
-                    } else {
+                    }
+                    else {
+
+
                         if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())) {
                             int amount;
                             if (isAddOrUpdate==1){
+
                                 amount = itemModel.getAmount();
                                 int newAmount = amount + model.getAmount();
                                 model.setAmount(newAmount);
@@ -164,13 +188,22 @@ public class CartList implements Serializable {
                             }
                             getItems().set(itemIndex, model);
                         } else {
-                            getItems().add(model);
+                            if (isAddOrUpdate==1){
+                                getItems().add(model);
+
+                            }else {
+                                getItems().set(itemIndex, model);
+
+
+                            }
                         }
                     }
                 } else {
 
-                    if (model.getSelectedModifiers().size() > 0) {
-                        if (itemModel.getSelectedModifiers().size() > 0) {
+                    if (model.getSelectedModifiers().size() > 0)
+                    {
+                        if (itemModel.getSelectedModifiers().size() > 0)
+                        {
                             if (model.getSelectedModifiers().size() == itemModel.getSelectedModifiers().size()) {
                                 for (int index = 0; index < model.getSelectedModifiers().size(); index++) {
                                     ModifierModel.Data modifierModel = model.getSelectedModifiers().get(index);
@@ -184,37 +217,56 @@ public class CartList implements Serializable {
                                     amount = itemModel.getAmount();
                                     int newAmount = amount + model.getAmount();
                                     model.setAmount(newAmount);
-                                    double netTotal = newAmount * Double.parseDouble(model.getSelectedVariant().getPrice());
+
+                                    double netTotal = newAmount * Double.parseDouble(model.getPrice());
                                     model.setNetTotal(netTotal);
                                 }else {
                                     amount = model.getAmount();
                                     model.setAmount(amount);
-                                    double netTotal = amount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    double netTotal = amount * Double.parseDouble(model.getPrice());
                                     model.setNetTotal(netTotal);
                                 }
                                 getItems().set(itemIndex, model);
 
-                            } else {
-                                getItems().add(model);
                             }
-                        } else {
-                            if (model.getSelectedVariant().getId().equals(itemModel.getSelectedVariant().getId())) {
+                            else {
+                                if(isAddOrUpdate==1){
+                                    getItems().add(model);
+
+                                }else {
+                                    getItems().set(itemIndex, model);
+
+                                }
+                            }
+                        }
+                        else {
+                            if (itemModel.getId().equals(model.getId())) {
                                 int amount;
                                 if (isAddOrUpdate==1){
                                     amount = itemModel.getAmount();
-                                    int newAmount = amount + model.getAmount();
-                                    model.setAmount(newAmount);
-                                    double netTotal = newAmount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    amount++;
+                                    model.setAmount(amount);
+                                    double netTotal = amount * Double.parseDouble(model.getPrice());
                                     model.setNetTotal(netTotal);
                                 }else {
                                     amount = model.getAmount();
                                     model.setAmount(amount);
-                                    double netTotal = amount * Double.parseDouble(model.getSelectedVariant().getPrice());
+                                    double netTotal = amount * Double.parseDouble(model.getPrice());
                                     model.setNetTotal(netTotal);
                                 }
                                 getItems().set(itemIndex, model);
+
+
                             } else {
-                                getItems().add(model);
+                                if(isAddOrUpdate==1){
+                                    getItems().add(model);
+
+                                }else {
+                                    getItems().set(itemIndex, model);
+
+                                }
+                                // getItems().add(model);
+
                             }
                         }
                     } else {
@@ -237,7 +289,14 @@ public class CartList implements Serializable {
 
 
                         } else {
-                            getItems().add(model);
+                            if(isAddOrUpdate==1){
+                                getItems().add(model);
+
+                            }else {
+                                getItems().set(itemIndex, model);
+
+                            }
+                           // getItems().add(model);
 
                         }
                     }
@@ -282,11 +341,20 @@ public class CartList implements Serializable {
         return total;
     }
 
+
     public double getTotalPrice() {
         double total = 0.0;
         double price = 0.0;
 
-        for (ItemModel itemModel : getItems()) {
+        double netItemPrice = getNetTotalPrice();
+        double totalItemsDiscount = getTotalDiscountValue();
+        double totalPrice = 0.0;
+
+        totalPrice = (netItemPrice-totalItemsDiscount)+getTotalTaxPrice();
+
+
+
+      /*  for (ItemModel itemModel : getItems()) {
             double totalExtraPrice = 0.0;
             double itemTotalPrice = 0.0;
 
@@ -301,6 +369,7 @@ public class CartList implements Serializable {
             }
 
             itemTotalPrice = (price * itemModel.getAmount()) + totalExtraPrice;
+
             for (DiscountModel discountModel : itemModel.getDiscounts()) {
                 double discount = 0.0;
                 if (discountModel.getType().equals("val")) {
@@ -319,6 +388,8 @@ public class CartList implements Serializable {
                 }
             }
 
+            Log.e("totalItmPrc",itemModel.getName()+"___"+itemTotalPrice+"");
+
 
 
 
@@ -333,10 +404,11 @@ public class CartList implements Serializable {
             total += itemTotalPrice;
 
 
-        }
+        }*/
 
+        //return total;
 
-        return total;
+        return totalPrice;
     }
 
     public double getTotalPriceAfterItemDiscount() {
@@ -410,11 +482,10 @@ public class CartList implements Serializable {
 
 
 
-
         }
         for (DiscountModel discountModel:getDiscounts()){
             if (discountModel.getType().equals("val")){
-                totalDiscount +=getTotalPriceAfterItemDiscount()+Double.parseDouble(discountModel.getValue());
+                totalDiscount +=Double.parseDouble(discountModel.getValue());
             }else {
                 totalDiscount += (Double.parseDouble(discountModel.getValue())/100.0)*getTotalPriceAfterItemDiscount();
             }
@@ -422,6 +493,7 @@ public class CartList implements Serializable {
 
         return totalDiscount;
     }
+
     public double getTotalTaxPrice()
     {
         double price = 0.0;
@@ -452,6 +524,8 @@ public class CartList implements Serializable {
                 }
                 itemTotalPrice -= discount;
             }
+
+
 
             for (DiscountModel discountModel:getDiscounts()){
                 if (discountModel.getType().equals("val")){

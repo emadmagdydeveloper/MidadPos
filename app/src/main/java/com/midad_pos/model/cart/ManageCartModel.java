@@ -96,4 +96,9 @@ public class ManageCartModel implements Serializable {
 
         return Preferences.getInstance().getCart(context);
     }
+
+    public void updateCartModel(Context context,CartList cartList) {
+        Preferences.getInstance().createUpdateCart(context,cartList);
+
+    }
 }

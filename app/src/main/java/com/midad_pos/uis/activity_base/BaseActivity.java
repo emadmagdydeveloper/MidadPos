@@ -28,6 +28,10 @@ import com.midad_pos.uis.activity_home.HomeActivity;
 import java.util.Objects;
 
 import io.paperdb.Paper;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class BaseActivity extends AppCompatActivity {
@@ -170,6 +174,8 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void updatePinView(String number) {
         baseMvvm.getPinCode().setValue(number);
+
+
         if (number.isEmpty()) {
             binding.pinView.firstPinView.setText("");
 
@@ -180,34 +186,38 @@ public class BaseActivity extends AppCompatActivity {
                 pinNumber += number;
                 binding.pinView.firstPinView.setText(pinNumber);
                 if (pinNumber.length() == 4) {
-                    UserModel userModel = getUserModel();
-                    User user = getUserByPin(pinNumber);
-                    if (user==null){
-                        binding.pinView.tvEnterPinCode.setTextColor(getResources().getColor(R.color.cancel));
-                        binding.pinView.tvEnterPinCode.setText(R.string.wrong_pin_code);
-                        binding.pinView.firstPinView.setItemBackgroundResources(R.drawable.circle_wrong_pin);
-                        binding.pinView.firstPinView.setTextColor(getResources().getColor(R.color.cancel));
-                        new Handler()
-                                .postDelayed(()->{
-                                    binding.pinView.tvEnterPinCode.setTextColor(getResources().getColor(R.color.black));
-                                    binding.pinView.tvEnterPinCode.setText(R.string.enter_pin);
-                                    binding.pinView.firstPinView.setItemBackgroundResources(R.drawable.circle_pin);
-                                    binding.pinView.firstPinView.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    String finalPinNumber = pinNumber;
+                    new Handler().postDelayed(() -> {
+                        UserModel userModel = getUserModel();
+                        User user = getUserByPin(finalPinNumber);
+                        if (user==null){
+                            binding.pinView.tvEnterPinCode.setTextColor(getResources().getColor(R.color.cancel));
+                            binding.pinView.tvEnterPinCode.setText(R.string.wrong_pin_code);
+                            binding.pinView.firstPinView.setItemBackgroundResources(R.drawable.circle_wrong_pin);
+                            binding.pinView.firstPinView.setTextColor(getResources().getColor(R.color.cancel));
+                            new Handler()
+                                    .postDelayed(()->{
+                                        binding.pinView.tvEnterPinCode.setTextColor(getResources().getColor(R.color.black));
+                                        binding.pinView.tvEnterPinCode.setText(R.string.enter_pin);
+                                        binding.pinView.firstPinView.setItemBackgroundResources(R.drawable.circle_pin);
+                                        binding.pinView.firstPinView.setTextColor(getResources().getColor(R.color.colorPrimary));
 
-                                    updatePinView("");
-                                },500);
-                    }else {
-                        userModel.getData().setSelectedUser(user);
-                        setUserModel(userModel);
+                                        updatePinView("");
+                                    },500);
+                        }else {
+                            userModel.getData().setSelectedUser(user);
+                            setUserModel(userModel);
 
-                        binding.pinContainer.setVisibility(View.GONE);
-                        binding.container.setVisibility(View.VISIBLE);
-                        updatePinView("");
+                            binding.pinContainer.setVisibility(View.GONE);
+                            binding.container.setVisibility(View.VISIBLE);
+                            updatePinView("");
 
-                        baseMvvm.getOnUserRefreshed().setValue(true);
+                            baseMvvm.getOnUserRefreshed().setValue(true);
 
 
-                    }
+                        }
+
+                    },10);
 
 
                 }

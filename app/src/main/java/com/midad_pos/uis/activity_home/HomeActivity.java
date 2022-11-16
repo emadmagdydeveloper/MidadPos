@@ -61,6 +61,7 @@ import com.midad_pos.model.DeliveryModel;
 import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
+import com.midad_pos.model.OrderModel;
 import com.midad_pos.model.VariantModel;
 import com.midad_pos.model.cart.CartList;
 import com.midad_pos.model.cart.ManageCartModel;
@@ -250,7 +251,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
         binding.dialogOpenedTickets.recView.setLayoutManager(new LinearLayoutManager(this));
         binding.dialogOpenedTickets.recView.setHasFixedSize(true);
-        openedTicketsAdapter = new OpenedTicketsAdapter(this);
+        openedTicketsAdapter = new OpenedTicketsAdapter(this,getLang());
         binding.dialogOpenedTickets.recView.setAdapter(openedTicketsAdapter);
 
 
@@ -259,6 +260,25 @@ public class HomeActivity extends DrawerBaseActivity {
         });
         mvvm.getIsLoadingOpenedTickets().observe(this,isLoading->{
             binding.dialogOpenedTickets.progBar.setVisibility(isLoading?View.VISIBLE:View.GONE);
+        });
+
+        mvvm.getOrders().observe(this,list->{
+            if (openedTicketsAdapter!=null){
+                openedTicketsAdapter.updateList(list);
+            }
+
+            if (mvvm.getCart().getValue()!=null&&mvvm.getCart().getValue().getItems().size()>0){
+                binding.btnSave.setText(R.string.save);
+                binding.btnSave.setEnabled(true);
+            }else if (mvvm.getMainOrders().getValue()!=null&&mvvm.getMainOrders().getValue().size()>0){
+                binding.btnSave.setText(R.string.open_tickets);
+                binding.btnSave.setEnabled(true);
+
+            }else {
+                binding.btnSave.setText(R.string.open_tickets);
+                binding.btnSave.setEnabled(false);
+
+            }
         });
 
         binding.dialogOpenedTickets.imageSearch.setOnClickListener(v -> mvvm.getIsOpenedTicketSearchOpened().setValue(true));
@@ -437,19 +457,27 @@ public class HomeActivity extends DrawerBaseActivity {
 
         mvvm.mainItemDiscountList.observe(this, discounts -> {
             if (itemDiscountAdapter != null && discounts != null) {
+
+                for (DiscountModel d:discounts){
+                    d.setSelected(false);
+                }
                 List<DiscountModel> list = new ArrayList<>();
+
+
 
                 for (DiscountModel discountModel : discounts) {
                     if (mvvm.getItemForPrice().getValue() != null) {
-                        for (DiscountModel model : mvvm.getItemForPrice().getValue().getDiscounts()) {
-                            if (discountModel.getId().equals(model.getId())) {
+                        if (mvvm.getItemForPrice().getValue().getDiscounts().size()>0){
+                            if (isDiscountExist(discountModel)){
                                 discountModel.setSelected(true);
-                                break;
-                            } else {
+                            }else {
                                 discountModel.setSelected(false);
-
                             }
+                        }else {
+                            discountModel.setSelected(false);
+
                         }
+
                     } else {
                         discountModel.setSelected(false);
 
@@ -511,8 +539,29 @@ public class HomeActivity extends DrawerBaseActivity {
                     binding.dialogItemExtras.edtComment.setText(mvvm.getItemForPrice().getValue().getComment());
 
                 }
+
                 if (itemDiscountAdapter != null && mvvm.mainItemDiscountList.getValue() != null) {
-                    List<DiscountModel> list = new ArrayList<>(mvvm.mainItemDiscountList.getValue());
+                    List<DiscountModel> list = new ArrayList<>();
+
+                    if (mvvm.getItemForPrice().getValue()!=null){
+                        if (mvvm.mainItemDiscountList.getValue()!=null){
+                            for (DiscountModel discountModel:mvvm.mainItemDiscountList.getValue()){
+                                discountModel.setSelected(false);
+                            }
+                            for (DiscountModel discountModel:mvvm.mainItemDiscountList.getValue()){
+                                for (DiscountModel model:mvvm.getItemForPrice().getValue().getDiscounts()){
+                                    if (discountModel.getId().equals(model.getId())){
+                                        discountModel.setSelected(true);
+                                    }else {
+                                        discountModel.setSelected(false);
+                                    }
+                                }
+                                list.add(discountModel);
+                            }
+
+                        }
+                    }
+
                     itemDiscountAdapter.updateList(list);
                     if (list.size() == 0) {
                         binding.dialogItemExtras.llDiscount.setVisibility(View.GONE);
@@ -970,6 +1019,18 @@ public class HomeActivity extends DrawerBaseActivity {
             }
 
 
+            if (cartList.getItems().size()>0){
+                binding.btnSave.setText(R.string.save);
+                binding.btnSave.setEnabled(true);
+            }else if (mvvm.getMainOrders().getValue()!=null&&mvvm.getMainOrders().getValue().size()>0){
+                binding.btnSave.setText(R.string.open_tickets);
+                binding.btnSave.setEnabled(true);
+            }else {
+                binding.btnSave.setText(R.string.open_tickets);
+                binding.btnSave.setEnabled(false);
+
+            }
+
         });
 
         binding.dialogCartDiscount.recViewDiscounts.setLayoutManager(new LinearLayoutManager(this));
@@ -1115,13 +1176,29 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
         binding.btnSave.setOnClickListener(v -> {
-            mvvm.getIsDialogOpenedTicketsOpened().setValue(true);
-            //mvvm.saveTicket(this);
+            if (mvvm.getCart().getValue()!=null&&mvvm.getCart().getValue().getItems().size()>0){
+                mvvm.saveTicket(this);
+            }else if (mvvm.getMainOrders().getValue()!=null&&mvvm.getMainOrders().getValue().size()>0){
+                mvvm.getIsDialogOpenedTicketsOpened().setValue(true);
+
+            }
+
         });
 
 
     }
 
+    private boolean isDiscountExist(DiscountModel model){
+        if (mvvm.getItemForPrice().getValue()!=null){
+            for (DiscountModel discountModel:mvvm.getItemForPrice().getValue().getDiscounts()){
+                if (discountModel.getId().equals(model.getId())){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     private void updateShiftData(AppSettingModel appSetting) {
 
         if (getAppSetting().getIsShiftOpen() == 0) {
@@ -1644,18 +1721,23 @@ public class HomeActivity extends DrawerBaseActivity {
         }
 
         ItemModel itemModel = new ItemModel(model.getId(), model.getType(), model.getName(), model.getImage(), model.getImage_type(), model.getColor(), model.getShape(), model.getPrice(), model.getCost(), model.getCode(), model.getBarcode_symbology(), model.getBrand_id(), model.getBrand(), model.getCategory_id(), model.getCategory(), model.isIs_variant(), model.getQty(), variants, modifierList, model.getTax(), model.isSelected(), 0.0, null, new ArrayList<>(), 1, new ArrayList<>());
+
+
         if (variants.size() > 0) {
             itemModel.setSelectedVariant(variants.get(0));
         }
 
-        if (itemModel.getVariants().size() > 0) {
+        if (itemModel.getVariants().size() > 0)
+        {
             itemModel.calculateTotal();
             mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
             mvvm.getItemForPrice().setValue(itemModel);
             mvvm.getItemForPricePos().setValue(adapterPosition);
             mvvm.getIsDialogExtrasOpened().setValue(true);
 
-        } else if (itemModel.getModifiers().size() > 0) {
+        }
+        else if (itemModel.getModifiers().size() > 0)
+        {
             if (itemModel.getPrice().isEmpty() || itemModel.getPrice().equals("0") || itemModel.getPrice().equals("0.00")) {
                 itemModel.calculateTotal();
                 mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
@@ -1672,14 +1754,17 @@ public class HomeActivity extends DrawerBaseActivity {
                 mvvm.getIsDialogExtrasOpened().setValue(true);
 
             }
-        } else if (itemModel.getPrice().isEmpty() || itemModel.getPrice().equals("0") || itemModel.getPrice().equals("0.00")) {
+        }
+        else if (itemModel.getPrice().isEmpty() || itemModel.getPrice().equals("0") || itemModel.getPrice().equals("0.00"))
+        {
             itemModel.calculateTotal();
             mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
             mvvm.getItemForPrice().setValue(itemModel);
             mvvm.getItemForPricePos().setValue(adapterPosition);
             mvvm.getIsDialogPriceOpened().setValue(true);
 
-        } else {
+        }
+        else {
 
             mvvm.mainItemDiscountList.setValue(mvvm.mainItemDiscountList.getValue());
             itemModel.calculateTotal();
@@ -1776,32 +1861,6 @@ public class HomeActivity extends DrawerBaseActivity {
         dialog.show();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (binding.dialogCustomer.getVisibility() == View.VISIBLE) {
-            if (binding.addCustomerDialog.flAddCustomerLayout.getVisibility() == View.VISIBLE) {
-                binding.addCustomerDialog.flAddCustomerLayout.setVisibility(View.GONE);
-                mvvm.getIsAddCustomerDialogShow().setValue(false);
-            } else {
-                binding.dialogCustomer.setVisibility(View.GONE);
-                mvvm.getIsOpenedCustomerDialog().setValue(false);
-            }
-
-
-        } else if (binding.flDialogAddPrice.getVisibility() == View.VISIBLE) {
-
-            mvvm.getIsDialogPriceOpened().setValue(false);
-        } else if (binding.flDialogItemExtras.getVisibility() == View.VISIBLE) {
-            mvvm.getIsDialogExtrasOpened().setValue(false);
-        } else if (binding.flDialogCartDiscount.getVisibility() == View.VISIBLE) {
-            mvvm.getIsDialogDiscountsOpened().setValue(false);
-        }else if (binding.flDialogOpenedTickets.getVisibility() == View.VISIBLE) {
-            mvvm.getIsDialogOpenedTicketsOpened().setValue(false);
-        } else {
-            super.onBackPressed();
-        }
-
-    }
 
     public void deleteCartDiscountItem(int adapterPosition) {
         mvvm.deleteCartDiscountItem(adapterPosition);
@@ -1819,6 +1878,10 @@ public class HomeActivity extends DrawerBaseActivity {
                 binding.toolbarLandAddUser.setImageResource(R.drawable.ic_add_user);
             }
         }
+    }
+
+    public void addOpenTicketToCart(OrderModel.Sale sale) {
+        mvvm.addFromDraftToCart(sale);
     }
 
     @Override
@@ -1916,7 +1979,6 @@ public class HomeActivity extends DrawerBaseActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.e("c", mvvm.showPin + "");
         App.showHomePin = false;
         App.saleSelected = false;
         outState.putBoolean("state", mvvm.showPin);
@@ -1933,6 +1995,34 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (binding.dialogCustomer.getVisibility() == View.VISIBLE) {
+            if (binding.addCustomerDialog.flAddCustomerLayout.getVisibility() == View.VISIBLE) {
+                binding.addCustomerDialog.flAddCustomerLayout.setVisibility(View.GONE);
+                mvvm.getIsAddCustomerDialogShow().setValue(false);
+            } else {
+                binding.dialogCustomer.setVisibility(View.GONE);
+                mvvm.getIsOpenedCustomerDialog().setValue(false);
+            }
+
+
+        } else if (binding.flDialogAddPrice.getVisibility() == View.VISIBLE) {
+
+            mvvm.getIsDialogPriceOpened().setValue(false);
+        } else if (binding.flDialogItemExtras.getVisibility() == View.VISIBLE) {
+            mvvm.getIsDialogExtrasOpened().setValue(false);
+        } else if (binding.flDialogCartDiscount.getVisibility() == View.VISIBLE) {
+            mvvm.getIsDialogDiscountsOpened().setValue(false);
+        }else if (binding.flDialogOpenedTickets.getVisibility() == View.VISIBLE) {
+            mvvm.getIsDialogOpenedTicketsOpened().setValue(false);
+        } else {
+            super.onBackPressed();
+        }
+
+    }
+
+
+    @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         mvvm.showPin = savedInstanceState.getBoolean("state");
         App.showHomePin = false;
@@ -1943,5 +2033,6 @@ public class HomeActivity extends DrawerBaseActivity {
         } catch (Exception e) {
         }
     }
+
 
 }
