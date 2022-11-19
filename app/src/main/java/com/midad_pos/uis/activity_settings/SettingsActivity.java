@@ -1,5 +1,6 @@
 package com.midad_pos.uis.activity_settings;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -17,6 +18,7 @@ import com.midad_pos.databinding.ActivitySettingsBinding;
 import com.midad_pos.databinding.DialogHomeItemLayoutBinding;
 import com.midad_pos.model.AppSettingModel;
 import com.midad_pos.mvvm.SettingsMvvm;
+import com.midad_pos.uis.activity_add_printer.AddPrinterActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -46,8 +48,8 @@ public class SettingsActivity extends DrawerBaseActivity {
 
         }
 
-        if (mvvm.getIsDialogTypeVisible().getValue()!=null){
-            if (mvvm.getIsDialogTypeVisible().getValue()){
+        if (mvvm.getIsDialogTypeVisible().getValue() != null) {
+            if (mvvm.getIsDialogTypeVisible().getValue()) {
                 showLayoutDialog();
             }
         }
@@ -155,6 +157,26 @@ public class SettingsActivity extends DrawerBaseActivity {
             updateSelections(2);
         });
 
+        if (binding.printersLayout != null) {
+            binding.printersLayout.fab.setOnClickListener(v -> {
+                mvvm.forNavigation = true;
+                Intent intent = new Intent(this, AddPrinterActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+            });
+        }
+
+
+        if (binding.printersDetailsLayout != null) {
+            binding.printersDetailsLayout.fab.setOnClickListener(v -> {
+                mvvm.forNavigation = true;
+
+                Intent intent = new Intent(this, AddPrinterActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+            });
+        }
+
 
     }
 
@@ -187,14 +209,13 @@ public class SettingsActivity extends DrawerBaseActivity {
             layoutBinding.rbList.setChecked(false);
             layoutBinding.rbGrid.setChecked(true);
 
-            if (binding.generalSettingsLayout!=null){
+            if (binding.generalSettingsLayout != null) {
                 binding.generalSettingsLayout.setLayout(getString(R.string.grid));
             }
 
-            if (binding.generalSettingsDetailsLayout!=null){
+            if (binding.generalSettingsDetailsLayout != null) {
                 binding.generalSettingsDetailsLayout.setLayout(getString(R.string.grid));
             }
-
 
 
         } else {
@@ -216,11 +237,11 @@ public class SettingsActivity extends DrawerBaseActivity {
 
             }
 
-            if (binding.generalSettingsLayout!=null){
+            if (binding.generalSettingsLayout != null) {
                 binding.generalSettingsLayout.setLayout(getString(R.string.list));
             }
 
-            if (binding.generalSettingsDetailsLayout!=null){
+            if (binding.generalSettingsDetailsLayout != null) {
                 binding.generalSettingsDetailsLayout.setLayout(getString(R.string.list));
             }
 
@@ -275,8 +296,7 @@ public class SettingsActivity extends DrawerBaseActivity {
         });
 
 
-
-        if (layoutBinding.img1!=null){
+        if (layoutBinding.img1 != null) {
             layoutBinding.img1.setOnClickListener(v -> {
                 layoutBinding.img1.setImageResource(R.drawable.selected_grid);
 
@@ -301,7 +321,7 @@ public class SettingsActivity extends DrawerBaseActivity {
 
         }
 
-        if (layoutBinding.imgLand1!=null){
+        if (layoutBinding.imgLand1 != null) {
             layoutBinding.imgLand1.setOnClickListener(v -> {
                 if (layoutBinding.img1 != null) {
                     layoutBinding.img1.setImageResource(R.drawable.selected_grid);
@@ -326,7 +346,7 @@ public class SettingsActivity extends DrawerBaseActivity {
 
         }
 
-        if (layoutBinding.img2!=null){
+        if (layoutBinding.img2 != null) {
             layoutBinding.img2.setOnClickListener(v -> {
                 if (layoutBinding.img1 != null) {
                     layoutBinding.img1.setImageResource(R.drawable.unselected_grid);
@@ -350,7 +370,7 @@ public class SettingsActivity extends DrawerBaseActivity {
 
         }
 
-        if (layoutBinding.imgLand2!=null){
+        if (layoutBinding.imgLand2 != null) {
             layoutBinding.imgLand2.setOnClickListener(v -> {
                 if (layoutBinding.img1 != null) {
                     layoutBinding.img1.setImageResource(R.drawable.unselected_grid);
@@ -375,9 +395,6 @@ public class SettingsActivity extends DrawerBaseActivity {
         }
 
 
-
-
-
         layoutBinding.cancel.setOnClickListener(v -> {
             dialog.dismiss();
             mvvm.getIsDialogTypeVisible().setValue(false);
@@ -387,11 +404,11 @@ public class SettingsActivity extends DrawerBaseActivity {
                 AppSettingModel appSettingModel = getAppSetting();
                 appSettingModel.setHome_layout_type(1);
                 setAppSettingModel(appSettingModel);
-                if (binding.generalSettingsLayout!=null){
+                if (binding.generalSettingsLayout != null) {
                     binding.generalSettingsLayout.setLayout(getString(R.string.grid));
                 }
 
-                if (binding.generalSettingsDetailsLayout!=null){
+                if (binding.generalSettingsDetailsLayout != null) {
                     binding.generalSettingsDetailsLayout.setLayout(getString(R.string.grid));
                 }
                 dialog.dismiss();
@@ -401,11 +418,11 @@ public class SettingsActivity extends DrawerBaseActivity {
                 AppSettingModel appSettingModel = getAppSetting();
                 appSettingModel.setHome_layout_type(2);
                 setAppSettingModel(appSettingModel);
-                if (binding.generalSettingsLayout!=null){
+                if (binding.generalSettingsLayout != null) {
                     binding.generalSettingsLayout.setLayout(getString(R.string.list));
                 }
 
-                if (binding.generalSettingsDetailsLayout!=null){
+                if (binding.generalSettingsDetailsLayout != null) {
                     binding.generalSettingsDetailsLayout.setLayout(getString(R.string.list));
                 }
                 dialog.dismiss();
@@ -519,6 +536,48 @@ public class SettingsActivity extends DrawerBaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (mvvm.showPin){
+            showPinCodeView();
+        }else {
+            hidePinCodeView();
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
+
+        }
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         disposable.clear();
@@ -539,12 +598,7 @@ public class SettingsActivity extends DrawerBaseActivity {
 
     }
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
 
-        }catch (Exception e){}
-    }
+
 
 }

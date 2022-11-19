@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 public class SettingsMvvm extends AndroidViewModel {
     private MutableLiveData<Integer> positions;
     private MutableLiveData<Boolean> isDialogTypeVisible;
+    public boolean showPin =false;
+    public boolean forNavigation = false;
 
     public SettingsMvvm(@NonNull Application application) {
         super(application);

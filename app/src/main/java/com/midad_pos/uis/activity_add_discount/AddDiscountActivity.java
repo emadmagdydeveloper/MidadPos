@@ -59,6 +59,11 @@ public class AddDiscountActivity extends BaseActivity {
 
         }
         binding.setLang(getLang());
+
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
+
         if (mvvm.getDiscountName().getValue() != null) {
             binding.edtDiscountName.setText(mvvm.getDiscountName().getValue());
         }
@@ -168,13 +173,38 @@ public class AddDiscountActivity extends BaseActivity {
         }
     }
 
+
     @Override
-    protected void onStop() {
-        super.onStop();
-        mvvm.showPin = true;
+    protected void onRestart() {
+        super.onRestart();
+
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
+
+        }
 
 
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
 
     @Override
     protected void onResume() {
@@ -192,11 +222,4 @@ public class AddDiscountActivity extends BaseActivity {
         overridePendingTransition(0, 0);
     }
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-
-        }catch (Exception e){}
-    }
 }

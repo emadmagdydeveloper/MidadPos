@@ -61,6 +61,11 @@ public class ReceiptsActivity extends DrawerBaseActivity {
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(ReceiptDetailsMvvm.class);
         binding.setLang(getLang());
+
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
+
         if (binding.recView != null) {
             binding.recView.setLayoutManager(new LinearLayoutManager(this));
             binding.recView.setHasFixedSize(true);
@@ -220,6 +225,7 @@ public class ReceiptsActivity extends DrawerBaseActivity {
         });
 
         binding.btnRefund.setOnClickListener(view -> {
+            mvvm.forNavigation = true;
             Intent intent = new Intent(this, RefundActivity.class);
             startActivity(intent);
             overridePendingTransition(0, 0);
@@ -241,6 +247,8 @@ public class ReceiptsActivity extends DrawerBaseActivity {
         popupMenu.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.sendEmail) {
                 if (binding.llReceiptDetails != null) {
+                    mvvm.forNavigation = true;
+
                     Intent intent = new Intent(this, SendTicketEmailActivity.class);
                     startActivity(intent);
                     overridePendingTransition(0, 0);
@@ -294,15 +302,6 @@ public class ReceiptsActivity extends DrawerBaseActivity {
     }
 
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-
-        } catch (Exception e) {
-        }
-    }
-
     public void setItemReceipt(OrderModel.Sale model) {
         mvvm.getSelectedOrder().setValue(model);
         if (binding.recView != null) {
@@ -310,6 +309,53 @@ public class ReceiptsActivity extends DrawerBaseActivity {
 
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mvvm.showPin){
+            showPinCodeView();
+        }else {
+            hidePinCodeView();
+        }
+
+
+    }
+
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
+
+        }
+
+
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
 
 
 }

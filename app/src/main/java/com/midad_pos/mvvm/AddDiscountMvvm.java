@@ -50,6 +50,7 @@ public class AddDiscountMvvm extends AndroidViewModel {
     private MutableLiveData<String> onError;
     private UserModel userModel;
     public boolean showPin =false;
+    public boolean forNavigation = false;
 
 
 

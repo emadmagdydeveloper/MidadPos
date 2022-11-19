@@ -35,6 +35,9 @@ public class SupportActivity extends DrawerBaseActivity {
 
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(SupportMvvm.class);
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
         if (mvvm.getPositions().getValue() != null) {
             updateSelections(mvvm.getPositions().getValue());
 
@@ -69,7 +72,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.helpLayout!=null){
             binding.helpLayout.helpCenter.setOnClickListener(view -> {
-                mvvm.getForNavigation().setValue(true);
+                mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
@@ -79,7 +82,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.helpLayout!=null){
             binding.helpLayout.community.setOnClickListener(view -> {
-                mvvm.getForNavigation().setValue(true);
+                mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
@@ -90,7 +93,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.legalInformationLayout!=null){
             binding.legalInformationLayout.terms.setOnClickListener(view -> {
-                mvvm.getForNavigation().setValue(true);
+                mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
@@ -100,7 +103,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.legalInformationLayout!=null){
             binding.legalInformationLayout.privacy.setOnClickListener(view -> {
-                mvvm.getForNavigation().setValue(true);
+                mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
@@ -110,7 +113,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.helpDetailsLayout!=null){
             binding.helpDetailsLayout.helpCenter.setOnClickListener(view -> {
-                mvvm.getForNavigation().setValue(true);
+                mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
@@ -120,7 +123,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.helpDetailsLayout!=null){
             binding.helpDetailsLayout.community.setOnClickListener(view -> {
-                mvvm.getForNavigation().setValue(true);
+                mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
@@ -131,7 +134,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.LegalInformationDetailsLayout!=null){
             binding.LegalInformationDetailsLayout.terms.setOnClickListener(view -> {
-                mvvm.getForNavigation().setValue(true);
+                mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
@@ -141,7 +144,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (binding.LegalInformationDetailsLayout!=null){
             binding.LegalInformationDetailsLayout.privacy.setOnClickListener(view -> {
-                mvvm.getForNavigation().setValue(true);
+                mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
                 intent.putExtra("url","https://www.google.com");
@@ -216,27 +219,46 @@ public class SupportActivity extends DrawerBaseActivity {
 
     protected void onResume() {
         super.onResume();
-        if (mvvm.getShowPin().getValue() != null && mvvm.getShowPin().getValue()) {
+        if (mvvm.showPin){
             showPinCodeView();
-        } else {
+        }else {
             hidePinCodeView();
         }
-        mvvm.getForNavigation().setValue(false);
-        mvvm.getShowPin().setValue(false);
+
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onRestart() {
+        super.onRestart();
 
-        if (mvvm.getForNavigation().getValue() != null && mvvm.getForNavigation().getValue()) {
-            mvvm.getShowPin().setValue(false);
-        } else {
-            mvvm.getShowPin().setValue(true);
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
 
         }
 
+
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
+
 
     @Override
     protected void onDestroy() {
@@ -258,11 +280,4 @@ public class SupportActivity extends DrawerBaseActivity {
     }
 
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-
-        }catch (Exception e){}
-    }
 }

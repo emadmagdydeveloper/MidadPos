@@ -45,6 +45,7 @@ public class ItemsActivity extends DrawerBaseActivity {
     private CategoryAdapter categoryAdapter;
     private ItemAdapter itemAdapter;
     private DiscountAdapter discountAdapter;
+    private boolean orientationChanged = false;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -67,6 +68,9 @@ public class ItemsActivity extends DrawerBaseActivity {
             updateSelections(mvvm.getPositions().getValue());
 
         }
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
 
 
         mvvm.getIsDeleteMode().observe(this, aBoolean -> {
@@ -719,9 +723,7 @@ public class ItemsActivity extends DrawerBaseActivity {
 
         if (binding.itemsLayout != null) {
             binding.itemsLayout.fabAddItem.setOnClickListener(v -> {
-                new Handler().postDelayed(() ->{
-                    mvvm.showPin = false;
-                }, 1600);
+                mvvm.forNavigation = true;
                 Intent intent = new Intent(this, AddItemActivity.class);
                 startActivity(intent);
                 overridePendingTransition(0, 0);
@@ -733,9 +735,8 @@ public class ItemsActivity extends DrawerBaseActivity {
 
         if (binding.itemsDetailsLayout != null) {
             binding.itemsDetailsLayout.fabAddItem.setOnClickListener(v -> {
-                new Handler().postDelayed(() ->{
-                    mvvm.showPin = false;
-                }, 1600);
+                mvvm.forNavigation = true;
+
                 Intent intent = new Intent(this, AddItemActivity.class);
                 startActivity(intent);
                 overridePendingTransition(0, 0);
@@ -757,9 +758,8 @@ public class ItemsActivity extends DrawerBaseActivity {
     }
 
     private void navigateToAddDiscountActivity(DiscountModel discountModel) {
-        new Handler().postDelayed(() ->{
-            mvvm.showPin = false;
-        }, 1600);
+        mvvm.forNavigation = true;
+
         Intent intent = new Intent(this, AddDiscountActivity.class);
         intent.putExtra("data",discountModel);
         startActivity(intent);
@@ -767,9 +767,7 @@ public class ItemsActivity extends DrawerBaseActivity {
     }
 
     private void navigateToAddCategoryActivity() {
-        new Handler().postDelayed(() ->{
-            mvvm.showPin = false;
-        }, 1600);
+        mvvm.forNavigation = true;
         Intent intent = new Intent(this, AddCategoryActivity.class);
         startActivity(intent);
         overridePendingTransition(0, 0);
@@ -1096,6 +1094,8 @@ public class ItemsActivity extends DrawerBaseActivity {
             }
             categoryAdapter.notifyItemChanged(adapterPosition);
         } else {
+            mvvm.forNavigation = true;
+
             Intent intent = new Intent(this, AddCategoryActivity.class);
             intent.putExtra("data", categoryModel);
             startActivity(intent);
@@ -1116,9 +1116,8 @@ public class ItemsActivity extends DrawerBaseActivity {
             }
             itemAdapter.notifyItemChanged(adapterPosition);
         } else {
-            new Handler().postDelayed(() ->{
-                mvvm.showPin = false;
-            }, 1600);
+            mvvm.forNavigation = true;
+
             Intent intent = new Intent(this, AddItemActivity.class);
             intent.putExtra("data", itemModel);
             startActivity(intent);
@@ -1143,15 +1142,57 @@ public class ItemsActivity extends DrawerBaseActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!orientationChanged){
+            mvvm.getItemsData();
+            mvvm.getCategoriesData(getUserModel().getData().getSelectedUser().getId());
+            mvvm.getDiscountsData();
+        }
+        orientationChanged = false;
+
+        if (mvvm.showPin){
+            showPinCodeView();
+        }else {
+            hidePinCodeView();
+        }
+    }
 
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mvvm.showPin = true;
+    protected void onRestart() {
+        super.onRestart();
+
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
+
+        }
 
 
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        orientationChanged = true;
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
     @Override
     protected void onDestroy() {
 
@@ -1175,28 +1216,10 @@ public class ItemsActivity extends DrawerBaseActivity {
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mvvm.getItemsData();
-        mvvm.getCategoriesData(getUserModel().getData().getSelectedUser().getId());
-        mvvm.getDiscountsData();
-
-        if (mvvm.showPin){
-            showPinCodeView();
-        }else {
-            hidePinCodeView();
-        }
-    }
 
 
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
 
-        }catch (Exception e){}
-    }
+
 
 }

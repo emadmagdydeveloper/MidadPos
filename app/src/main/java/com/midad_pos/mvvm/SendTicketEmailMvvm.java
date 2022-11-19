@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 public class SendTicketEmailMvvm extends AndroidViewModel {
     private MutableLiveData<String> email;
+    public boolean showPin =false;
 
     public SendTicketEmailMvvm(@NonNull Application application) {
         super(application);

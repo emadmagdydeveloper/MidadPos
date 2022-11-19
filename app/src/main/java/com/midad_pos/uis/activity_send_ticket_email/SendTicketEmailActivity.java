@@ -23,11 +23,16 @@ public class SendTicketEmailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this,R.layout.activity_send_ticket_email);
+        setContentView(binding.getRoot());
         initView();
     }
 
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(SendTicketEmailMvvm.class);
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
+
         if (mvvm.getEmail().getValue()!=null){
             binding.email.setText(mvvm.getEmail().getValue());
         }
@@ -60,10 +65,39 @@ public class SendTicketEmailActivity extends BaseActivity {
 
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (mvvm.showPin){
+            showPinCodeView();
+        }else {
+            hidePinCodeView();
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        mvvm.showPin = true;
+
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
         try {
             super.onRestoreInstanceState(savedInstanceState);
 
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
+
 }

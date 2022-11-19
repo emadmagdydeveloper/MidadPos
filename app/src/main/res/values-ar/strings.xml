@@ -223,6 +223,17 @@
     <string name="sort_amount">القيمة</string>
     <string name="sort_time">الوقت</string>
     <string name="sort_employee">الموظف</string>
+    <string name="print_receipts_and_bills">طباعة الإيصالات والفواتير</string>
+    <string name="printer_model">طراز الطابعة</string>
+    <string name="no_printers">لا توجد طابعة</string>
+    <string name="other_model">طراز اخر</string>
+    <string name="create_printer">إنشاء طابعة</string>
+    <string name="mm80">80 ملم</string>
+    <string name="mm58">58 ملم</string>
+    <string name="paper_width">عرض الورقة</string>
+    <string name="inerface">الواجهة</string>
+    <string name="bluetooth">بلوتوث</string>
+    <string name="bluetooth_printer">طابعة بلوتوث</string>
 
 
     <string-array name="delivery_options">

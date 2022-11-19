@@ -10,14 +10,10 @@ import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 
 import com.midad_pos.language.Language;
-import com.midad_pos.uis.activity_charge.ChargeActivity;
-import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
-import com.midad_pos.uis.activity_login.LoginActivity;
 import com.midad_pos.uis.activity_receipts.ReceiptsActivity;
 import com.midad_pos.uis.activity_settings.SettingsActivity;
 import com.midad_pos.uis.activity_shift.ShiftActivity;
-import com.midad_pos.uis.activity_splash.SplashActivity;
 import com.midad_pos.uis.activity_support.SupportActivity;
 
 import java.util.HashSet;
@@ -25,11 +21,9 @@ import java.util.Set;
 
 
 public class App extends MultiDexApplication {
-    public static boolean showHomePin = true;
-    public static boolean saleSelected = true;
 
     private Set<Activity> runningActivities = new HashSet<>();
-
+    public static boolean navigate = false;
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(Language.updateResources(newBase,"ar"));
@@ -39,20 +33,16 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle bundle) {
                 if (activity instanceof ReceiptsActivity||activity instanceof ItemsActivity||activity instanceof SettingsActivity||activity instanceof SupportActivity||activity instanceof ShiftActivity){
                     runningActivities.add(activity);
-                    showHomePin = false;
-
                 }
 
 
 
-                if (activity instanceof ChargeActivity){
-                    showHomePin = false;
-                }
 
             }
 

@@ -65,6 +65,7 @@ public class ItemsMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isDiscountDeleteMode;
     private MutableLiveData<List<Integer>> deletedDiscountIds;
     public boolean showPin =false;
+    public boolean forNavigation = false;
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
@@ -257,7 +258,10 @@ public class ItemsMvvm extends AndroidViewModel {
         if (query.isEmpty()) {
             if (getSelectedItemCategory().getValue() != null) {
                 if (getSelectedItemCategory().getValue().getId() == -1) {
-                    getItems().setValue(getMainItemsList().getValue());
+                    if (getMainItemsList().getValue()!=null){
+                        getItems().setValue(getMainItemsList().getValue());
+
+                    }
 
                 } else {
 

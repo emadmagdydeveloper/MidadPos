@@ -101,8 +101,10 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<ItemModel> itemForPrice;
 
     private MutableLiveData<List<DiscountModel>> discounts;
-    public boolean showPin = false;
+    public boolean showPin = true;
     public boolean forNavigation = false;
+    public boolean orientationChanged = false;
+
     private MutableLiveData<Boolean> isTicketModel;
     ///////////////////////////
     private List<CustomerModel> mainCustomerList = new ArrayList<>();
@@ -118,6 +120,9 @@ public class HomeMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isLoadingOpenedTickets;
     private MutableLiveData<List<OrderModel.Sale>> mainOrders;
     private MutableLiveData<List<OrderModel.Sale>> orders;
+    private List<String> deletedSales = new ArrayList<>();
+    private MutableLiveData<Boolean> isDeleteAllDraftTicketsSelected;
+    private MutableLiveData<Boolean> canDeleteOpenedTickets;
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -126,7 +131,6 @@ public class HomeMvvm extends AndroidViewModel {
     public boolean isItemForUpdate = false;
     private MutableLiveData<List<DiscountModel>> cartDiscounts;
     private List<DiscountModel> deletedCartDiscounts = new ArrayList<>();
-
     ///////////////////////////////////////////////////////////////////////////
     private MutableLiveData<AppSettingModel> appSettingModel;
 
@@ -377,7 +381,6 @@ public class HomeMvvm extends AndroidViewModel {
         return itemForPrice;
     }
 
-
     public MutableLiveData<Integer> getTicketCount() {
         if (ticketCount == null) {
             ticketCount = new MutableLiveData<>();
@@ -392,7 +395,6 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return cartDiscounts;
     }
-
 
     public MutableLiveData<Boolean> getIsScanOpened() {
         if (isScanOpened == null) {
@@ -469,6 +471,21 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return isLoadingOpenedTickets;
     }
+
+    public MutableLiveData<Boolean> getIsDeleteAllDraftTicketsSelected() {
+        if (isDeleteAllDraftTicketsSelected == null) {
+            isDeleteAllDraftTicketsSelected = new MutableLiveData<>();
+        }
+        return isDeleteAllDraftTicketsSelected;
+    }
+
+    public MutableLiveData<Boolean> getCanDeleteOpenedTickets() {
+        if (canDeleteOpenedTickets == null) {
+            canDeleteOpenedTickets = new MutableLiveData<>();
+        }
+        return canDeleteOpenedTickets;
+    }
+
 
     public MutableLiveData<List<OrderModel.Sale>> getMainOrders() {
         if (mainOrders == null) {
@@ -920,195 +937,6 @@ public class HomeMvvm extends AndroidViewModel {
 
     }
 
-    public void getDraftTickets() {
-        getIsLoadingOpenedTickets().setValue(true);
-        UserModel userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
-        Api.getService(Tags.base_url)
-                .getDraftOrders(userModel.getData().getSelectedUser().getId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-
-                .subscribe(new SingleObserver<Response<OrderDataModel>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        disposable.add(d);
-                    }
-
-                    @Override
-                    public void onSuccess(Response<OrderDataModel> response) {
-                        getIsLoadingOpenedTickets().setValue(false);
-                        if (response.isSuccessful()) {
-                            if (response.body() != null) {
-                                if (response.body().getStatus() == 200) {
-                                    updateData(response.body().getData());
-                                }
-                            }
-                        } else {
-                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
-
-                            try {
-                                if (response.errorBody() != null) {
-                                    Log.e(TAG, response.code() + "__" + response.errorBody().string());
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-
-                    @Override
-                    public void onError(Throwable e) {
-                        getIsLoadingOpenedTickets().setValue(false);
-                        Log.e("error", e.getMessage() + "");
-
-                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
-                            Toast.makeText(getApplication().getApplicationContext(), R.string.check_network, Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
-
-                        }
-                    }
-                });
-
-    }
-
-    private void updateData(List<OrderModel> data) {
-        List<OrderModel.Sale> sales = new ArrayList<>();
-        for (OrderModel model : data) {
-            List<OrderModel.Sale> list = new ArrayList<>();
-            for (OrderModel.Sale sale : model.getSales()) {
-                sale.setOrder_date(model.getDate());
-                list.add(sale);
-            }
-
-
-            sales.addAll(list);
-        }
-        getMainOrders().setValue(sales);
-        searchMyTicket();
-    }
-
-    public void searchMyTicket() {
-        String query = getQueryMyOpenedTickets().getValue();
-        if (query == null) {
-            List<OrderModel.Sale> list = new ArrayList<>();
-            if (getMainOrders().getValue() != null) {
-                list.addAll(getMainOrders().getValue());
-                if (getTicketSortPos().getValue() != null) {
-                    int pos = getTicketSortPos().getValue();
-                    Collections.sort(list, (o2, o1) -> {
-                        if (pos == 1) {
-                            if (Double.parseDouble(o1.getGrand_total()) > Double.parseDouble(o2.getGrand_total())) {
-                                return 1;
-                            } else if (Double.parseDouble(o1.getGrand_total()) < Double.parseDouble(o2.getGrand_total())) {
-                                return -1;
-                            } else {
-                                return 0;
-                            }
-                        } else if (pos == 2) {
-                            if (Long.parseLong(o1.getDate()) > Long.parseLong(o2.getDate())) {
-                                return 1;
-                            } else if (Long.parseLong(o1.getDate()) < Long.parseLong(o2.getDate())) {
-                                return -1;
-                            } else {
-                                return 0;
-                            }
-                        } else if (pos == 3) {
-                            return o1.getUser().getName().compareToIgnoreCase(o2.getUser().getName());
-
-                        } else {
-                            return o1.getName().compareToIgnoreCase(o2.getName());
-
-                        }
-                    });
-                } else {
-                    getOrders().setValue(list);
-
-                }
-            } else {
-                getOrders().setValue(list);
-            }
-        } else if (query.isEmpty()) {
-
-            List<OrderModel.Sale> list = new ArrayList<>();
-            if (getMainOrders().getValue() != null) {
-                list.addAll(getMainOrders().getValue());
-                if (getTicketSortPos().getValue() != null) {
-                    int pos = getTicketSortPos().getValue();
-                    Collections.sort(list, (o2, o1) -> {
-                        if (pos == 1) {
-                            if (Double.parseDouble(o1.getGrand_total()) > Double.parseDouble(o2.getGrand_total())) {
-                                return 1;
-                            } else if (Double.parseDouble(o1.getGrand_total()) < Double.parseDouble(o2.getGrand_total())) {
-                                return -1;
-                            } else {
-                                return 0;
-                            }
-                        } else if (pos == 2) {
-                            if (Long.parseLong(o1.getDate()) > Long.parseLong(o2.getDate())) {
-                                return 1;
-                            } else if (Long.parseLong(o1.getDate()) < Long.parseLong(o2.getDate())) {
-                                return -1;
-                            } else {
-                                return 0;
-                            }
-                        } else if (pos == 3) {
-                            return o1.getUser().getName().compareToIgnoreCase(o2.getUser().getName());
-
-                        } else {
-                            return o1.getName().compareToIgnoreCase(o2.getName());
-
-                        }
-                    });
-
-                }
-            }
-
-            getOrders().setValue(list);
-        } else {
-
-            List<OrderModel.Sale> list = new ArrayList<>();
-            if (getMainOrders().getValue() != null) {
-                for (OrderModel.Sale sale : getMainOrders().getValue()) {
-                    if (sale.getName() != null && !sale.getName().isEmpty() && sale.getName().toLowerCase().startsWith(query.toLowerCase())) {
-                        list.add(sale);
-                    }
-                }
-                if (getTicketSortPos().getValue() != null) {
-                    int pos = getTicketSortPos().getValue();
-                    Collections.sort(list, (o2, o1) -> {
-                        if (pos == 1) {
-                            if (Double.parseDouble(o1.getGrand_total()) > Double.parseDouble(o2.getGrand_total())) {
-                                return 1;
-                            } else if (Double.parseDouble(o1.getGrand_total()) < Double.parseDouble(o2.getGrand_total())) {
-                                return -1;
-                            } else {
-                                return 0;
-                            }
-                        } else if (pos == 2) {
-                            if (Long.parseLong(o1.getDate()) > Long.parseLong(o2.getDate())) {
-                                return 1;
-                            } else if (Long.parseLong(o1.getDate()) < Long.parseLong(o2.getDate())) {
-                                return -1;
-                            } else {
-                                return 0;
-                            }
-                        } else if (pos == 3) {
-                            return o1.getUser().getName().compareToIgnoreCase(o2.getUser().getName());
-
-                        } else {
-                            return o1.getName().compareToIgnoreCase(o2.getName());
-
-                        }
-                    });
-
-                }
-            }
-            getOrders().setValue(list);
-        }
-    }
-
     public void getItemsData() {
         if (mainItemList.size() > 0) {
             getIsLoading().setValue(false);
@@ -1462,6 +1290,172 @@ public class HomeMvvm extends AndroidViewModel {
         manageCartModel.removeCustomerFromCart(getApplication().getApplicationContext());
     }
 
+    //////////////////////////////////////////////////////////////////////
+    public void getDraftTickets() {
+        getIsLoadingOpenedTickets().setValue(true);
+        UserModel userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
+        Api.getService(Tags.base_url)
+                .getDraftOrders(userModel.getData().getSelectedUser().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new SingleObserver<Response<OrderDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<OrderDataModel> response) {
+                        getIsLoadingOpenedTickets().setValue(false);
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    updateData(response.body().getData());
+                                }
+                            }
+                        } else {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
+
+                            try {
+                                if (response.errorBody() != null) {
+                                    Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        getIsLoadingOpenedTickets().setValue(false);
+                        Log.e("error", e.getMessage() + "");
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.check_network, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
+
+    }
+
+    private void updateData(List<OrderModel> data) {
+        List<OrderModel.Sale> sales = new ArrayList<>();
+        for (OrderModel model : data) {
+            List<OrderModel.Sale> list = new ArrayList<>();
+            for (OrderModel.Sale sale : model.getSales()) {
+                sale.setOrder_date(model.getDate());
+                list.add(sale);
+            }
+
+
+            sales.addAll(list);
+        }
+        getMainOrders().setValue(sales);
+        searchMyTicket();
+    }
+
+    public void searchMyTicket() {
+        String query = getQueryMyOpenedTickets().getValue();
+        List<OrderModel.Sale> list = new ArrayList<>();
+        if (query == null||query.isEmpty()) {
+
+            if (getMainOrders().getValue() != null) {
+                for (OrderModel.Sale sale :getMainOrders().getValue()){
+                    int pos = getDeletedDraftPos(sale);
+                    sale.setSelected(pos!=-1);
+                    list.add(sale);
+                }
+                if (getTicketSortPos().getValue() != null) {
+                    int pos = getTicketSortPos().getValue();
+                    Collections.sort(list, (o2, o1) -> {
+                        if (pos == 1) {
+                            if (Double.parseDouble(o1.getGrand_total()) > Double.parseDouble(o2.getGrand_total())) {
+                                return 1;
+                            } else if (Double.parseDouble(o1.getGrand_total()) < Double.parseDouble(o2.getGrand_total())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 2) {
+                            if (Long.parseLong(o1.getDate()) > Long.parseLong(o2.getDate())) {
+                                return 1;
+                            } else if (Long.parseLong(o1.getDate()) < Long.parseLong(o2.getDate())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 3) {
+                            return o1.getUser().getName().compareToIgnoreCase(o2.getUser().getName());
+
+                        } else {
+                            return o1.getName().compareToIgnoreCase(o2.getName());
+
+                        }
+                    });
+
+
+                }
+
+            }
+
+        }
+         else {
+
+            if (getMainOrders().getValue() != null) {
+                for (OrderModel.Sale sale : getMainOrders().getValue()) {
+                    int pos = getDeletedDraftPos(sale);
+                    sale.setSelected(pos!=-1);
+
+                    if (sale.getName() != null && !sale.getName().isEmpty() && sale.getName().equalsIgnoreCase(query)) {
+                        list.add(sale);
+                    }
+
+                }
+                if (getTicketSortPos().getValue() != null) {
+                    int pos = getTicketSortPos().getValue();
+                    Collections.sort(list, (o2, o1) -> {
+                        if (pos == 1) {
+                            if (Double.parseDouble(o1.getGrand_total()) > Double.parseDouble(o2.getGrand_total())) {
+                                return 1;
+                            } else if (Double.parseDouble(o1.getGrand_total()) < Double.parseDouble(o2.getGrand_total())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 2) {
+                            if (Long.parseLong(o1.getDate()) > Long.parseLong(o2.getDate())) {
+                                return 1;
+                            } else if (Long.parseLong(o1.getDate()) < Long.parseLong(o2.getDate())) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (pos == 3) {
+                            return o1.getUser().getName().compareToIgnoreCase(o2.getUser().getName());
+
+                        } else {
+                            return o1.getName().compareToIgnoreCase(o2.getName());
+
+                        }
+                    });
+
+                }
+            }
+        }
+
+
+        getIsDeleteAllDraftTicketsSelected().setValue(getOrders().getValue()!=null&&deletedSales.size()==getOrders().getValue().size());
+
+        getOrders().setValue(list);
+    }
+
+
     public void saveTicket(Context context) {
         ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
         dialog.setCanceledOnTouchOutside(false);
@@ -1754,6 +1748,131 @@ public class HomeMvvm extends AndroidViewModel {
         return false;
     }
 
+    public void addDraftTicketToDelete(OrderModel.Sale sale){
+
+        int index = getDeletedDraftPos(sale);
+        if (sale.isSelected()){
+            if (index==-1){
+                deletedSales.add(sale.getId());
+
+            }
+
+
+        }else {
+            if (index!=-1){
+                deletedSales.remove(index);
+            }
+        }
+
+        getIsDeleteAllDraftTicketsSelected().setValue(getOrders().getValue()!=null&&deletedSales.size()==getOrders().getValue().size());
+
+        getCanDeleteOpenedTickets().setValue(deletedSales.size()>0);
+
+    }
+
+    public void addAllDraftTicketToDelete(boolean isChecked){
+        deletedSales.clear();
+        if (getOrders().getValue()!=null&&getOrders().getValue().size()>0){
+            for (OrderModel.Sale sale:getOrders().getValue()){
+                sale.setSelected(isChecked);
+                if (isChecked){
+                    deletedSales.add(sale.getId());
+                }
+            }
+            getOrders().setValue(getOrders().getValue());
+
+        }else {
+            getIsDeleteAllDraftTicketsSelected().setValue(false);
+        }
+
+        getCanDeleteOpenedTickets().setValue(deletedSales.size()>0);
+
+
+    }
+
+    private int getDeletedDraftPos(OrderModel.Sale sale){
+        if (getOrders().getValue()!=null){
+            int index = 0;
+            for (String id :deletedSales){
+                if (id.equals(sale.getId())){
+                    return index;
+                }
+                index++;
+            }
+        }
+        return -1;
+    }
+
+    public void deleteDraftTickets(Context context){
+        ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+
+
+
+        Api.getService(Tags.base_url)
+                .deleteDraftTicket(userModel.getData().getSelectedUser().getId(),deletedSales)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<StatusResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<StatusResponse> response) {
+                        dialog.dismiss();
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    List<OrderModel.Sale> list = new ArrayList<>();
+                                    List<OrderModel.Sale> mainList = new ArrayList<>();
+
+                                    if (getOrders().getValue()!=null){
+                                        for (OrderModel.Sale sale : getOrders().getValue()){
+                                            if (!sale.isSelected()){
+                                                list.add(sale);
+                                                mainList.add(sale);
+                                            }
+                                        }
+                                        getMainOrders().setValue(mainList);
+                                        getOrders().setValue(list);
+
+                                    }
+                                    getCanDeleteOpenedTickets().setValue(false);
+                                    getIsDeleteAllDraftTicketsSelected().setValue(false);
+
+                                    deletedSales.clear();
+                                }
+                            }
+                        } else {
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dialog.dismiss();
+                        Log.e(TAG, e.getMessage() + "");
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.check_network, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplication().getApplicationContext(), R.string.something_wrong, Toast.LENGTH_SHORT).show();
+
+
+                        }
+                    }
+                });
+
+    }
     @Override
     protected void onCleared() {
         super.onCleared();

@@ -24,6 +24,11 @@ import com.midad_pos.model.UserModel;
 import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.preferences.Preferences;
 import com.midad_pos.uis.activity_home.HomeActivity;
+import com.midad_pos.uis.activity_items.ItemsActivity;
+import com.midad_pos.uis.activity_receipts.ReceiptsActivity;
+import com.midad_pos.uis.activity_settings.SettingsActivity;
+import com.midad_pos.uis.activity_shift.ShiftActivity;
+import com.midad_pos.uis.activity_support.SupportActivity;
 
 import java.util.Objects;
 
@@ -37,6 +42,7 @@ import io.reactivex.schedulers.Schedulers;
 public class BaseActivity extends AppCompatActivity {
     private ActivityBaseLayoutBinding binding;
     public BaseMvvm baseMvvm;
+
     public static final String READ_PERM = Manifest.permission.READ_EXTERNAL_STORAGE;
     public static final String WRITE_PERM = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     public static final String CAM_PERM = Manifest.permission.CAMERA;
@@ -211,7 +217,7 @@ public class BaseActivity extends AppCompatActivity {
                             binding.pinContainer.setVisibility(View.GONE);
                             binding.container.setVisibility(View.VISIBLE);
                             updatePinView("");
-
+                            baseMvvm.getOnPinSuccess().setValue(true);
                             baseMvvm.getOnUserRefreshed().setValue(true);
 
 
@@ -306,7 +312,9 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (this instanceof HomeActivity){
+        if (this instanceof ItemsActivity || this instanceof ReceiptsActivity|| this instanceof  ShiftActivity || this instanceof SettingsActivity|| this instanceof SupportActivity){
+
+        }else {
             super.onBackPressed();
             overridePendingTransition(0, 0);
         }

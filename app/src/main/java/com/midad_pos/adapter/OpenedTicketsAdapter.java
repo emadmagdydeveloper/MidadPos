@@ -2,7 +2,9 @@ package com.midad_pos.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -45,6 +47,14 @@ public class OpenedTicketsAdapter extends RecyclerView.Adapter<RecyclerView.View
         myHolder.itemView.setOnClickListener(v -> {
             HomeActivity activity = (HomeActivity) context;
             activity.addOpenTicketToCart(list.get(myHolder.getAdapterPosition()));
+        });
+
+        myHolder.binding.checkbox.setOnClickListener(v -> {
+            HomeActivity activity = (HomeActivity) context;
+            OrderModel.Sale sale  = list.get(myHolder.getAdapterPosition());
+            sale.setSelected(myHolder.binding.checkbox.isChecked());
+
+            activity.addOpenTicketToDelete(sale);
         });
 
 

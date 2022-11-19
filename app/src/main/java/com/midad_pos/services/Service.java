@@ -206,4 +206,12 @@ public interface Service {
     Single<Response<OrderDataModel>> getDraftOrders(@Query("user_id") String user_id
     );
 
+
+    @FormUrlEncoded
+    @POST("api/orders/deleteOrders")
+    Single<Response<StatusResponse>> deleteDraftTicket(@Field("user_id") String user_id,
+                                                       @Field("saleIds[]") List<String> ids
+
+
+    );
 }

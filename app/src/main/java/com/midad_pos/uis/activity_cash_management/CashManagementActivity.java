@@ -49,6 +49,9 @@ public class CashManagementActivity extends BaseActivity {
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(CashManagementMvvm.class);
         binding.setLang(getLang());
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
 
         binding.recView.setLayoutManager(new LinearLayoutManager(this));
         binding.recView.setHasFixedSize(true);
@@ -152,12 +155,30 @@ public class CashManagementActivity extends BaseActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mvvm.showPin = true;
+    protected void onRestart() {
+        super.onRestart();
+
+        mvvm.showPin = false;
 
 
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
 
     @Override
     protected void onResume() {
@@ -179,14 +200,6 @@ public class CashManagementActivity extends BaseActivity {
         overridePendingTransition(0, 0);
 
 
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-
-        }catch (Exception e){}
     }
 
 

@@ -26,8 +26,11 @@
             android:paddingBottom="8dp"
             >
             <CheckBox
+                android:id="@+id/checkbox"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:checked="@{model.selected}"
+
                 />
             <androidx.legacy.widget.Space
                 android:layout_width="36dp"

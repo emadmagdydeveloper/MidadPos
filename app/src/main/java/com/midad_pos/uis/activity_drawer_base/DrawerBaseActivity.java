@@ -108,8 +108,6 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
         itemId = item.getItemId();
 
         if (item.getItemId() == R.id.sales) {
-            App.saleSelected = true;
-
             if (selectedPos != 0) {
                 App app = (App) getApplicationContext();
                 app.killAllActivities();
@@ -118,15 +116,17 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
             }
 
 
+
         } else if (item.getItemId() == R.id.receipts) {
-            App.saleSelected = false;
+            App.navigate = true;
 
             if (selectedPos != 1) {
                 navigation(ReceiptsActivity.class);
             }
 
+
         } else if (item.getItemId() == R.id.shift) {
-            App.saleSelected = false;
+            App.navigate = true;
 
             if (selectedPos != 2) {
                 navigation(ShiftActivity.class);
@@ -134,7 +134,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
 
         } else if (item.getItemId() == R.id.items) {
-            App.saleSelected = false;
+            App.navigate = true;
 
             if (selectedPos != 3) {
                 navigation(ItemsActivity.class);
@@ -142,33 +142,37 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
 
         } else if (item.getItemId() == R.id.settings) {
-            App.saleSelected = false;
+            App.navigate = true;
 
             if (selectedPos != 4) {
                 navigation(SettingsActivity.class);
             }
 
         } else if (item.getItemId() == R.id.support) {
-            App.saleSelected = false;
+            App.navigate = true;
 
             if (selectedPos != 6) {
                 navigation(SupportActivity.class);
             }
 
-        } else if (item.getItemId() == R.id.backOffice) {
-            App.saleSelected = false;
 
+        } else if (item.getItemId() == R.id.backOffice) {
+            App.navigate = true;
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://midad-pos.wem-tech.site/login"));
             startActivity(intent);
+
 
         }
         return true;
     }
 
     public void navigation(Class<?> activityClass) {
-        Intent intent = new Intent(this, activityClass);
-        startActivity(intent);
-        overridePendingTransition(0, 0);
+        new Handler().postDelayed(()->{
+            Intent intent = new Intent(this, activityClass);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        },100);
+
     }
 
     public void updateSelectedPos(int pos) {

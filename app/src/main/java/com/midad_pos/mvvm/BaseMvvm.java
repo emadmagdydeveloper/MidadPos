@@ -35,6 +35,9 @@ public class BaseMvvm extends AndroidViewModel {
     private UserModel userModel;
     private MutableLiveData<String> onError;
     private MutableLiveData<Boolean> isUserSelected;
+    private MutableLiveData<Boolean> onPinSuccess;
+    private MutableLiveData<Boolean> onNavigate;
+
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
@@ -67,6 +70,20 @@ public class BaseMvvm extends AndroidViewModel {
             onUserRefreshed = new MutableLiveData<>();
         }
         return onUserRefreshed;
+    }
+
+    public MutableLiveData<Boolean> getOnPinSuccess() {
+        if (onPinSuccess == null) {
+            onPinSuccess = new MutableLiveData<>();
+        }
+        return onPinSuccess;
+    }
+
+    public MutableLiveData<Boolean> getOnNavigate() {
+        if (onNavigate == null) {
+            onNavigate = new MutableLiveData<>();
+        }
+        return onNavigate;
     }
 
     public MutableLiveData<Boolean> getIsUserSelected() {
@@ -149,8 +166,6 @@ public class BaseMvvm extends AndroidViewModel {
                     }
                 });
     }
-
-
     @Override
     protected void onCleared() {
         super.onCleared();

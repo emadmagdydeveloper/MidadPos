@@ -223,6 +223,17 @@
     <string name="sort_amount">AMOUNT</string>
     <string name="sort_time">TIME</string>
     <string name="sort_employee">EMPLOYEE</string>
+    <string name="print_receipts_and_bills">Print receipts and bills</string>
+    <string name="printer_model">Printer model</string>
+    <string name="no_printers">No printers</string>
+    <string name="other_model">Other model</string>
+    <string name="create_printer">Create printer</string>
+    <string name="mm80">80 mm</string>
+    <string name="mm58">58 mm</string>
+    <string name="paper_width">Paper width</string>
+    <string name="inerface">Interface</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="bluetooth_printer">Bluetooth printer</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

@@ -41,12 +41,11 @@ public class ShiftMvvm extends AndroidViewModel {
     private MutableLiveData<Boolean> isLoadingShifts;
     private MutableLiveData<Boolean> isOpenSuccess;
     private MutableLiveData<ShiftModel> shift;
-    private MutableLiveData<Boolean> showPin;
-    private MutableLiveData<Boolean> forNavigation;
     private MutableLiveData<String> actualAmount;
     private MutableLiveData<List<ShiftModel>> shifts;
     private MutableLiveData<ShiftModel> selectedHistoryShift;
-
+    public boolean showPin =false;
+    public boolean forNavigation = false;
     private UserModel userModel;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -103,23 +102,6 @@ public class ShiftMvvm extends AndroidViewModel {
     }
 
 
-    public MutableLiveData<Boolean> getForNavigation() {
-        if (forNavigation == null) {
-            forNavigation = new MutableLiveData<>();
-            forNavigation.setValue(false);
-        }
-
-        return forNavigation;
-    }
-
-    public MutableLiveData<Boolean> getShowPin() {
-        if (showPin == null) {
-            showPin = new MutableLiveData<>();
-            showPin.setValue(false);
-        }
-
-        return showPin;
-    }
 
     public MutableLiveData<Boolean> getIsLoading() {
         if (isLoading == null) {

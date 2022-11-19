@@ -46,6 +46,8 @@ public class ReceiptDetailsMvvm extends AndroidViewModel {
     private MutableLiveData<List<OrderModel.Sale>> orders;
     private final CompositeDisposable disposable = new CompositeDisposable();
     private MutableLiveData<OrderModel.Sale> selectedOrder;
+    public boolean showPin =false;
+    public boolean forNavigation = false;
 
 
     public ReceiptDetailsMvvm(@NonNull Application application) {

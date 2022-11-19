@@ -103,7 +103,6 @@ public class HomeActivity extends DrawerBaseActivity {
     private OpenedTicketsAdapter openedTicketsAdapter;
 
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -155,6 +154,13 @@ public class HomeActivity extends DrawerBaseActivity {
         baseMvvm.getOnUserRefreshed().observe(this, aBoolean -> {
             mvvm.loadHomeData();
         });
+
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+            mvvm.forNavigation = false;
+        });
+
+
 
         binding.toolBarHomeLayout.setLang(getLang());
 
@@ -210,9 +216,6 @@ public class HomeActivity extends DrawerBaseActivity {
         }
 
 
-
-
-
         spinnerCountryAdapter = new SpinnerCountryAdapter(this, getLang());
         binding.addCustomerDialog.addCustomerLayout.spinnerCountry.setAdapter(spinnerCountryAdapter);
         binding.addCustomerDialog.addCustomerLayout.spinnerCountry.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -254,6 +257,9 @@ public class HomeActivity extends DrawerBaseActivity {
         openedTicketsAdapter = new OpenedTicketsAdapter(this,getLang());
         binding.dialogOpenedTickets.recView.setAdapter(openedTicketsAdapter);
 
+        mvvm.getIsDeleteAllDraftTicketsSelected().observe(this,checked -> {
+            binding.dialogOpenedTickets.checkboxSelectAllOpenedTickets.setChecked(checked);
+        });
 
         mvvm.getIsOpenedTicketSearchOpened().observe(this,isOpened->{
             binding.dialogOpenedTickets.llSearch.setVisibility(isOpened?View.VISIBLE:View.GONE);
@@ -262,7 +268,14 @@ public class HomeActivity extends DrawerBaseActivity {
             binding.dialogOpenedTickets.progBar.setVisibility(isLoading?View.VISIBLE:View.GONE);
         });
 
+        mvvm.getCanDeleteOpenedTickets().observe(this,canDelete-> binding.dialogOpenedTickets.setCanDelete(canDelete));
+
+        binding.dialogOpenedTickets.deleteAllOpenedTickets.setOnClickListener(v -> {
+            mvvm.deleteDraftTickets(this);
+        });
+
         mvvm.getOrders().observe(this,list->{
+
             if (openedTicketsAdapter!=null){
                 openedTicketsAdapter.updateList(list);
             }
@@ -316,6 +329,11 @@ public class HomeActivity extends DrawerBaseActivity {
         if (binding.dialogOpenedTickets.filter!=null){
             binding.dialogOpenedTickets.filter.setOnClickListener(this::createSortOpenedTicketsPopupMenu);
         }
+
+        binding.dialogOpenedTickets.checkboxSelectAllOpenedTickets.setOnClickListener(v -> {
+
+            mvvm.addAllDraftTicketToDelete(binding.dialogOpenedTickets.checkboxSelectAllOpenedTickets.isChecked());
+        });
         ///////////////////////////////////////////////////////////////////////////////
 
         mvvm.getCustomersInstance().observe(this, customers -> {
@@ -818,6 +836,8 @@ public class HomeActivity extends DrawerBaseActivity {
 
         binding.dialogOpenedTickets.closeDialogOpenedTicket.setOnClickListener(v -> {
             mvvm.getIsDialogOpenedTicketsOpened().setValue(false);
+            mvvm.addAllDraftTicketToDelete(false);
+            mvvm.getIsDeleteAllDraftTicketsSelected().setValue(false);
         });
 
         if (binding.barcode != null && binding.llData != null) {
@@ -1256,8 +1276,9 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
         }
+        baseMvvm.getOnNavigate().setValue(true);
         mvvm.forNavigation = true;
-        mvvm.showPin = false;
+
     }
 
     private void scrollToLastItemCart() {
@@ -1881,9 +1902,15 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
     public void addOpenTicketToCart(OrderModel.Sale sale) {
-        mvvm.addFromDraftToCart(sale);
+        if (mvvm.getIsOpenedTicketSearchOpened().getValue()!=null&&!mvvm.getIsOpenedTicketSearchOpened().getValue()){
+            mvvm.addFromDraftToCart(sale);
+
+        }
     }
 
+    public void addOpenTicketToDelete(OrderModel.Sale sale) {
+        mvvm.addDraftTicketToDelete(sale);
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -1927,35 +1954,25 @@ public class HomeActivity extends DrawerBaseActivity {
             initCodeScanner(mvvm.getCamera().getValue());
         }
 
-        Log.e("show", mvvm.showPin + "__" + App.showHomePin + "__" + App.saleSelected);
 
+        Log.e("orie",mvvm.orientationChanged+"");
 
-        if (App.showHomePin) {
+        if (mvvm.showPin){
             showPinCodeView();
-
-        } else {
-            if (App.saleSelected) {
-                hidePinCodeView();
-
-
-            } else {
-                if (mvvm.showPin) {
-                    showPinCodeView();
-
-
-                } else {
-                    hidePinCodeView();
-                }
-            }
+        }else {
+            hidePinCodeView();
+        }
+        if (!mvvm.orientationChanged){
+            mvvm.loadHomeData();
+            mvvm.orientationChanged = false;
 
         }
 
-        mvvm.loadHomeData();
-        App.showHomePin = true;
-        App.saleSelected = true;
+
 
 
     }
+
 
 
     @Override
@@ -1968,30 +1985,57 @@ public class HomeActivity extends DrawerBaseActivity {
 
     }
 
+
+
     @Override
-    protected void onStop() {
-        super.onStop();
-        mvvm.showPin = true;
+    protected void onRestart() {
+        super.onRestart();
+
+        if (App.navigate){
+            mvvm.forNavigation = true;
+            App.navigate = false;
+        }else {
+            mvvm.forNavigation = false;
+
+        }
+
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+
+            mvvm.showPin = true;
+
+        }
 
 
     }
 
+
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        App.showHomePin = false;
-        App.saleSelected = false;
-        outState.putBoolean("state", mvvm.showPin);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        mvvm.orientationChanged = true;
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
 
+        } catch (Exception e) {
+        }
     }
 
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
         disposable.clear();
+
     }
 
     @Override
@@ -2022,17 +2066,8 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        mvvm.showPin = savedInstanceState.getBoolean("state");
-        App.showHomePin = false;
 
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
 
-        } catch (Exception e) {
-        }
-    }
 
 
 }

@@ -67,6 +67,9 @@ public class AddCategoryActivity extends BaseActivity {
         mvvm = ViewModelProviders.of(this, new AddCategoryMvvm.MyViewModelFactory(getApplication(), categoryModel)).get(AddCategoryMvvm.class);
         binding.setLang(getLang());
 
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
         if (categoryModel == null) {
             binding.setTitle(getString(R.string.create_category));
             binding.cardDelete.setVisibility(View.GONE);
@@ -118,6 +121,8 @@ public class AddCategoryActivity extends BaseActivity {
                     mvvm.getCategoryName().setValue("");
                     binding.edtCategoryName.setText(null);
                 }
+
+                mvvm.forNavigation = true;
 
                 Intent intent = new Intent(this, AddItemActivity.class);
                 startActivity(intent);
@@ -504,15 +509,6 @@ public class AddCategoryActivity extends BaseActivity {
     public void assignItem(ItemModel itemModel) {
         mvvm.addRemoveAssignItem(itemModel);
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mvvm.showPin = true;
-
-
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -522,6 +518,40 @@ public class AddCategoryActivity extends BaseActivity {
             hidePinCodeView();
         }
     }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
+
+        }
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
+
+
 
     @Override
     public void onBackPressed() {
@@ -537,13 +567,6 @@ public class AddCategoryActivity extends BaseActivity {
 
     }
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-
-        }catch (Exception e){}
-    }
 
 
 }

@@ -33,6 +33,6 @@ public class DiffUtilsOpenedTickets extends DiffUtil.Callback {
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldList.get(oldItemPosition)==newList.get(newItemPosition);
+        return oldList.get(oldItemPosition).isSelected()!=newList.get(newItemPosition).isSelected();
     }
 }

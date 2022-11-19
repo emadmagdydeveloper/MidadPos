@@ -280,8 +280,7 @@ public class ShiftActivity extends DrawerBaseActivity {
         });
 
         binding.btnCashManagement.setOnClickListener(v -> {
-            mvvm.getForNavigation().setValue(true);
-
+            mvvm.forNavigation = true;
             Intent intent = new Intent(this, CashManagementActivity.class);
             if (mvvm.getShift().getValue() != null && mvvm.getShift().getValue().getData() != null) {
                 intent.putExtra("data", (Serializable) mvvm.getShift().getValue().getData());
@@ -331,30 +330,64 @@ public class ShiftActivity extends DrawerBaseActivity {
         }
     }
 
+    public void setShiftData(ShiftModel model) {
+        mvvm.getSelectedHistoryShift().setValue(model);
+        mvvm.getIsShiftReportsOpened().setValue(true);
+        binding.flDialog.setVisibility(View.VISIBLE);
+        binding.flShift.setVisibility(View.VISIBLE);
+        binding.flShiftReport.setVisibility(View.VISIBLE);
+        binding.shiftReportLayout.setModel(model);
+        if (paymentAdapter2!=null){
+            paymentAdapter2.updateList(model.getPayments());
+        }
+
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
-        if (mvvm.getShowPin().getValue() != null && mvvm.getShowPin().getValue()) {
+        if (mvvm.showPin) {
             showPinCodeView();
         } else {
             hidePinCodeView();
         }
-        mvvm.getForNavigation().setValue(false);
-        mvvm.getShowPin().setValue(false);
+
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onRestart() {
+        super.onRestart();
 
-        if (mvvm.getForNavigation().getValue() != null && mvvm.getForNavigation().getValue()) {
-            mvvm.getShowPin().setValue(false);
-        } else {
-            mvvm.getShowPin().setValue(true);
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
 
         }
 
+
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
+
+
 
     @Override
     public void onBackPressed() {
@@ -381,25 +414,4 @@ public class ShiftActivity extends DrawerBaseActivity {
     }
 
 
-
-    public void setShiftData(ShiftModel model) {
-        mvvm.getSelectedHistoryShift().setValue(model);
-        mvvm.getIsShiftReportsOpened().setValue(true);
-        binding.flDialog.setVisibility(View.VISIBLE);
-        binding.flShift.setVisibility(View.VISIBLE);
-        binding.flShiftReport.setVisibility(View.VISIBLE);
-        binding.shiftReportLayout.setModel(model);
-        if (paymentAdapter2!=null){
-            paymentAdapter2.updateList(model.getPayments());
-        }
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-
-        }catch (Exception e){}
-    }
 }

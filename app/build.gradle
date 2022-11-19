@@ -73,6 +73,7 @@ dependencies {
     implementation 'com.budiyev.android:code-scanner:2.1.0'
     implementation 'com.chaos.view:pinview:1.4.4'
     implementation 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.1'
+    implementation "com.github.skydoves:powermenu:2.2.1"
 
 
 }

@@ -58,15 +58,6 @@ public class ChargeActivity extends BaseActivity {
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mvvm.showPin) {
-            showPinCodeView();
-        } else {
-            hidePinCodeView();
-        }
-    }
 
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(ChargeMvvm.class);
@@ -78,6 +69,11 @@ public class ChargeActivity extends BaseActivity {
         binding.layout.recViewPayment.setHasFixedSize(true);
         paymentsAdapter = new PaymentsAdapter(this);
         binding.layout.recViewPayment.setAdapter(paymentsAdapter);
+
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
+
 
         if (binding.layout.recViewCart != null) {
             binding.layout.recViewCart.setLayoutManager(new LinearLayoutManager(this));
@@ -636,6 +632,105 @@ public class ChargeActivity extends BaseActivity {
     }
 
 
+
+
+    public void choosePayment(PaymentModel paymentModel) {
+        mvvm.getPaymentType().setValue(Integer.valueOf(paymentModel.getId()));
+
+        mvvm.getIsPaidShown().setValue(true);
+        if (mvvm.getCartListInstance().getValue() != null && mvvm.getPaidAmount().getValue() != null) {
+            double remaining = Double.parseDouble(mvvm.getPaidAmount().getValue()) - mvvm.getCartListInstance().getValue().getTotalPrice();
+            mvvm.getRemaining().setValue(Double.parseDouble(String.format(Locale.US, "%.2f", remaining)));
+        }
+    }
+
+    public void chooseSplitPayment(ChargeModel chargeModel, int adapterPosition, View view) {
+        if (!chargeModel.isPaid()) {
+            createMenu(view, chargeModel, adapterPosition);
+
+        }
+    }
+
+    private void createMenu(View view, ChargeModel chargeModel, int adapterPos) {
+        if (mvvm.getAllPayment().getValue() != null) {
+            int pos = 0;
+            PopupMenu popupMenu = new PopupMenu(this, view);
+            for (PaymentModel paymentModel : mvvm.getAllPayment().getValue()) {
+                popupMenu.getMenu().add(1, pos, 1, paymentModel.getName());
+                pos += 1;
+            }
+
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                chargeModel.setPaymentModel(mvvm.getAllPayment().getValue().get(item.getItemId()));
+                splitAdapter.notifyItemChanged(adapterPos);
+                return true;
+            });
+
+            popupMenu.show();
+        }
+
+    }
+
+
+
+    public void itemSplitPay(ChargeModel chargeModel) {
+        mvvm.itemForPaid = chargeModel;
+        if (chargeModel.getPaymentModel().getType().equalsIgnoreCase("cash")) {
+            mvvm.getItemSplitPrice().setValue(chargeModel.getPrice());
+            binding.layout.edtCashSplitItem.setText(chargeModel.getPrice().replace(",", ""));
+
+            binding.layout.setItemDueAmount(Double.parseDouble(chargeModel.getPrice().replace(",", "")));
+            mvvm.getShowItemPaid().setValue(true);
+        } else {
+            mvvm.itemForPaid.setPaid(true);
+            mvvm.itemForPaid.setEdited(true);
+            mvvm.itemForPaid.setPaidAmount(Double.parseDouble(mvvm.itemForPaid.getPrice()));
+            mvvm.getRemainingPrice();
+            mvvm.getSplitList().setValue(mvvm.getSplitList().getValue());
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mvvm.showPin) {
+            showPinCodeView();
+        } else {
+            hidePinCodeView();
+        }
+    }
+
+
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        mvvm.showPin = true;
+
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
+        try {
+            super.onRestoreInstanceState(savedInstanceState);
+
+        } catch (Exception e) {
+        }
+    }
+
+
     @Override
     public void onBackPressed() {
         if (binding.layout.dialogCustomer != null && binding.layout.addCustomerDialog != null) {
@@ -687,80 +782,4 @@ public class ChargeActivity extends BaseActivity {
     }
 
 
-    public void choosePayment(PaymentModel paymentModel) {
-        mvvm.getPaymentType().setValue(Integer.valueOf(paymentModel.getId()));
-
-        mvvm.getIsPaidShown().setValue(true);
-        if (mvvm.getCartListInstance().getValue() != null && mvvm.getPaidAmount().getValue() != null) {
-            double remaining = Double.parseDouble(mvvm.getPaidAmount().getValue()) - mvvm.getCartListInstance().getValue().getTotalPrice();
-            mvvm.getRemaining().setValue(Double.parseDouble(String.format(Locale.US, "%.2f", remaining)));
-        }
-    }
-
-    public void chooseSplitPayment(ChargeModel chargeModel, int adapterPosition, View view) {
-        if (!chargeModel.isPaid()) {
-            createMenu(view, chargeModel, adapterPosition);
-
-        }
-    }
-
-    private void createMenu(View view, ChargeModel chargeModel, int adapterPos) {
-        if (mvvm.getAllPayment().getValue() != null) {
-            int pos = 0;
-            PopupMenu popupMenu = new PopupMenu(this, view);
-            for (PaymentModel paymentModel : mvvm.getAllPayment().getValue()) {
-                popupMenu.getMenu().add(1, pos, 1, paymentModel.getName());
-                pos += 1;
-            }
-
-
-            popupMenu.setOnMenuItemClickListener(item -> {
-                chargeModel.setPaymentModel(mvvm.getAllPayment().getValue().get(item.getItemId()));
-                splitAdapter.notifyItemChanged(adapterPos);
-                return true;
-            });
-
-            popupMenu.show();
-        }
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mvvm.showPin = true;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mvvm.showPin = false;
-    }
-
-    public void itemSplitPay(ChargeModel chargeModel) {
-        mvvm.itemForPaid = chargeModel;
-        if (chargeModel.getPaymentModel().getType().equalsIgnoreCase("cash")) {
-            mvvm.getItemSplitPrice().setValue(chargeModel.getPrice());
-            binding.layout.edtCashSplitItem.setText(chargeModel.getPrice().replace(",", ""));
-
-            binding.layout.setItemDueAmount(Double.parseDouble(chargeModel.getPrice().replace(",", "")));
-            mvvm.getShowItemPaid().setValue(true);
-        } else {
-            mvvm.itemForPaid.setPaid(true);
-            mvvm.itemForPaid.setEdited(true);
-            mvvm.itemForPaid.setPaidAmount(Double.parseDouble(mvvm.itemForPaid.getPrice()));
-            mvvm.getRemainingPrice();
-            mvvm.getSplitList().setValue(mvvm.getSplitList().getValue());
-        }
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-
-        } catch (Exception e) {
-        }
-    }
 }

@@ -84,6 +84,9 @@ public class AddItemActivity extends BaseActivity {
     private void initView() {
         mvvm = ViewModelProviders.of(this).get(AddItemMvvm.class);
         binding.setLang(getLang());
+        baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
+            mvvm.showPin = false;
+        });
         if (itemModel==null){
             binding.setTitle(getString(R.string.create_item));
             binding.cardDelete.setVisibility(View.GONE);
@@ -373,6 +376,7 @@ public class AddItemActivity extends BaseActivity {
 
 
     private void navigateToAddCategory() {
+        mvvm.forNavigation = true;
         Intent intent = new Intent(this, AddCategoryActivity.class);
         startActivity(intent);
         overridePendingTransition(0, 0);
@@ -556,6 +560,7 @@ public class AddItemActivity extends BaseActivity {
     }
 
     private void openCamera() {
+        mvvm.forNavigation = true;
         req = 1;
         String authority = getPackageName() + ".provider";
         outPutUri = FileProvider.getUriForFile(this, authority, getCameraOutPutFile());
@@ -570,6 +575,7 @@ public class AddItemActivity extends BaseActivity {
     }
 
     private void openGallery() {
+        mvvm.forNavigation = true;
         req = 2;
         Intent intentGallery = new Intent();
         intentGallery.setAction(Intent.ACTION_GET_CONTENT);
@@ -596,12 +602,7 @@ public class AddItemActivity extends BaseActivity {
         return file;
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(0, 0);
 
-    }
 
     public void selectSoldBy(UnitModel model) {
         Objects.requireNonNull(mvvm.getAddItemModel().getValue()).setUnit_id(model.getId());
@@ -635,16 +636,6 @@ public class AddItemActivity extends BaseActivity {
         dialog.show();
     }
 
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mvvm.showPin = true;
-
-
-    }
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -662,11 +653,48 @@ public class AddItemActivity extends BaseActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        if (mvvm.forNavigation){
+            mvvm.showPin = false;
+
+        }else {
+            mvvm.showPin = true;
+
+        }
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("pin",mvvm.showPin);
+    }
+
+    @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        mvvm.showPin = savedInstanceState.getBoolean("pin");
         try {
             super.onRestoreInstanceState(savedInstanceState);
 
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
+
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(0, 0);
+
+    }
+
+
+
+
+
 
 }
