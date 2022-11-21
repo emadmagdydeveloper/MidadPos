@@ -26,6 +26,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.midad_pos.R;
 import com.midad_pos.databinding.AlertDialogBinding;
+import com.midad_pos.databinding.ErrorDialogBinding;
 
 import java.io.File;
 
@@ -61,6 +62,16 @@ public class Common {
         dialog.setIndeterminateDrawable(drawable);
         return dialog;
 
+    }
+    public static void createErrorDialog(Context context, String content) {
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .create();
+        dialog.setCanceledOnTouchOutside(false);
+        ErrorDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.error_dialog, null, false);
+        binding.setContent(content);
+        dialog.setView(binding.getRoot());
+        binding.cancel.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 
     public static void createAlertDialog(Context context, String title, boolean isHtml) {

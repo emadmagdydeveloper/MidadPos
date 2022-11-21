@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="model"
+            type="com.midad_pos.model.PrinterModel" />
+
+    </data>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="8dp"
+
+
+        >
+        <androidx.cardview.widget.CardView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/grey19"
+            >
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_printer"
+                app:tint="@color/grey4"
+                android:padding="3dp"
+                />
+        </androidx.cardview.widget.CardView>
+        <androidx.legacy.widget.Space
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:lines="1"
+                        android:ellipsize="end"
+                        android:maxEms="10"
+                        android:text="@{model.name}"
+                        android:gravity="start"
+                        android:textAlignment="viewStart"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:lines="1"
+                        android:ellipsize="end"
+                        android:layout_marginTop="8dp"
+                        android:text='@{model.printer_type.equalsIgnoreCase("other")?(model.bluetooth_name.isEmpty()?@string/other_model:model.bluetooth_name):model.printer_type}'
+                        android:gravity="start"
+                        android:textAlignment="viewStart"
+                        />
+                </LinearLayout>
+                <androidx.legacy.widget.Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/grey18"
+                    android:textSize="13sp"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    android:maxEms="10"
+                    android:text='@{model.can_print_receipt_and_bill?@string/print_receipts_and_bills:""}'
+                    />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey3"
+                android:layout_marginTop="16dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

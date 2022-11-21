@@ -1921,7 +1921,8 @@ public class HomeActivity extends DrawerBaseActivity {
             adapter.updateType(getAppSetting().getHome_layout_type());
         }
 
-        if (getAppSetting().getHome_layout_type() == 1) {
+        if (getAppSetting().getHome_layout_type() == 1)
+        {
             if (binding.recView != null) {
                 binding.recView.setLayoutManager(new GridLayoutManager(this, 3));
             }
@@ -1935,7 +1936,9 @@ public class HomeActivity extends DrawerBaseActivity {
                 binding.recViewLand.setLayoutManager(new GridLayoutManager(this, 5));
 
             }
-        } else {
+        }
+        else
+        {
             if (binding.recView != null) {
                 binding.recView.setLayoutManager(new LinearLayoutManager(this));
             }
@@ -1953,9 +1956,6 @@ public class HomeActivity extends DrawerBaseActivity {
         if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
             initCodeScanner(mvvm.getCamera().getValue());
         }
-
-
-        Log.e("orie",mvvm.orientationChanged+"");
 
         if (mvvm.showPin){
             showPinCodeView();

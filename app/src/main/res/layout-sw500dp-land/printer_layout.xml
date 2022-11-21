@@ -53,6 +53,7 @@
             </com.google.android.material.appbar.AppBarLayout>
 
             <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -73,7 +74,7 @@
 
 
         <LinearLayout
-            android:id="@+id/ll_no_items"
+            android:id="@+id/ll_no_printers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

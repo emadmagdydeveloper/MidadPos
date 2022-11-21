@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 
 import com.midad_pos.language.Language;
+import com.midad_pos.print_utils.SunmiPrintHelper;
 import com.midad_pos.uis.activity_items.ItemsActivity;
 import com.midad_pos.uis.activity_receipts.ReceiptsActivity;
 import com.midad_pos.uis.activity_settings.SettingsActivity;
@@ -33,6 +34,7 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        SunmiPrintHelper.getInstance().initSunmiPrinterService(this);
 
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override

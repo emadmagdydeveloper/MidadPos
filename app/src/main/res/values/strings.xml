@@ -234,6 +234,15 @@
     <string name="inerface">Interface</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="bluetooth_printer">Bluetooth printer</string>
+    <string name="searching">Searching...</string>
+    <string name="choose_bluetooth_printer">Choose bluetooth printer</string>
+    <string name="already_added_printer">You have already added this printer</string>
+    <string name="opps">Ooops</string>
+    <string name="choose_printer">Choose printer</string>
+    <string name="vat">VAT#</string>
+    <string name="simp_tax_inv">Simplified tax invoice</string>
+    <string name="thank_you">Thank you</string>
+    <string name="total_with_tax">Total with tax</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

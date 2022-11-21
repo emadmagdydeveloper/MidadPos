@@ -233,6 +233,7 @@ public class SupportActivity extends DrawerBaseActivity {
 
         if (mvvm.forNavigation){
             mvvm.showPin = false;
+            mvvm.forNavigation = false;
 
         }else {
             mvvm.showPin = true;

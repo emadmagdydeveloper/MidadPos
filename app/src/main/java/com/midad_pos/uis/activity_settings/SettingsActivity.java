@@ -12,8 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.midad_pos.R;
+import com.midad_pos.adapter.PrinterAdapter;
 import com.midad_pos.databinding.ActivitySettingsBinding;
 import com.midad_pos.databinding.DialogHomeItemLayoutBinding;
 import com.midad_pos.model.AppSettingModel;
@@ -26,6 +28,7 @@ import io.reactivex.disposables.CompositeDisposable;
 public class SettingsActivity extends DrawerBaseActivity {
     private SettingsMvvm mvvm;
     private ActivitySettingsBinding binding;
+    private PrinterAdapter printerAdapter;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Override
@@ -43,6 +46,8 @@ public class SettingsActivity extends DrawerBaseActivity {
         mvvm = ViewModelProviders.of(this).get(SettingsMvvm.class);
         binding.setModel(getUserModel());
 
+        printerAdapter = new PrinterAdapter(this);
+
         if (mvvm.getPositions().getValue() != null) {
             updateSelections(mvvm.getPositions().getValue());
 
@@ -54,10 +59,43 @@ public class SettingsActivity extends DrawerBaseActivity {
             }
         }
 
+        mvvm.getPrintersInstance().observe(this, list -> {
+            if (printerAdapter != null) {
+                printerAdapter.updateList(list);
+            }
+            if (binding.printersLayout!=null){
+                binding.printersLayout.llNoPrinters.setVisibility(list.size()>0?View.GONE:View.VISIBLE);
+
+            }
+
+            if (binding.printersDetailsLayout!=null){
+                binding.printersDetailsLayout.llNoPrinters.setVisibility(list.size()>0?View.GONE:View.VISIBLE);
+
+            }
+        });
+
+
+        if (binding.printersLayout!=null)
+        {
+            binding.printersLayout.recView.setLayoutManager(new LinearLayoutManager(this));
+            binding.printersLayout.recView.setHasFixedSize(true);
+            binding.printersLayout.recView.setAdapter(printerAdapter);
+        }
+
+        if (binding.printersDetailsLayout!=null)
+        {
+            binding.printersDetailsLayout.recView.setLayoutManager(new LinearLayoutManager(this));
+            binding.printersDetailsLayout.recView.setHasFixedSize(true);
+            binding.printersDetailsLayout.recView.setAdapter(printerAdapter);
+        }
+
         if (binding.flPrintersLayout != null && binding.printersLayout != null && binding.printersLayout.arrowBack != null) {
             binding.printersLayout.setLang(getLang());
             binding.printersLayout.arrowBack.setOnClickListener(view -> binding.flPrintersLayout.setVisibility(View.GONE));
+
         }
+
+
 
         if (binding.flCustomerDisplayLayout != null && binding.customerDisplayLayout != null && binding.customerDisplayLayout.arrowBack != null) {
             binding.customerDisplayLayout.setLang(getLang());
@@ -141,6 +179,7 @@ public class SettingsActivity extends DrawerBaseActivity {
             }
 
         }
+
 
         binding.printers.setOnClickListener(view -> {
             mvvm.getPositions().setValue(0);
@@ -538,21 +577,23 @@ public class SettingsActivity extends DrawerBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mvvm.showPin){
+        if (mvvm.showPin) {
             showPinCodeView();
-        }else {
+        } else {
             hidePinCodeView();
         }
+        mvvm.getPrinters();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
 
-        if (mvvm.forNavigation){
+        if (mvvm.forNavigation) {
             mvvm.showPin = false;
+            mvvm.forNavigation = false;
 
-        }else {
+        } else {
             mvvm.showPin = true;
 
         }
@@ -563,7 +604,7 @@ public class SettingsActivity extends DrawerBaseActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("pin",mvvm.showPin);
+        outState.putBoolean("pin", mvvm.showPin);
     }
 
     @Override
@@ -597,8 +638,6 @@ public class SettingsActivity extends DrawerBaseActivity {
 
 
     }
-
-
 
 
 }

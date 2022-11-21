@@ -18,12 +18,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+
+import com.midad_pos.R;
+import com.midad_pos.model.UserModel;
+import com.midad_pos.preferences.Preferences;
 
 public class PrintUtils {
     private BluetoothAdapter bluetoothAdapter;
@@ -35,7 +41,12 @@ public class PrintUtils {
     private byte[] readBuffer;
     private int readBufferPosition;
     private volatile boolean stopWorker;
+    private PrintResponse response;
 
+
+    public PrintUtils(PrintResponse response) {
+        this.response = response;
+    }
 
     public void findBluetoothDevice(AppCompatActivity context) {
 
@@ -52,6 +63,7 @@ public class PrintUtils {
                     return;
                 }
             } else {
+                response.onStartIntent();
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 context.startActivityForResult(enableBT, 0);
 
@@ -61,10 +73,8 @@ public class PrintUtils {
             Set<BluetoothDevice> pairedDevice = bluetoothAdapter.getBondedDevices();
 
             if (pairedDevice.size() > 0) {
-                for (BluetoothDevice pairedDev : pairedDevice) {
-                    Log.e("dev", pairedDev.getName());
-
-                }
+                List<BluetoothDevice> list = new ArrayList<>(pairedDevice);
+                response.onDevices(list);
             } else {
                 Log.e("dev", "no devices");
 
@@ -76,7 +86,7 @@ public class PrintUtils {
 
     }
 
-    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, AppCompatActivity context) throws IOException {
+    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, AppCompatActivity context,int paper) throws IOException {
         try {
 
             //Standard uuid from string //
@@ -85,17 +95,19 @@ public class PrintUtils {
                 return;
             }
             bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuidSting);
+
             bluetoothSocket.connect();
             Toast.makeText(context, "connected", Toast.LENGTH_SHORT).show();
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
-
             beginListenData();
+            printTestDataText(paper,context);
 
         } catch (Exception ex) {
 
         }
     }
+
 
     public void beginListenData() {
         try {
@@ -145,10 +157,37 @@ public class PrintUtils {
         }
     }
 
-    public void printData() throws IOException {
+    public void printTestDataText(int paper,Context context) {
         try {
+            UserModel userModel = Preferences.getInstance().getUserData(context);
             String msg = "";
-            msg += "\n";
+            msg += userModel.getData().getSelectedUser().getCompany_name()+"\n";
+            msg +=context.getString(R.string.simp_tax_inv)+"\n";
+
+            msg +="\n";
+            msg +="\n";
+
+            msg +=context.getString(R.string.receipt)+"#"+"\n";
+
+            msg +=context.getString(R.string.inv_date)+"\n";
+            msg +=context.getString(R.string.cashier)+"\n";
+            msg +=context.getString(R.string.pos)+"\n";
+
+            msg +="--------------------------------\n";
+            msg +="\n";
+            msg +="Delivery\n";
+            msg +="\n";
+
+            msg +="--------------------------------\n";
+
+            msg +="test           0.00\n";
+            msg +="1 X 0.00\n";
+
+            msg +="--------------------------------\n";
+
+            msg +="     "+context.getString(R.string.thank_you)+"     \n";
+
+
             outputStream.write(msg.getBytes());
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -344,6 +383,12 @@ public class PrintUtils {
             return imgbuf;
         }
 
+    }
+
+
+    public interface PrintResponse{
+        void onDevices(List<BluetoothDevice> list);
+        void onStartIntent();
     }
 
 }

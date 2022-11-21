@@ -171,7 +171,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
             Intent intent = new Intent(this, activityClass);
             startActivity(intent);
             overridePendingTransition(0, 0);
-        },100);
+        },500);
 
     }
 
