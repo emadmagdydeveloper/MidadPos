@@ -3,19 +3,30 @@ plugins {
     //id 'com.google.gms.google-services'
 }
 
+apply plugin: 'kotlin-android'
+
 android {
 
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.midad_pos"
-        minSdk 19
+        minSdkVersion 21
+        targetSdkVersion 33
+        minSdk 21
         targetSdk 32
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
-
+        renderscriptTargetApi 31
+        renderscriptSupportModeEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+
+    }
+
+    configurations {
+        all*.exclude group: 'com.google.zxing'
     }
 
     buildTypes {
@@ -35,6 +46,8 @@ android {
     }
 
 
+
+
 }
 
 dependencies {
@@ -49,7 +62,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
-    implementation 'io.paperdb:paperdb:2.7.1'
+    implementation 'io.github.pilgr:paperdb:2.7.2'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'com.facebook.shimmer:shimmer:0.5.0@aar'
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
@@ -83,6 +96,7 @@ dependencies {
     implementation 'com.sunmi:printerlibrary:1.0.13'
     implementation files('libs/core-3.3.0.jar')
     implementation 'com.sunmi:sunmiui:1.1.27'
-    implementation 'com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.2.0'
-
+    implementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

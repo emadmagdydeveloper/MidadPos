@@ -283,6 +283,16 @@ public class BaseActivity extends AppCompatActivity {
         preferences.createUpdateUserData(this, userModel);
     }
 
+    protected void clearUserModel() {
+        Preferences preferences = Preferences.getInstance();
+        preferences.clearUserData(this);
+        AppSettingModel model = getAppSetting();
+        model.setShift_id("");
+        model.setIsShiftOpen(0);
+        setAppSettingModel(model);
+
+
+    }
     protected AppSettingModel getAppSetting() {
         Preferences preferences = Preferences.getInstance();
         return preferences.getAppSetting(this);

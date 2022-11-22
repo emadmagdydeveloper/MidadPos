@@ -1,6 +1,7 @@
 package com.midad_pos.model;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -21,6 +22,7 @@ public class PrinterModel implements Serializable {
     private boolean can_print_orders;
 
 
+    @Ignore
     public PrinterModel() {
     }
 

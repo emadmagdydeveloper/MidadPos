@@ -29,6 +29,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            >
+            <include
+                android:id="@+id/layoutPrint"
+                layout="@layout/print_test_layout"
+                />
+        </FrameLayout>
+
         <LinearLayout
 
             android:layout_width="match_parent"
@@ -427,6 +438,7 @@
                                 android:layout_marginTop="16dp"
                                 />
                             <FrameLayout
+                                android:id="@+id/flPrint"
                                 android:layout_width="match_parent"
                                 android:layout_height="56dp"
                                 >

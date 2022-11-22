@@ -811,30 +811,18 @@ public class SunmiPrintHelper {
                         null);
             }
 
-            try {
-                sunmiPrinterService.setPrinterStyle(WoyouConsts.SET_LINE_SPACING, 0);
-            } catch (RemoteException e) {
-                sunmiPrinterService.sendRAWData(new byte[]{0x1B, 0x33, 0x00}, null);
-            }
 
 
-            String[] txts = new String[]{"", ""};
+
+            String[] txts = new String[]{"test", "0.00"};
             int[] width = new int[]{1, 1};
             int[] align = new int[]{0, 2};
             sunmiPrinterService.printColumnsString(txts, width, align, null);
 
-            try {
-                sunmiPrinterService.setPrinterStyle(WoyouConsts.ENABLE_BOLD, WoyouConsts.ENABLE);
-            } catch (RemoteException e) {
-                sunmiPrinterService.sendRAWData(ESCUtil.boldOn(), null);
-            }
 
-            txts[0] = "test";
-            txts[1] = "0.00";
-            sunmiPrinterService.printColumnsString(txts, width, align, null);
 
             txts[0] = "1 X 0.00";
-            txts[1] = "";
+            txts[1] = " ";
             sunmiPrinterService.printColumnsString(txts, width, align, null);
 
 
@@ -845,22 +833,16 @@ public class SunmiPrintHelper {
                         null);
             }
 
-            try {
-                sunmiPrinterService.setPrinterStyle(WoyouConsts.SET_LINE_SPACING, 0);
-            } catch (RemoteException e) {
-                sunmiPrinterService.sendRAWData(new byte[]{0x1B, 0x33, 0x00}, null);
-            }
 
             txts[0] = "Total:";
             txts[1] = "0.00";
 
-            try {
-                sunmiPrinterService.setPrinterStyle(WoyouConsts.ENABLE_BOLD, WoyouConsts.ENABLE);
-            } catch (RemoteException e) {
-                sunmiPrinterService.sendRAWData(ESCUtil.boldOn(), null);
-            }
-            sunmiPrinterService.printText(context.getString(R.string.thank_you), null);
+            sunmiPrinterService.printColumnsString(txts, width, align, null);
+
+
+            sunmiPrinterService.printText(context.getString(R.string.thank_you)+"\n", null);
             sunmiPrinterService.autoOutPaper(null);
+            cutpaper();
         } catch (RemoteException e) {
             e.printStackTrace();
         }

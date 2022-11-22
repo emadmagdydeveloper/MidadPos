@@ -3,6 +3,7 @@ package com.midad_pos.uis.activity_add_printer;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,12 +17,22 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -49,17 +60,20 @@ import com.skydoves.powermenu.PowerMenuItem;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 
 public class AddPrinterActivity extends BaseActivity implements PrintUtils.PrintResponse {
     private AddPrinterMvvm mvvm;
     private ActivityAddPrinterBinding binding;
-    private ActivityResultLauncher<String[]> permissions,permissions2;
+    private ActivityResultLauncher<String[]> permissions, permissions2, permissions3;
     private PrintUtils printUtils = new PrintUtils(this);
     private DevicesBluetoothAdapter adapter = new DevicesBluetoothAdapter(this);
     private AlertDialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +83,9 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
     }
 
     private void initView() {
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+
         mvvm = ViewModelProviders.of(this).get(AddPrinterMvvm.class);
         binding.setLang(getLang());
         baseMvvm.getOnPinSuccess().observe(this, aBoolean -> {
@@ -120,11 +137,11 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
         });
 
-        mvvm.getOnAddPrinterSuccess().observe(this,model->{
+        mvvm.getOnAddPrinterSuccess().observe(this, model -> {
             onBackPressed();
         });
 
-        mvvm.getOnAddedError().observe(this,error-> Common.createErrorDialog(this,error));
+        mvvm.getOnAddedError().observe(this, error -> Common.createErrorDialog(this, error));
 
 
         if (mvvm.getName().getValue() != null) {
@@ -160,7 +177,7 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
             String name = binding.edtName.getText().toString().trim();
             if (!name.isEmpty()) {
                 binding.txtInput.setError(null);
-                mvvm.addPrinter(false,null);
+                mvvm.addPrinter(false, null, this);
 
             } else {
                 binding.txtInput.setError(getString(R.string.empty_field));
@@ -180,61 +197,72 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
         binding.btnSearch.setOnClickListener(v -> {
             checkBluetoothPermission();
+
+
         });
 
 
-        permissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted->{
-            if (!isGranted.containsValue(false)){
+        permissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
+            if (!isGranted.containsValue(false)) {
 
                 printUtils.findBluetoothDevice(this);
                 createBluetoothDeviceDialog();
 
-            }else {
+
+            } else {
                 Toast.makeText(this, "Bluetooth permission denied", Toast.LENGTH_SHORT).show();
             }
         });
 
-        permissions2 = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),isGranted->{
-            if (!isGranted.containsValue(false)){
+        permissions2 = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
+            if (!isGranted.containsValue(false)) {
                 printUtils.findBluetoothDevice(this);
                 createBluetoothDeviceDialog();
 
 
-            }else {
+            } else {
                 Toast.makeText(this, "Bluetooth permission denied", Toast.LENGTH_SHORT).show();
             }
+        });
+
+
+        binding.flPrint.setOnClickListener(v -> {
+            mvvm.createBitmap(binding.layoutPrint.scrollView, this);
         });
 
 
     }
 
+
     private void checkBluetoothPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED){
-            if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.S){
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
                     createBluetoothDeviceDialog();
 
                     printUtils.findBluetoothDevice(this);
-                }else {
-                    permissions2.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_CONNECT});
+                } else {
+                    permissions2.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
 
                 }
-            }else {
+            } else {
                 createBluetoothDeviceDialog();
                 printUtils.findBluetoothDevice(this);
+
             }
 
-        }else {
-            if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.S){
-                permissions2.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_CONNECT});
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                permissions2.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
 
-            }else {
-                permissions.launch(new String[]{Manifest.permission.BLUETOOTH,Manifest.permission.BLUETOOTH_ADMIN});
+            } else {
+                permissions.launch(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN});
 
             }
         }
 
     }
+
 
     private void showPopupPrinters() {
         PowerMenuItem item1 = new PowerMenuItem(getString(R.string.no_printers), false);
@@ -353,8 +381,8 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
         powerMenu.showAsDropDown(binding.icon3, binding.llSpinnerInterface.getMeasuredWidth() - 48, -48);
     }
 
-    private void createBluetoothDeviceDialog(){
-        DialogBluetoothDevicesBinding devicesBinding = DataBindingUtil.inflate(LayoutInflater.from(this),R.layout.dialog_bluetooth_devices,null,false);
+    private void createBluetoothDeviceDialog() {
+        DialogBluetoothDevicesBinding devicesBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_bluetooth_devices, null, false);
         dialog = new AlertDialog.Builder(this)
                 .create();
         dialog.setCanceledOnTouchOutside(false);
@@ -371,7 +399,7 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
     @Override
     public void onDevices(List<BluetoothDevice> list) {
-        if (adapter!=null){
+        if (adapter != null) {
             adapter.updateList(list);
         }
     }
@@ -380,15 +408,24 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
     public void selectBluetoothDevice(BluetoothDevice bluetoothDevice) {
         mvvm.getBluetoothDevice().setValue(bluetoothDevice);
         binding.setPrinterBluetoothName(bluetoothDevice.getName());
-        if (dialog!=null){
+        if (dialog != null) {
             dialog.dismiss();
         }
 
     }
+
     @Override
     public void onStartIntent() {
         mvvm.forNavigation = true;
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0 && resultCode == RESULT_OK) {
+            printUtils.findBluetoothDevice(this);
+        }
     }
 
     @Override
@@ -401,17 +438,25 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
         }
     }
 
+    public static class ScanReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e("action", intent.getAction());
+        }
+    }
+
     @Override
     protected void onRestart() {
         super.onRestart();
-        if (dialog!=null){
+        if (dialog != null) {
             dialog.dismiss();
         }
-        if (mvvm.forNavigation){
+        if (mvvm.forNavigation) {
             mvvm.showPin = false;
             mvvm.forNavigation = false;
 
-        }else {
+        } else {
             mvvm.showPin = true;
 
         }
@@ -440,6 +485,8 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
     }
 
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

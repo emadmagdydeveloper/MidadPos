@@ -214,4 +214,12 @@ public interface Service {
 
 
     );
+
+    @FormUrlEncoded
+    @POST("api/auth/logout")
+    Single<Response<StatusResponse>> logout(@Field("user_id") String user_id,
+                                            @Field("pos_id") String pos_id
+
+
+    );
 }

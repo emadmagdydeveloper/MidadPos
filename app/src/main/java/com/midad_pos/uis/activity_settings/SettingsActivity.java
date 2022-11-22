@@ -22,6 +22,7 @@ import com.midad_pos.model.AppSettingModel;
 import com.midad_pos.mvvm.SettingsMvvm;
 import com.midad_pos.uis.activity_add_printer.AddPrinterActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
+import com.midad_pos.uis.activity_splash.SplashActivity;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -74,6 +75,15 @@ public class SettingsActivity extends DrawerBaseActivity {
             }
         });
 
+        mvvm.getOnLogoutSuccess().observe(this,success->{
+            if (success){
+                clearUserModel();
+                Intent intent = new Intent(this, SplashActivity.class);
+                startActivity(intent);
+                finishAffinity();
+                overridePendingTransition(0,0);
+            }
+        });
 
         if (binding.printersLayout!=null)
         {
@@ -215,6 +225,8 @@ public class SettingsActivity extends DrawerBaseActivity {
                 overridePendingTransition(0, 0);
             });
         }
+
+        binding.logout.setOnClickListener(v -> mvvm.logout(this));
 
 
     }

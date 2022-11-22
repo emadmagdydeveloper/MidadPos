@@ -420,7 +420,7 @@
                                 android:layout_height="48dp"
                                 android:padding="12dp"
                                 android:src="@drawable/ic_scan_barcode"
-                                android:tint="@color/grey4" />
+                                app:tint="@color/grey4" />
 
                             <ImageView
                                 android:id="@+id/openSearch"
@@ -428,7 +428,7 @@
                                 android:layout_height="48dp"
                                 android:padding="12dp"
                                 android:src="@drawable/ic_search"
-                                android:tint="@color/grey4" />
+                                app:tint="@color/grey4" />
                         </LinearLayout>
 
                         <View
@@ -581,7 +581,7 @@
                 android:layout_width="96dp"
                 android:layout_height="96dp"
                 android:src="@drawable/ic_clock"
-                android:tint="@color/grey18"
+                app:tint="@color/grey18"
                 />
             <TextView
                 android:layout_width="wrap_content"

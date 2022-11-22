@@ -1,9 +1,13 @@
 package com.midad_pos.print_utils;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -48,6 +52,9 @@ public class PrintUtils {
         this.response = response;
     }
 
+
+
+    @SuppressLint("MissingPermission")
     public void findBluetoothDevice(AppCompatActivity context) {
 
         try {
@@ -58,27 +65,23 @@ public class PrintUtils {
             }
 
             if (bluetoothAdapter.isEnabled()) {
-                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
 
-                    return;
+                Set<BluetoothDevice> pairedDevice = bluetoothAdapter.getBondedDevices();
+
+                if (pairedDevice.size() > 0) {
+                    List<BluetoothDevice> list = new ArrayList<>(pairedDevice);
+                    response.onDevices(list);
+                } else {
+                    Toast.makeText(context, "No devices available", Toast.LENGTH_SHORT).show();
+
                 }
             } else {
                 response.onStartIntent();
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 context.startActivityForResult(enableBT, 0);
-
-
             }
 
-            Set<BluetoothDevice> pairedDevice = bluetoothAdapter.getBondedDevices();
 
-            if (pairedDevice.size() > 0) {
-                List<BluetoothDevice> list = new ArrayList<>(pairedDevice);
-                response.onDevices(list);
-            } else {
-                Log.e("dev", "no devices");
-
-            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -86,7 +89,7 @@ public class PrintUtils {
 
     }
 
-    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, AppCompatActivity context,int paper) throws IOException {
+    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, AppCompatActivity context,Bitmap bitmap) {
         try {
 
             //Standard uuid from string //
@@ -101,7 +104,8 @@ public class PrintUtils {
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
             beginListenData();
-            printTestDataText(paper,context);
+            printImage(bitmap);
+            //printTestDataText(paper,context);
 
         } catch (Exception ex) {
 
@@ -384,6 +388,7 @@ public class PrintUtils {
         }
 
     }
+
 
 
     public interface PrintResponse{

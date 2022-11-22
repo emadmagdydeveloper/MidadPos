@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+//import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
 import com.midad_pos.model.AppSettingModel;
