@@ -243,6 +243,9 @@
     <string name="simp_tax_inv">فاتورة ضريبية مبسطة</string>
     <string name="thank_you">شكرا لزيارتكم</string>
     <string name="total_with_tax">الإجمالي شامل الضريبة</string>
+    <string name="invalid_credential">البريد الإلكتروني أو كلمة المرور غير صحيحة.\nالرجاء المحاولة مرة اخرى</string>
+    <string name="print_bill">طباعة الفاتورة</string>
+    <string name="printer">طابعة</string>
 
 
     <string-array name="delivery_options">

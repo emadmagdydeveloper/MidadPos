@@ -93,9 +93,15 @@ public class LoginMvvm extends AndroidViewModel {
                         getIsLoading().setValue(false);
                         if (response.isSuccessful()){
                             if (response.body()!=null){
+                                Log.e("code",response.body().getStatus()+""+response.body().getMessage().toString());
                                 if (response.body().getStatus()==200){
                                     getIsLoginDone().setValue(true);
                                     getOnUserLogin().setValue(response.body());
+                                }else if (response.body().getStatus()==406){
+                                    getIsLoginDone().setValue(false);
+
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.invalid_credential));
+
                                 }else {
                                     getIsLoginDone().setValue(false);
 

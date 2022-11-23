@@ -14,11 +14,11 @@ android {
         minSdkVersion 21
         targetSdkVersion 33
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
-        renderscriptTargetApi 31
+        renderscriptTargetApi 33
         renderscriptSupportModeEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true

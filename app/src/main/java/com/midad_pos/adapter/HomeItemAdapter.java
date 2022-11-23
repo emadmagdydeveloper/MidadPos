@@ -46,6 +46,7 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HolderColor){
@@ -112,9 +113,11 @@ public class HomeItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void updateList(List<ItemModel> list){
         DiffUtilsItems callback = new DiffUtilsItems(this.list,list);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
+        diffResult.dispatchUpdatesTo(this);
         this.list.clear();
         this.list.addAll(list);
-        diffResult.dispatchUpdatesTo(this);
+
+
 
     }
     public void updateType(int type){

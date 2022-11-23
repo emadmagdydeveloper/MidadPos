@@ -50,6 +50,13 @@
 
         />
     <item
+        android:id="@+id/print"
+        android:icon="@drawable/ic_printer"
+        android:title="@string/print_bill"
+        app:iconTint="@drawable/ticket_options_menu"
+
+        />
+    <item
         android:id="@+id/edit"
         android:icon="@drawable/ic_edit"
         android:title="@string/edit_ticket"

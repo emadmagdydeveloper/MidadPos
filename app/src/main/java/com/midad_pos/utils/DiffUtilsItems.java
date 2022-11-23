@@ -1,5 +1,9 @@
 package com.midad_pos.utils;
 
+import android.os.Bundle;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.midad_pos.model.ItemModel;
@@ -31,8 +35,11 @@ public class DiffUtilsItems extends DiffUtil.Callback {
         return oldItemPosition == newItemPosition;
     }
 
+
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldList.get(oldItemPosition)==newList.get(newItemPosition);
+        return  newList.get(newItemPosition)==oldList.get(oldItemPosition);
+
     }
+
 }

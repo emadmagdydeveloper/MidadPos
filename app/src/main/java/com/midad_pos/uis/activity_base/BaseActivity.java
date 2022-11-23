@@ -23,6 +23,7 @@ import com.midad_pos.model.User;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.mvvm.BaseMvvm;
 import com.midad_pos.preferences.Preferences;
+import com.midad_pos.share.App;
 import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_items.ItemsActivity;
 import com.midad_pos.uis.activity_receipts.ReceiptsActivity;
@@ -236,7 +237,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void showPinCodeView(){
         if (binding!=null){
             binding.pinContainer.setVisibility(View.VISIBLE);
-            binding.container.setVisibility(View.GONE);
             updatePinView("");
         }
     }
@@ -244,7 +244,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void hidePinCodeView(){
         if (binding!=null){
             binding.pinContainer.setVisibility(View.GONE);
-            binding.container.setVisibility(View.VISIBLE);
             updatePinView("");
         }
     }
@@ -322,12 +321,17 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (this instanceof ItemsActivity || this instanceof ReceiptsActivity|| this instanceof  ShiftActivity || this instanceof SettingsActivity|| this instanceof SupportActivity){
+        if (binding.pinContainer.getVisibility()==View.GONE){
+            if (this instanceof ItemsActivity || this instanceof ReceiptsActivity|| this instanceof  ShiftActivity || this instanceof SettingsActivity|| this instanceof SupportActivity){
+                App app = (App) getApplicationContext();
+                app.killAllActivities();
+            }else {
+                super.onBackPressed();
+                overridePendingTransition(0, 0);
 
-        }else {
-            super.onBackPressed();
-            overridePendingTransition(0, 0);
+            }
         }
+
 
 
     }

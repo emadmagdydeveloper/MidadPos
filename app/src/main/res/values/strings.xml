@@ -243,6 +243,10 @@
     <string name="simp_tax_inv">Simplified tax invoice</string>
     <string name="thank_you">Thank you</string>
     <string name="total_with_tax">Total with tax</string>
+    <string name="invalid_credential">Incorrect email or password.\nPlease try again</string>
+    <string name="print_bill">Print bill</string>
+
+    <string name="printer">Printer</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

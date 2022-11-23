@@ -19,7 +19,9 @@ import com.midad_pos.adapter.PrinterAdapter;
 import com.midad_pos.databinding.ActivitySettingsBinding;
 import com.midad_pos.databinding.DialogHomeItemLayoutBinding;
 import com.midad_pos.model.AppSettingModel;
+import com.midad_pos.model.PrinterModel;
 import com.midad_pos.mvvm.SettingsMvvm;
+import com.midad_pos.uis.activity_add_category.AddCategoryActivity;
 import com.midad_pos.uis.activity_add_printer.AddPrinterActivity;
 import com.midad_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_pos.uis.activity_splash.SplashActivity;
@@ -59,6 +61,38 @@ public class SettingsActivity extends DrawerBaseActivity {
                 showLayoutDialog();
             }
         }
+
+        mvvm.getIsDeleteMode().observe(this, aBoolean -> {
+            if (aBoolean) {
+                if (binding.printersLayout != null) {
+                    binding.printersLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
+                }
+
+                if (binding.printersDetailsLayout != null) {
+                    binding.printersDetailsLayout.toolbarDeleteModel.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (binding.printersLayout != null) {
+                    binding.printersLayout.toolbarDeleteModel.setVisibility(View.GONE);
+                }
+
+                if (binding.printersDetailsLayout != null) {
+                    binding.printersDetailsLayout.toolbarDeleteModel.setVisibility(View.GONE);
+                }
+            }
+
+        });
+
+
+        mvvm.getDeletedPrinters().observe(this, list -> {
+            if (binding.printersLayout != null) {
+                binding.printersLayout.setDeleteCount(list.size() + "");
+            }
+
+            if (binding.printersDetailsLayout != null) {
+                binding.printersDetailsLayout.setDeleteCount(list.size() + "");
+            }
+        });
 
         mvvm.getPrintersInstance().observe(this, list -> {
             if (printerAdapter != null) {
@@ -228,6 +262,21 @@ public class SettingsActivity extends DrawerBaseActivity {
 
         binding.logout.setOnClickListener(v -> mvvm.logout(this));
 
+        if (binding.printersLayout!=null){
+            binding.printersLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedPrinters());
+        }
+
+        if (binding.printersDetailsLayout!=null){
+            binding.printersDetailsLayout.imageNormalMode.setOnClickListener(v -> mvvm.clearDeletedPrinters());
+        }
+
+        if (binding.printersLayout!=null){
+            binding.printersLayout.imageDelete.setOnClickListener(v -> mvvm.deletePrinters());
+        }
+
+        if (binding.printersDetailsLayout!=null){
+            binding.printersDetailsLayout.imageDelete.setOnClickListener(v -> mvvm.deletePrinters());
+        }
 
     }
 
@@ -239,7 +288,8 @@ public class SettingsActivity extends DrawerBaseActivity {
         DialogHomeItemLayoutBinding layoutBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.dialog_home_item_layout, null, false);
         dialog.setView(layoutBinding.getRoot());
 
-        if (getAppSetting().getHome_layout_type() == 1) {
+        if (getAppSetting().getHome_layout_type() == 1)
+        {
             if (layoutBinding.img1 != null) {
                 layoutBinding.img1.setImageResource(R.drawable.selected_grid);
 
@@ -269,7 +319,8 @@ public class SettingsActivity extends DrawerBaseActivity {
             }
 
 
-        } else {
+        }
+        else {
             if (layoutBinding.img1 != null) {
                 layoutBinding.img1.setImageResource(R.drawable.selected_linear);
 
@@ -280,11 +331,11 @@ public class SettingsActivity extends DrawerBaseActivity {
             }
 
             if (layoutBinding.imgLand1 != null) {
-                layoutBinding.imgLand1.setImageResource(R.drawable.tabled_selected_linear);
+                layoutBinding.imgLand1.setImageResource(R.drawable.tablet_unselected_linear);
 
             }
             if (layoutBinding.imgLand2 != null) {
-                layoutBinding.imgLand2.setImageResource(R.drawable.tablet_unselected_grid);
+                layoutBinding.imgLand2.setImageResource(R.drawable.tablet_selected_grid);
 
             }
 
@@ -439,7 +490,7 @@ public class SettingsActivity extends DrawerBaseActivity {
                 layoutBinding.imgLand2.setImageResource(R.drawable.tabled_selected_linear);
 
                 layoutBinding.rbGrid.setChecked(false);
-                layoutBinding.rbList.setChecked(false);
+                layoutBinding.rbList.setChecked(true);
 
             });
 
@@ -652,4 +703,26 @@ public class SettingsActivity extends DrawerBaseActivity {
     }
 
 
+    public void updateDeleteModel(int adapterPosition) {
+        if (mvvm.getDeletedPrinters().getValue() != null && mvvm.getDeletedPrinters().getValue().size() == 0) {
+            mvvm.getIsDeleteMode().setValue(true);
+            mvvm.addPrinterToDelete(adapterPosition);
+            printerAdapter.notifyItemChanged(adapterPosition);
+
+        }
+    }
+
+
+    public void selectDeletePrinter(int adapterPosition, PrinterModel printerModel) {
+        if (mvvm.getIsDeleteMode().getValue() != null && mvvm.getIsDeleteMode().getValue()) {
+            if (printerModel.isSelected()) {
+                printerModel.setSelected(false);
+                mvvm.removePrinterFromDeletedList(adapterPosition);
+            } else {
+                mvvm.addPrinterToDelete(adapterPosition);
+
+            }
+            printerAdapter.notifyItemChanged(adapterPosition);
+        }
+    }
 }

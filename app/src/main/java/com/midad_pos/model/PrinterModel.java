@@ -20,6 +20,8 @@ public class PrinterModel implements Serializable {
     private String paper_width;
     private boolean can_print_receipt_and_bill;
     private boolean can_print_orders;
+    @Ignore
+    private boolean isSelected;
 
 
     @Ignore
@@ -116,5 +118,15 @@ public class PrinterModel implements Serializable {
 
     public void setCan_print_orders(boolean can_print_orders) {
         this.can_print_orders = can_print_orders;
+    }
+
+    @Ignore
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    @Ignore
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

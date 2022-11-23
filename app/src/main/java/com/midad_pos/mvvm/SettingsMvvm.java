@@ -13,7 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.midad_pos.R;
 import com.midad_pos.database.AppDatabase;
 import com.midad_pos.database.DAO;
-import com.midad_pos.model.OrderModel;
+import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.PrinterModel;
 import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.CompletableObserver;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -44,6 +45,9 @@ public class SettingsMvvm extends AndroidViewModel {
     private AppDatabase database;
     private DAO dao;
     private MutableLiveData<List<PrinterModel>> printers;
+    private MutableLiveData<Boolean> isDeleteMode;
+    private MutableLiveData<List<PrinterModel>> deletedPrinters;
+
     private CompositeDisposable disposable = new CompositeDisposable();
 
     public SettingsMvvm(@NonNull Application application) {
@@ -84,6 +88,21 @@ public class SettingsMvvm extends AndroidViewModel {
         return onLogoutSuccess;
     }
 
+    public MutableLiveData<Boolean> getIsDeleteMode() {
+        if (isDeleteMode == null) {
+            isDeleteMode = new MutableLiveData<>();
+        }
+
+        return isDeleteMode;
+    }
+    public MutableLiveData<List<PrinterModel>> getDeletedPrinters() {
+        if (deletedPrinters == null) {
+            deletedPrinters = new MutableLiveData<>();
+            deletedPrinters.setValue(new ArrayList<>());
+        }
+
+        return deletedPrinters;
+    }
     public void getPrinters(){
         dao.getPrinters().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -95,7 +114,27 @@ public class SettingsMvvm extends AndroidViewModel {
 
                     @Override
                     public void onSuccess(List<PrinterModel> list) {
+
+                        for (PrinterModel printerModel:list){
+                            int pos = getDeletedPrinterPos(printerModel.getId());
+                            if (pos!=-1){
+                                printerModel.setSelected(true);
+                            }else {
+                                printerModel.setSelected(false);
+
+                            }
+
+                        }
+
+                        if (getDeletedPrinters().getValue()!=null&&getDeletedPrinters().getValue().size()>0){
+                            getIsDeleteMode().setValue(true);
+
+                        }else {
+                            getIsDeleteMode().setValue(false);
+
+                        }
                         getPrintersInstance().setValue(list);
+
                     }
 
                     @Override
@@ -104,6 +143,95 @@ public class SettingsMvvm extends AndroidViewModel {
                     }
                 });
     }
+
+    public void clearDeletedPrinters() {
+        if (getDeletedPrinters().getValue() != null) {
+            getDeletedPrinters().getValue().clear();
+            getDeletedPrinters().setValue(getDeletedPrinters().getValue());
+            getIsDeleteMode().setValue(false);
+            if (getPrintersInstance().getValue() != null) {
+                for (PrinterModel model : getPrintersInstance().getValue()) {
+                    if (model.isSelected()) {
+                        model.setSelected(false);
+                    }
+                }
+
+                getDeletedPrinters().setValue(getDeletedPrinters().getValue());
+            }
+
+        }
+    }
+
+
+    public void addPrinterToDelete(int pos) {
+        if (getDeletedPrinters().getValue() != null && getPrintersInstance().getValue() != null) {
+            getDeletedPrinters().getValue().add(getPrintersInstance().getValue().get(pos));
+            getDeletedPrinters().setValue(getDeletedPrinters().getValue());
+            PrinterModel model = getPrintersInstance().getValue().get(pos);
+            model.setSelected(true);
+
+        }
+
+    }
+
+    public void removePrinterFromDeletedList(int pos) {
+        if (getDeletedPrinters().getValue() != null && getPrintersInstance().getValue() != null) {
+            if (getDeletedPrinters().getValue().size() > 0) {
+                PrinterModel printerModel = getPrintersInstance().getValue().get(pos);
+                int index = getDeletedPrinterPos(printerModel.getId());
+                if (index != -1) {
+                    getDeletedPrinters().getValue().remove(index);
+                    getDeletedPrinters().setValue(getDeletedPrinters().getValue());
+
+                }
+                if (getDeletedPrinters().getValue().size() == 0) {
+                    getIsDeleteMode().setValue(false);
+                }
+            }
+        }
+
+
+    }
+
+
+    private int getDeletedPrinterPos(long id) {
+        if (getDeletedPrinters().getValue() != null) {
+            for (int index = 0; index < getDeletedPrinters().getValue().size(); index++) {
+                if (getDeletedPrinters().getValue().get(index).getId() == id) {
+                    return index;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public void deletePrinters() {
+        dao.deletePrinter(getDeletedPrinters().getValue())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if (getDeletedPrinters().getValue()!=null){
+                            getDeletedPrinters().getValue().clear();
+                        }
+                        getPrinters();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
+
+    }
+
+
 
     public void logout(Context context){
         ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));

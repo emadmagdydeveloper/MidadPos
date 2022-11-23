@@ -196,7 +196,7 @@
                                 android:layout_marginStart="16dp"
                                 android:layout_marginEnd="16dp"
                                 android:src="@drawable/ic_delete"
-                                android:tint="@color/grey4"
+                                app:tint="@color/grey4"
                                 />
                         </LinearLayout>
                     </androidx.appcompat.widget.Toolbar>

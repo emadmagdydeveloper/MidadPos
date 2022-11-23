@@ -103,14 +103,15 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        binding.drawerLayout.closeDrawer(GravityCompat.START);
 
         itemId = item.getItemId();
 
         if (item.getItemId() == R.id.sales) {
             if (selectedPos != 0) {
-                App app = (App) getApplicationContext();
-                app.killAllActivities();
+                App.navigate = true;
+                /*App app = (App) getApplicationContext();
+                app.killAllActivities();*/
+                navigationDrawer(HomeActivity.class);
 
 
             }
@@ -121,7 +122,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
             App.navigate = true;
 
             if (selectedPos != 1) {
-                navigation(ReceiptsActivity.class);
+                navigationDrawer(ReceiptsActivity.class);
             }
 
 
@@ -129,7 +130,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
             App.navigate = true;
 
             if (selectedPos != 2) {
-                navigation(ShiftActivity.class);
+                navigationDrawer(ShiftActivity.class);
             }
 
 
@@ -137,7 +138,7 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
             App.navigate = true;
 
             if (selectedPos != 3) {
-                navigation(ItemsActivity.class);
+                navigationDrawer(ItemsActivity.class);
             }
 
 
@@ -145,14 +146,14 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
             App.navigate = true;
 
             if (selectedPos != 4) {
-                navigation(SettingsActivity.class);
+                navigationDrawer(SettingsActivity.class);
             }
 
         } else if (item.getItemId() == R.id.support) {
             App.navigate = true;
 
             if (selectedPos != 6) {
-                navigation(SupportActivity.class);
+                navigationDrawer(SupportActivity.class);
             }
 
 
@@ -163,15 +164,36 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
 
         }
+        binding.drawerLayout.closeDrawer(GravityCompat.START);
+
         return true;
     }
 
     public void navigation(Class<?> activityClass) {
-        new Handler().postDelayed(()->{
-            Intent intent = new Intent(this, activityClass);
-            startActivity(intent);
-            overridePendingTransition(0, 0);
-        },500);
+        App.navigate = true;
+        Intent intent = new Intent(DrawerBaseActivity.this, activityClass);
+        startActivity(intent);
+        finishAffinity();
+        overridePendingTransition(0, 0);
+
+
+    }
+
+    public void navigationDrawer(Class<?> activityClass) {
+        binding.drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                if (activityClass!=null){
+                    Intent intent = new Intent(DrawerBaseActivity.this, activityClass);
+                    startActivity(intent);
+                    finishAffinity();
+                    overridePendingTransition(0, 0);
+                }
+
+            }
+        });
+
 
     }
 

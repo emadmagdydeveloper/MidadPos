@@ -15,6 +15,7 @@ import com.midad_pos.databinding.PrinterRowBinding;
 import com.midad_pos.model.CategoryModel;
 import com.midad_pos.model.PrinterModel;
 import com.midad_pos.uis.activity_items.ItemsActivity;
+import com.midad_pos.uis.activity_settings.SettingsActivity;
 import com.midad_pos.utils.DiffUtilsCategories;
 import com.midad_pos.utils.DiffUtilsPrinters;
 
@@ -41,6 +42,22 @@ public class PrinterAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         Holder myHolder = (Holder) holder;
         myHolder.binding.setModel(list.get(position));
 
+        myHolder.binding.getRoot().setOnLongClickListener(v ->{
+            if (context instanceof SettingsActivity){
+                SettingsActivity activity = (SettingsActivity) context;
+                PrinterModel printerModel = list.get(myHolder.getAdapterPosition());
+                printerModel.setSelected(true);
+                activity.updateDeleteModel(myHolder.getAdapterPosition());
+            }
+            return  true;
+        });
+        myHolder.binding.getRoot().setOnClickListener(v -> {
+            if (context instanceof SettingsActivity){
+                SettingsActivity activity = (SettingsActivity) context;
+                PrinterModel printerModel = list.get(myHolder.getAdapterPosition());
+                activity.selectDeletePrinter(myHolder.getAdapterPosition(),printerModel);
+            }
+        });
     }
 
 

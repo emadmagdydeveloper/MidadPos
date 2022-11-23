@@ -133,14 +133,29 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
     private void initView() {
+
         baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
         mvvm = ViewModelProviders.of(this).get(HomeMvvm.class);
+
+        if (App.navigate){
+            mvvm.forNavigation = true;
+            App.navigate = false;
+            mvvm.showPin = false;
+        }else {
+            mvvm.forNavigation = false;
+            mvvm.showPin = true;
+
+        }
+
         codeScanner = new CodeScanner(this, binding.scanCode);
 
         adapter = new HomeItemAdapter(this);
-        adapter.updateType(1);
+        adapter.updateType(getAppSetting().getHome_layout_type());
 
         homeDiscountAdapter = new HomeDiscountAdapter(this, getLang());
+
+        homeDiscountAdapter.updateType(getAppSetting().getHome_layout_type());
+
 
         permissions = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
             if (result) {
@@ -152,7 +167,7 @@ public class HomeActivity extends DrawerBaseActivity {
         });
 
         baseMvvm.getOnUserRefreshed().observe(this, aBoolean -> {
-            mvvm.loadHomeData();
+            //mvvm.loadHomeData();
         });
 
         baseMvvm.getOnPinSuccess().observe(this,aBoolean -> {
@@ -361,42 +376,70 @@ public class HomeActivity extends DrawerBaseActivity {
             }
 
             if (binding.recView != null) {
-                binding.recView.setLayoutManager(new GridLayoutManager(this, 3));
+                if (getAppSetting().getHome_layout_type()==1){
+                    binding.recView.setLayoutManager(new GridLayoutManager(this, 3));
+
+                }else {
+                    binding.recView.setLayoutManager(new LinearLayoutManager(this));
+
+                }
+
+
                 binding.recView.setHasFixedSize(true);
+
                 if (selectedCategory.getId() == -2) {
                     binding.recView.setAdapter(homeDiscountAdapter);
                 } else {
                     binding.recView.setAdapter(adapter);
+                    adapter.updateType(getAppSetting().getHome_layout_type());
+
 
                 }
             }
 
             if (binding.recViewPort != null) {
-                binding.recViewPort.setLayoutManager(new GridLayoutManager(this, 5));
+                if (getAppSetting().getHome_layout_type()==1){
+                    binding.recViewPort.setLayoutManager(new GridLayoutManager(this, 5));
+
+                }else {
+                    binding.recViewPort.setLayoutManager(new LinearLayoutManager(this));
+
+                }
                 binding.recViewPort.setHasFixedSize(true);
                 if (selectedCategory.getId() == -2) {
                     binding.recViewPort.setAdapter(homeDiscountAdapter);
 
                 } else {
+
                     binding.recViewPort.setAdapter(adapter);
+                    adapter.updateType(getAppSetting().getHome_layout_type());
+
 
                 }
             }
 
             if (binding.recViewLand != null) {
-                binding.recViewLand.setLayoutManager(new GridLayoutManager(this, 5));
+                if (getAppSetting().getHome_layout_type()==1){
+                    binding.recViewLand.setLayoutManager(new GridLayoutManager(this, 5));
+
+                }else {
+                    binding.recViewLand.setLayoutManager(new LinearLayoutManager(this));
+
+                }
                 binding.recViewLand.setHasFixedSize(true);
                 if (selectedCategory.getId() == -2) {
                     binding.recViewLand.setAdapter(homeDiscountAdapter);
 
                 } else {
                     binding.recViewLand.setAdapter(adapter);
+                    adapter.updateType(getAppSetting().getHome_layout_type());
 
                 }
             }
 
 
         });
+
 
         mvvm.getSelectedDeliveryOptions().observe(this, deliveryOption -> {
             binding.setDeliveryOption(deliveryOption);
@@ -440,6 +483,16 @@ public class HomeActivity extends DrawerBaseActivity {
         mvvm.getItems().observe(this, items -> {
             if (adapter != null) {
                 adapter.updateList(items);
+            }
+            if (binding.recView!=null){
+                binding.recView.setAdapter(adapter);
+            }
+
+            if (binding.recViewPort!=null){
+                binding.recViewPort.setAdapter(adapter);
+            }
+            if (binding.recViewLand!=null){
+                binding.recViewLand.setAdapter(adapter);
             }
             if (items.size() > 0) {
                 binding.llNoItems.setVisibility(View.GONE);
@@ -830,9 +883,14 @@ public class HomeActivity extends DrawerBaseActivity {
             }
         });
 
-        binding.btnGoToItems.setOnClickListener(view -> navigation(ItemsActivity.class));
+        binding.btnGoToItems.setOnClickListener(view -> {
+            navigation(ItemsActivity.class);
 
-        binding.openShift.setOnClickListener(view -> navigation(ShiftActivity.class));
+        });
+
+        binding.openShift.setOnClickListener(view ->{
+            navigation(ShiftActivity.class);
+        } );
 
         binding.dialogOpenedTickets.closeDialogOpenedTicket.setOnClickListener(v -> {
             mvvm.getIsDialogOpenedTicketsOpened().setValue(false);
@@ -1427,13 +1485,24 @@ public class HomeActivity extends DrawerBaseActivity {
         menuHelper.setForceShowIcon(true);
         menuHelper.show();
 
+        if (mvvm.getPrintersInstance().getValue()!=null&&mvvm.getPrintersInstance().getValue().size()>0){
+            popupMenu.getMenu().findItem(R.id.print).setVisible(true);
+
+        }else {
+            popupMenu.getMenu().findItem(R.id.print).setVisible(false);
+
+        }
         if (mvvm.getCart().getValue() != null && mvvm.getCart().getValue().getItems().size() > 0) {
             popupMenu.getMenu().findItem(R.id.clear).setEnabled(true);
+            popupMenu.getMenu().findItem(R.id.print).setEnabled(true);
 
         } else {
             popupMenu.getMenu().findItem(R.id.clear).setEnabled(false);
+            popupMenu.getMenu().findItem(R.id.print).setEnabled(false);
 
         }
+
+
         popupMenu.getMenu().findItem(R.id.edit).setEnabled(false);
         popupMenu.getMenu().findItem(R.id.assign).setEnabled(false);
         popupMenu.getMenu().findItem(R.id.merge).setEnabled(false);
@@ -1460,19 +1529,33 @@ public class HomeActivity extends DrawerBaseActivity {
         MenuItem menuItemMenu3 = menu.findItem(R.id.assign);
         MenuItem menuItemMenu4 = menu.findItem(R.id.merge);
         MenuItem menuItemMenu5 = menu.findItem(R.id.split);
+        MenuItem menuItemMenu6 = menu.findItem(R.id.print);
+
 
         menuItemMenu2.setEnabled(false);
         menuItemMenu3.setEnabled(false);
         menuItemMenu4.setEnabled(false);
         menuItemMenu5.setEnabled(false);
+        menuItemMenu6.setEnabled(false);
 
         if (mvvm.getCart().getValue() != null && mvvm.getCart().getValue().getItems().size() > 0) {
             menuItemMenu1.setEnabled(true);
+            menuItemMenu6.setEnabled(true);
+
         } else {
             menuItemMenu1.setEnabled(false);
+            menuItemMenu6.setEnabled(false);
+
 
         }
 
+        if (mvvm.getPrintersInstance().getValue()!=null&&mvvm.getPrintersInstance().getValue().size()>0){
+            menuItemMenu6.setVisible(true);
+
+        }else {
+            menuItemMenu6.setVisible(false);
+
+        }
 
         for (int index = 0; index < menu.size(); index++) {
             MenuItem item = menu.getItem(index);
@@ -1500,6 +1583,7 @@ public class HomeActivity extends DrawerBaseActivity {
             MenuBuilder menuBuilder = (MenuBuilder) menu;
             menuBuilder.setOptionalIconsVisible(true);
         }
+        
         MenuItem menuItemSearch = menu.findItem(R.id.search);
         MenuItem menuItemAddUser = menu.findItem(R.id.addUser);
         MenuItem menuItemBarCode = menu.findItem(R.id.barcode);
@@ -1533,6 +1617,7 @@ public class HomeActivity extends DrawerBaseActivity {
                 menuItemMenu3.setVisible(false);
                 menuItemMenu4.setVisible(false);
                 menuItemMenu5.setVisible(false);
+                menuItemMenu6.setVisible(false);
                 menuItemAddUser.setVisible(false);
                 menuItemBarCode.setVisible(false);
 
@@ -1550,6 +1635,7 @@ public class HomeActivity extends DrawerBaseActivity {
                     menuItemMenu3.setVisible(true);
                     menuItemMenu4.setVisible(true);
                     menuItemMenu5.setVisible(true);
+                    menuItemMenu6.setVisible(true);
                     menuItemAddUser.setVisible(true);
                     menuItemSearch.setVisible(true);
                     if (getAppSetting() != null && getAppSetting().isScan()) {
@@ -1563,6 +1649,7 @@ public class HomeActivity extends DrawerBaseActivity {
                     menuItemMenu3.setVisible(false);
                     menuItemMenu4.setVisible(false);
                     menuItemMenu5.setVisible(false);
+                    menuItemMenu6.setVisible(false);
 
                     menuItemAddUser.setVisible(false);
                     menuItemSearch.setVisible(true);
@@ -1577,6 +1664,7 @@ public class HomeActivity extends DrawerBaseActivity {
                     menuItemMenu3.setVisible(true);
                     menuItemMenu4.setVisible(true);
                     menuItemMenu5.setVisible(true);
+                    menuItemMenu6.setVisible(true);
                     menuItemAddUser.setVisible(true);
                 }
 
@@ -1626,6 +1714,8 @@ public class HomeActivity extends DrawerBaseActivity {
                     menuItemMenu3.setVisible(false);
                     menuItemMenu4.setVisible(false);
                     menuItemMenu5.setVisible(false);
+                    menuItemMenu6.setVisible(false);
+
                 }
             } else {
                 menuItemAddUser.setVisible(false);
@@ -1646,6 +1736,7 @@ public class HomeActivity extends DrawerBaseActivity {
                     menuItemMenu3.setVisible(true);
                     menuItemMenu4.setVisible(true);
                     menuItemMenu5.setVisible(true);
+                    menuItemMenu6.setVisible(true);
 
                     menuItemAddUser.setVisible(true);
                     menuItemSearch.setVisible(true);
@@ -1657,6 +1748,7 @@ public class HomeActivity extends DrawerBaseActivity {
                     menuItemMenu3.setVisible(false);
                     menuItemMenu4.setVisible(false);
                     menuItemMenu5.setVisible(false);
+                    menuItemMenu6.setVisible(false);
                     menuItemAddUser.setVisible(false);
                     menuItemBarCode.setVisible(getAppSetting() != null && getAppSetting().isScan());
 
@@ -1671,6 +1763,8 @@ public class HomeActivity extends DrawerBaseActivity {
                 menuItemMenu3.setVisible(true);
                 menuItemMenu4.setVisible(true);
                 menuItemMenu5.setVisible(true);
+                menuItemMenu6.setVisible(true);
+
                 menuItemAddUser.setVisible(true);
                 menuItemSearch.setVisible(false);
                 menuItemBarCode.setVisible(false);
@@ -1917,45 +2011,15 @@ public class HomeActivity extends DrawerBaseActivity {
         updateSelectedPos(0);
         updateShiftData(getAppSetting());
 
-        if (adapter != null) {
-            adapter.updateType(getAppSetting().getHome_layout_type());
-        }
 
-        if (getAppSetting().getHome_layout_type() == 1)
-        {
-            if (binding.recView != null) {
-                binding.recView.setLayoutManager(new GridLayoutManager(this, 3));
-            }
 
-            if (binding.recViewPort != null) {
-                binding.recViewPort.setLayoutManager(new GridLayoutManager(this, 5));
 
-            }
 
-            if (binding.recViewLand != null) {
-                binding.recViewLand.setLayoutManager(new GridLayoutManager(this, 5));
-
-            }
-        }
-        else
-        {
-            if (binding.recView != null) {
-                binding.recView.setLayoutManager(new LinearLayoutManager(this));
-            }
-
-            if (binding.recViewPort != null) {
-                binding.recViewPort.setLayoutManager(new LinearLayoutManager(this));
-
-            }
-
-            if (binding.recViewLand != null) {
-                binding.recViewLand.setLayoutManager(new LinearLayoutManager(this));
-
-            }
-        }
         if (mvvm.getIsScanOpened().getValue() != null && mvvm.getIsScanOpened().getValue() && mvvm.getCamera().getValue() != null) {
             initCodeScanner(mvvm.getCamera().getValue());
         }
+
+
 
         if (mvvm.showPin){
             showPinCodeView();

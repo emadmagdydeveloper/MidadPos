@@ -438,13 +438,7 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
         }
     }
 
-    public static class ScanReceiver extends BroadcastReceiver {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.e("action", intent.getAction());
-        }
-    }
 
     @Override
     protected void onRestart() {
