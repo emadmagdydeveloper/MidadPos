@@ -74,6 +74,7 @@ public class Common {
         dialog.show();
     }
 
+
     public static void createAlertDialog(Context context, String title, boolean isHtml) {
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .create();

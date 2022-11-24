@@ -246,6 +246,12 @@
     <string name="invalid_credential">البريد الإلكتروني أو كلمة المرور غير صحيحة.\nالرجاء المحاولة مرة اخرى</string>
     <string name="print_bill">طباعة الفاتورة</string>
     <string name="printer">طابعة</string>
+    <string name="enter_your_email_address_to_receive_instructions_to_rest_password">قم بإدخال عنوان بريدك الإلكتروني لتلقي التعليمات من أجل إعادة ضبط كلمة المرور.</string>
+    <string name="inv_email">البريد الإلكتروني غير صحيح</string>
+    <string name="email_not_found">البريد الالكتروني غير موجود</string>
+
+    <string name="email_sent">تم إرسال بريد إلكتروني</string>
+    <string name="check_email">تحقق من صندوق الوارد الخاص بك للمزيد من الإرشادات</string>
 
 
     <string-array name="delivery_options">

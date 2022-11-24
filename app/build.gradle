@@ -44,8 +44,7 @@ android {
         dataBinding true
 
     }
-
-
+    namespace 'com.midad_pos'
 
 
 }

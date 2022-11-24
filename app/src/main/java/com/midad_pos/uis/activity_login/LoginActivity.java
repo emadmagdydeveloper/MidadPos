@@ -21,6 +21,7 @@ import com.midad_pos.mvvm.LoginMvvm;
 import com.midad_pos.share.Common;
 import com.midad_pos.tags.Tags;
 import com.midad_pos.uis.activity_base.BaseActivity;
+import com.midad_pos.uis.activity_forgot_password.ForgotPasswordActivity;
 import com.midad_pos.uis.activity_home.HomeActivity;
 import com.midad_pos.uis.activity_pos.PosActivity;
 import com.midad_pos.uis.activity_store.StoreActivity;
@@ -107,6 +108,16 @@ public class LoginActivity extends BaseActivity {
         launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),result -> {
 
         });
+
+        binding.tvForgotPassword.setOnClickListener(v -> {
+            navigateToForgetPasswordActivity();
+        });
+    }
+
+    private void navigateToForgetPasswordActivity() {
+        Intent intent = new Intent(this, ForgotPasswordActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
     }
 
     private void navigateToWereHouses(UserModel userModel) {

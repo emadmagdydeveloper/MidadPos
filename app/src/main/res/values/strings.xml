@@ -247,6 +247,12 @@
     <string name="print_bill">Print bill</string>
 
     <string name="printer">Printer</string>
+    <string name="enter_your_email_address_to_receive_instructions_to_rest_password">Enter your email address to receive instructions to rest password.</string>
+    <string name="inv_email">Invalid email address</string>
+    <string name="email_not_found">Email address not found</string>
+
+    <string name="email_sent">Email sent</string>
+    <string name="check_email">Check your inbox for further instructions</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

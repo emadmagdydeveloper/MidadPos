@@ -222,4 +222,10 @@ public interface Service {
 
 
     );
+
+    @FormUrlEncoded
+    @POST("api/auth/sendEmail")
+    Single<Response<StatusResponse>> forgotPassword(@Field("email") String email
+
+    );
 }
