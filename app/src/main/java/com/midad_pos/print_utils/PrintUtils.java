@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -53,14 +54,22 @@ public class PrintUtils {
     }
 
 
-
     @SuppressLint("MissingPermission")
     public void findBluetoothDevice(AppCompatActivity context) {
 
         try {
+            BluetoothManager bluetoothManager = null;
+            BluetoothAdapter bluetoothAdapter = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                bluetoothManager = context.getSystemService(BluetoothManager.class);
+                bluetoothAdapter = bluetoothManager.getAdapter();
+            } else {
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            }
 
-            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
             if (bluetoothAdapter == null) {
+                Toast.makeText(context, "Device not support bluetooth", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -82,14 +91,13 @@ public class PrintUtils {
             }
 
 
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
     }
 
-    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, AppCompatActivity context,Bitmap bitmap) {
+    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, AppCompatActivity context, Bitmap bitmap) {
         try {
 
             //Standard uuid from string //
@@ -98,7 +106,6 @@ public class PrintUtils {
                 return;
             }
             bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuidSting);
-
             bluetoothSocket.connect();
             Toast.makeText(context, "connected", Toast.LENGTH_SHORT).show();
             outputStream = bluetoothSocket.getOutputStream();
@@ -161,35 +168,35 @@ public class PrintUtils {
         }
     }
 
-    public void printTestDataText(int paper,Context context) {
+    public void printTestDataText(int paper, Context context) {
         try {
             UserModel userModel = Preferences.getInstance().getUserData(context);
             String msg = "";
-            msg += userModel.getData().getSelectedUser().getCompany_name()+"\n";
-            msg +=context.getString(R.string.simp_tax_inv)+"\n";
+            msg += userModel.getData().getSelectedUser().getCompany_name() + "\n";
+            msg += context.getString(R.string.simp_tax_inv) + "\n";
 
-            msg +="\n";
-            msg +="\n";
+            msg += "\n";
+            msg += "\n";
 
-            msg +=context.getString(R.string.receipt)+"#"+"\n";
+            msg += context.getString(R.string.receipt) + "#" + "\n";
 
-            msg +=context.getString(R.string.inv_date)+"\n";
-            msg +=context.getString(R.string.cashier)+"\n";
-            msg +=context.getString(R.string.pos)+"\n";
+            msg += context.getString(R.string.inv_date) + "\n";
+            msg += context.getString(R.string.cashier) + "\n";
+            msg += context.getString(R.string.pos) + "\n";
 
-            msg +="--------------------------------\n";
-            msg +="\n";
-            msg +="Delivery\n";
-            msg +="\n";
+            msg += "--------------------------------\n";
+            msg += "\n";
+            msg += "Delivery\n";
+            msg += "\n";
 
-            msg +="--------------------------------\n";
+            msg += "--------------------------------\n";
 
-            msg +="test           0.00\n";
-            msg +="1 X 0.00\n";
+            msg += "test           0.00\n";
+            msg += "1 X 0.00\n";
 
-            msg +="--------------------------------\n";
+            msg += "--------------------------------\n";
 
-            msg +="     "+context.getString(R.string.thank_you)+"     \n";
+            msg += "     " + context.getString(R.string.thank_you) + "     \n";
 
 
             outputStream.write(msg.getBytes());
@@ -204,8 +211,7 @@ public class PrintUtils {
             printPic.init(bitmap);
             byte[] bitmapData = printPic.printDraw();
             outputStream.write(bitmapData);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -390,9 +396,9 @@ public class PrintUtils {
     }
 
 
-
-    public interface PrintResponse{
+    public interface PrintResponse {
         void onDevices(List<BluetoothDevice> list);
+
         void onStartIntent();
     }
 

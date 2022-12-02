@@ -55,7 +55,8 @@
                             android:textColor="@color/black"
                             android:text="@={model.email}"
                             android:textSize="14sp"
-
+                            android:gravity="start"
+                            android:textAlignment="viewStart"
                             />
                     </com.google.android.material.textfield.TextInputLayout>
 

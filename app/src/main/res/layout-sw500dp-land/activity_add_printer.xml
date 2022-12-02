@@ -22,6 +22,9 @@
             type="String" />
 
         <variable
+            name="printerKitchenName"
+            type="String" />
+        <variable
             name="printerBluetoothName"
             type="String" />
 
@@ -209,7 +212,7 @@
                                     android:layout_gravity="center_vertical"
                                     android:layout_marginStart="16dp"
                                     android:layout_marginEnd="16dp"
-                                    android:tint="@color/grey4"
+                                    app:tint="@color/grey4"
                                     />
                             </LinearLayout>
                             <View
@@ -273,7 +276,7 @@
                                         android:layout_gravity="center_vertical"
                                         android:layout_marginStart="16dp"
                                         android:layout_marginEnd="16dp"
-                                        android:tint="@color/grey4"
+                                        app:tint="@color/grey4"
                                         />
                                 </LinearLayout>
                                 <View
@@ -286,6 +289,66 @@
                             </LinearLayout>
 
                             <LinearLayout
+                                android:id="@+id/llKitchenPrinter"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginTop="24dp"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginEnd="16dp"
+                                android:visibility="gone"
+                                >
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    >
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical"
+                                        android:layout_weight="1"
+                                        android:layout_gravity="center_vertical"
+
+                                        >
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center_vertical"
+                                            android:textColor="@color/black"
+                                            android:hint="@string/kitchen_display_ip_address"
+                                            android:textColorHint="@color/grey17"
+
+                                            android:textSize="16sp"
+                                            android:text="@{printerKitchenName}"
+                                            />
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1dp"
+                                            android:background="@color/grey3"
+                                            android:layout_marginTop="12dp"
+                                            />
+                                    </LinearLayout>
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="24dp"
+                                        android:layout_height="0dp"/>
+
+                                    <Button
+                                        android:id="@+id/btnKitchenSearch"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="42dp"
+                                        android:textColor="@color/white"
+                                        android:background="@drawable/small_rounded_primary"
+                                        android:textSize="16sp"
+                                        app:backgroundTint="@null"
+                                        android:text="@string/search"
+                                        />
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+
                                 android:id="@+id/llBluetoothPrinter"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -389,7 +452,7 @@
                                         android:layout_gravity="center_vertical"
                                         android:layout_marginStart="16dp"
                                         android:layout_marginEnd="16dp"
-                                        android:tint="@color/grey4"
+                                        app:tint="@color/grey4"
                                         />
                                 </LinearLayout>
                                 <View
@@ -402,6 +465,7 @@
                             </LinearLayout>
 
                             <View
+                                android:id="@+id/viewPrintReceiptBillUi"
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:background="@color/grey3"
@@ -409,6 +473,7 @@
                                 />
 
                             <LinearLayout
+                                android:id="@+id/llPrintReceiptBillUi"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="16dp"
@@ -441,6 +506,50 @@
                                 android:background="@color/grey3"
                                 android:layout_marginTop="16dp"
                                 />
+
+                            <LinearLayout
+                                android:id="@+id/llPrintAutomatic"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:visibility="gone"
+                                >
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="16dp"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_marginEnd="16dp"
+                                    android:orientation="horizontal"
+                                    >
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/black"
+                                        android:text="@string/automatically_print_receipt"
+                                        />
+                                    <androidx.legacy.widget.Space
+                                        android:layout_width="0dp"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        />
+                                    <com.google.android.material.switchmaterial.SwitchMaterial
+                                        android:id="@+id/btnSwitchPrintAutomatic"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        />
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="@color/grey3"
+                                    android:layout_marginTop="16dp"
+                                    />
+                            </LinearLayout>
+
+
                             <FrameLayout
                                 android:id="@+id/flPrint"
                                 android:layout_width="match_parent"
@@ -457,7 +566,7 @@
                                         android:layout_width="24dp"
                                         android:layout_height="24dp"
                                         android:src="@drawable/ic_printer"
-                                        android:tint="@color/grey17"
+                                        app:tint="@color/grey17"
                                         />
                                     <androidx.legacy.widget.Space
                                         android:layout_width="16dp"

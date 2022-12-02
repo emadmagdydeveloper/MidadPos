@@ -5,11 +5,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Printer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 
+import com.mazenrashed.printooth.Printooth;
 import com.midad_pos.language.Language;
 import com.midad_pos.print_utils.SunmiPrintHelper;
 import com.midad_pos.uis.activity_items.ItemsActivity;
@@ -35,6 +37,7 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        Printooth.INSTANCE.init(this);
         SunmiPrintHelper.getInstance().initSunmiPrinterService(this);
 
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {

@@ -40,6 +40,20 @@ public interface Service {
                                       @Field("password") String password);
 
     @FormUrlEncoded
+    @POST("api/auth/register")
+    Single<Response<UserModel>> signUp(@Field("email") String email,
+                                       @Field("password") String password,
+                                       @Field("phone_number") String phone_number,
+                                       @Field("full_name") String full_name
+
+    );
+
+
+    @GET("api/auth/getProfile")
+    Single<Response<UserModel>> getProfile(@Query("user_id") String user_id);
+
+
+    @FormUrlEncoded
     @POST("api/items/storeCategory")
     Single<Response<SingleCategoryData>> addCategory(@Field("user_id") String user_id,
                                                      @Field("name") String name,

@@ -16,9 +16,7 @@ public class User implements Serializable {
     private List<WereHouse> warehouses;
     private String access_token;
     private String token_type;
-
-
-
+    private boolean available;
 
     public String getId() {
         return id;
@@ -68,5 +66,11 @@ public class User implements Serializable {
         return token_type;
     }
 
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
 
+    public boolean isAvailable() {
+        return available;
+    }
 }

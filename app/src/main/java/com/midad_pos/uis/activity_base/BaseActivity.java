@@ -235,7 +235,8 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void showPinCodeView(){
-        if (binding!=null){
+
+        if (binding!=null&&getUserModel()!=null&&getUserModel().getData().getUser().isAvailable()){
             binding.pinContainer.setVisibility(View.VISIBLE);
             updatePinView("");
         }

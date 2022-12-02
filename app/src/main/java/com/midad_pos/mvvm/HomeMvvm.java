@@ -27,6 +27,7 @@ import com.midad_pos.model.PrinterModel;
 import com.midad_pos.model.ShiftDataModel;
 import com.midad_pos.model.SingleCustomerModel;
 import com.midad_pos.model.StatusResponse;
+import com.midad_pos.model.User;
 import com.midad_pos.model.VariantModel;
 import com.midad_pos.model.cart.CartList;
 import com.midad_pos.model.cart.CartModel;
@@ -138,6 +139,9 @@ public class HomeMvvm extends AndroidViewModel {
     private AppDatabase database;
     private DAO dao;
     private MutableLiveData<List<PrinterModel>> printers;
+
+    private MutableLiveData<UserModel> userModelData;
+
     ///////////////////////////////////////////////////////////////////////////
     private MutableLiveData<AppSettingModel> appSettingModel;
 
@@ -195,13 +199,18 @@ public class HomeMvvm extends AndroidViewModel {
         getCartData();
         getPrinters();
 
+        if (userModel!=null&&!userModel.getData().getUser().isAvailable()){
+            getProfile();
+        }
+
     }
 
     public void getCartData() {
         getCart().setValue(manageCartModel.getCartModel(getApplication().getApplicationContext()));
 
     }
-    public MutableLiveData<List<PrinterModel>> getPrintersInstance () {
+
+    public MutableLiveData<List<PrinterModel>> getPrintersInstance() {
         if (printers == null) {
             printers = new MutableLiveData<>();
         }
@@ -234,6 +243,14 @@ public class HomeMvvm extends AndroidViewModel {
         return deliveryOptions;
     }
 
+    public MutableLiveData<UserModel> getUserModelData() {
+        if (userModelData == null) {
+            userModelData = new MutableLiveData<>();
+
+        }
+        return userModelData;
+    }
+
     public MutableLiveData<List<CategoryModel>> getCategories() {
         if (categories == null) {
             categories = new MutableLiveData<>();
@@ -241,6 +258,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return categories;
     }
+
 
     public MutableLiveData<CategoryModel> getSelectedCategory() {
         if (selectedCategory == null) {
@@ -521,7 +539,7 @@ public class HomeMvvm extends AndroidViewModel {
         return orders;
     }
 
-    public void getPrinters(){
+    public void getPrinters() {
         dao.getPrinters().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<List<PrinterModel>>() {
@@ -646,6 +664,50 @@ public class HomeMvvm extends AndroidViewModel {
                         } else {
 
                             getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
+    }
+
+    public void getProfile() {
+        Api.getService(Tags.base_url)
+                .getProfile(userModel.getData().getSelectedUser().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<UserModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<UserModel> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    getUserModelData().setValue(response.body());
+                                }
+                            }
+                        } else {
 
                             try {
                                 Log.e(TAG, response.code() + "__" + response.errorBody().string());
@@ -1059,7 +1121,7 @@ public class HomeMvvm extends AndroidViewModel {
                                     mainDiscountList.addAll(response.body().getData());
                                     mainItemDiscountList.setValue(response.body().getData());
 
-                                    if (getSelectedCategory().getValue()!=null&&getSelectedCategory().getValue().getId()==-2){
+                                    if (getSelectedCategory().getValue() != null && getSelectedCategory().getValue().getId() == -2) {
                                         search(getSearchQuery().getValue());
 
                                     }
@@ -1405,12 +1467,12 @@ public class HomeMvvm extends AndroidViewModel {
     public void searchMyTicket() {
         String query = getQueryMyOpenedTickets().getValue();
         List<OrderModel.Sale> list = new ArrayList<>();
-        if (query == null||query.isEmpty()) {
+        if (query == null || query.isEmpty()) {
 
             if (getMainOrders().getValue() != null) {
-                for (OrderModel.Sale sale :getMainOrders().getValue()){
+                for (OrderModel.Sale sale : getMainOrders().getValue()) {
                     int pos = getDeletedDraftPos(sale);
-                    sale.setSelected(pos!=-1);
+                    sale.setSelected(pos != -1);
                     list.add(sale);
                 }
                 if (getTicketSortPos().getValue() != null) {
@@ -1446,13 +1508,12 @@ public class HomeMvvm extends AndroidViewModel {
 
             }
 
-        }
-         else {
+        } else {
 
             if (getMainOrders().getValue() != null) {
                 for (OrderModel.Sale sale : getMainOrders().getValue()) {
                     int pos = getDeletedDraftPos(sale);
-                    sale.setSelected(pos!=-1);
+                    sale.setSelected(pos != -1);
 
                     if (sale.getName() != null && !sale.getName().isEmpty() && sale.getName().equalsIgnoreCase(query)) {
                         list.add(sale);
@@ -1492,7 +1553,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
 
 
-        getIsDeleteAllDraftTicketsSelected().setValue(getOrders().getValue()!=null&&deletedSales.size()==getOrders().getValue().size());
+        getIsDeleteAllDraftTicketsSelected().setValue(getOrders().getValue() != null && deletedSales.size() == getOrders().getValue().size());
 
         getOrders().setValue(list);
     }
@@ -1790,53 +1851,53 @@ public class HomeMvvm extends AndroidViewModel {
         return false;
     }
 
-    public void addDraftTicketToDelete(OrderModel.Sale sale){
+    public void addDraftTicketToDelete(OrderModel.Sale sale) {
 
         int index = getDeletedDraftPos(sale);
-        if (sale.isSelected()){
-            if (index==-1){
+        if (sale.isSelected()) {
+            if (index == -1) {
                 deletedSales.add(sale.getId());
 
             }
 
 
-        }else {
-            if (index!=-1){
+        } else {
+            if (index != -1) {
                 deletedSales.remove(index);
             }
         }
 
-        getIsDeleteAllDraftTicketsSelected().setValue(getOrders().getValue()!=null&&deletedSales.size()==getOrders().getValue().size());
+        getIsDeleteAllDraftTicketsSelected().setValue(getOrders().getValue() != null && deletedSales.size() == getOrders().getValue().size());
 
-        getCanDeleteOpenedTickets().setValue(deletedSales.size()>0);
+        getCanDeleteOpenedTickets().setValue(deletedSales.size() > 0);
 
     }
 
-    public void addAllDraftTicketToDelete(boolean isChecked){
+    public void addAllDraftTicketToDelete(boolean isChecked) {
         deletedSales.clear();
-        if (getOrders().getValue()!=null&&getOrders().getValue().size()>0){
-            for (OrderModel.Sale sale:getOrders().getValue()){
+        if (getOrders().getValue() != null && getOrders().getValue().size() > 0) {
+            for (OrderModel.Sale sale : getOrders().getValue()) {
                 sale.setSelected(isChecked);
-                if (isChecked){
+                if (isChecked) {
                     deletedSales.add(sale.getId());
                 }
             }
             getOrders().setValue(getOrders().getValue());
 
-        }else {
+        } else {
             getIsDeleteAllDraftTicketsSelected().setValue(false);
         }
 
-        getCanDeleteOpenedTickets().setValue(deletedSales.size()>0);
+        getCanDeleteOpenedTickets().setValue(deletedSales.size() > 0);
 
 
     }
 
-    private int getDeletedDraftPos(OrderModel.Sale sale){
-        if (getOrders().getValue()!=null){
+    private int getDeletedDraftPos(OrderModel.Sale sale) {
+        if (getOrders().getValue() != null) {
             int index = 0;
-            for (String id :deletedSales){
-                if (id.equals(sale.getId())){
+            for (String id : deletedSales) {
+                if (id.equals(sale.getId())) {
                     return index;
                 }
                 index++;
@@ -1845,16 +1906,15 @@ public class HomeMvvm extends AndroidViewModel {
         return -1;
     }
 
-    public void deleteDraftTickets(Context context){
+    public void deleteDraftTickets(Context context) {
         ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
         dialog.show();
 
 
-
         Api.getService(Tags.base_url)
-                .deleteDraftTicket(userModel.getData().getSelectedUser().getId(),deletedSales)
+                .deleteDraftTicket(userModel.getData().getSelectedUser().getId(), deletedSales)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<StatusResponse>>() {
@@ -1872,9 +1932,9 @@ public class HomeMvvm extends AndroidViewModel {
                                     List<OrderModel.Sale> list = new ArrayList<>();
                                     List<OrderModel.Sale> mainList = new ArrayList<>();
 
-                                    if (getOrders().getValue()!=null){
-                                        for (OrderModel.Sale sale : getOrders().getValue()){
-                                            if (!sale.isSelected()){
+                                    if (getOrders().getValue() != null) {
+                                        for (OrderModel.Sale sale : getOrders().getValue()) {
+                                            if (!sale.isSelected()) {
                                                 list.add(sale);
                                                 mainList.add(sale);
                                             }
@@ -1915,6 +1975,7 @@ public class HomeMvvm extends AndroidViewModel {
                 });
 
     }
+
     @Override
     protected void onCleared() {
         super.onCleared();

@@ -17,6 +17,9 @@
         <variable
             name="total"
             type="Double" />
+        <variable
+            name="model"
+            type="com.midad_pos.model.UserModel" />
         <import type="android.view.View"/>
 
     </data>
@@ -277,7 +280,9 @@
                             android:text="@string/save"
                             android:enabled="false"
                             android:textColor="@drawable/disable_text_color"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            android:visibility="@{model.data.user.available?View.VISIBLE:View.GONE}"
+                            />
 
                         <View
                             android:layout_width="1px"

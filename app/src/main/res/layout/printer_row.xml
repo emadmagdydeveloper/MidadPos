@@ -107,7 +107,7 @@
                         android:lines="1"
                         android:ellipsize="end"
                         android:layout_marginTop="8dp"
-                        android:text='@{model.printer_type.equalsIgnoreCase("other")?(model.bluetooth_name.isEmpty()?@string/other_model:model.bluetooth_name):model.printer_type}'
+                        android:text='@{model.printer_type.equalsIgnoreCase("other")?(model.device==null?@string/other_model:model.device.name):model.printer_type}'
                         android:gravity="start"
                         android:textAlignment="viewStart"
                         />

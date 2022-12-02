@@ -12,8 +12,7 @@ import java.io.Serializable;
 public class SignUpModel extends BaseObservable implements Serializable {
     private String email;
     private String password;
-    private String first_name;
-    private String last_name;
+    private String name;
     private String phone;
     private boolean valid1;
 
@@ -28,8 +27,7 @@ public class SignUpModel extends BaseObservable implements Serializable {
     public SignUpModel() {
         this.email ="";
         this.password ="";
-        this.first_name="";
-        this.last_name ="";
+        this.name ="";
         this.phone ="";
         this.valid1 = false;
         this.business_name ="";
@@ -42,9 +40,9 @@ public class SignUpModel extends BaseObservable implements Serializable {
     private void isDataValid1(){
         if (Patterns.EMAIL_ADDRESS.matcher(email).matches()&&
                 password.length()>=8&&
-                !first_name.isEmpty()&&
-                !last_name.isEmpty()&&
-                !phone.isEmpty()
+                !name.isEmpty()&&
+                !phone.isEmpty() &&
+                accept_terms
         ){
             setValid1(true);
         }else {
@@ -88,26 +86,17 @@ public class SignUpModel extends BaseObservable implements Serializable {
     }
 
     @Bindable
-    public String getFirst_name() {
-        return first_name;
+    public String getName() {
+        return name;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
-        notifyPropertyChanged(BR.first_name);
+    public void setName(String name) {
+        this.name = name;
+        notifyPropertyChanged(BR.name);
         isDataValid1();
     }
 
-    @Bindable
-    public String getLast_name() {
-        return last_name;
-    }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
-        notifyPropertyChanged(BR.last_name);
-        isDataValid1();
-    }
 
     @Bindable
     public String getPhone() {
@@ -185,7 +174,7 @@ public class SignUpModel extends BaseObservable implements Serializable {
     public void setAccept_terms(boolean accept_terms) {
         this.accept_terms = accept_terms;
         notifyPropertyChanged(BR.accept_terms);
-        isDataValid2();
+        isDataValid1();
 
     }
 

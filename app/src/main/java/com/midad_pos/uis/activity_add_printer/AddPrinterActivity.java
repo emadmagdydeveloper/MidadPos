@@ -42,6 +42,8 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.mazenrashed.printooth.Printooth;
+import com.mazenrashed.printooth.ui.ScanningActivity;
 import com.midad_pos.R;
 import com.midad_pos.adapter.DevicesBluetoothAdapter;
 import com.midad_pos.databinding.ActivityAddDiscountBinding;
@@ -73,6 +75,7 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
     private PrintUtils printUtils = new PrintUtils(this);
     private DevicesBluetoothAdapter adapter = new DevicesBluetoothAdapter(this);
     private AlertDialog dialog;
+    private ActivityResultLauncher<Intent> launcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +86,6 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
     }
 
     private void initView() {
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 
         mvvm = ViewModelProviders.of(this).get(AddPrinterMvvm.class);
         binding.setLang(getLang());
@@ -98,12 +99,32 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
                 binding.llPaperWidth.setVisibility(View.GONE);
                 binding.llInterface.setVisibility(View.GONE);
                 mvvm.getSelectedInterfacePos().setValue(-1);
+                binding.llBluetoothPrinter.setVisibility(View.GONE);
+                binding.viewPrintReceiptBillUi.setVisibility(View.VISIBLE);
+                binding.llPrintReceiptBillUi.setVisibility(View.VISIBLE);
+                binding.llKitchenPrinter.setVisibility(View.GONE);
 
 
             } else if (pos == 1) {
                 binding.setTitle("Sunmi");
                 binding.llPaperWidth.setVisibility(View.VISIBLE);
                 binding.llInterface.setVisibility(View.GONE);
+                mvvm.getSelectedInterfacePos().setValue(-1);
+                binding.llBluetoothPrinter.setVisibility(View.GONE);
+                binding.viewPrintReceiptBillUi.setVisibility(View.VISIBLE);
+                binding.llPrintReceiptBillUi.setVisibility(View.VISIBLE);
+                binding.llKitchenPrinter.setVisibility(View.GONE);
+
+
+            } else if (pos == 2) {
+                binding.setTitle(getString(R.string.kitchen_display));
+                binding.llPaperWidth.setVisibility(View.GONE);
+                binding.llInterface.setVisibility(View.GONE);
+                binding.llBluetoothPrinter.setVisibility(View.GONE);
+                binding.viewPrintReceiptBillUi.setVisibility(View.GONE);
+                binding.llPrintReceiptBillUi.setVisibility(View.GONE);
+                binding.llKitchenPrinter.setVisibility(View.VISIBLE);
+
                 mvvm.getSelectedInterfacePos().setValue(-1);
 
 
@@ -113,6 +134,11 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
                 binding.llPaperWidth.setVisibility(View.VISIBLE);
                 binding.llInterface.setVisibility(View.VISIBLE);
                 mvvm.getSelectedInterfacePos().setValue(0);
+                binding.llBluetoothPrinter.setVisibility(View.VISIBLE);
+                binding.viewPrintReceiptBillUi.setVisibility(View.VISIBLE);
+                binding.llPrintReceiptBillUi.setVisibility(View.VISIBLE);
+                binding.llKitchenPrinter.setVisibility(View.GONE);
+
 
             }
         });
@@ -149,6 +175,11 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
         }
         if (mvvm.getCanPrint().getValue() != null) {
             binding.btnSwitch.setChecked(mvvm.getCanPrint().getValue());
+            binding.llPrintAutomatic.setVisibility(mvvm.getCanPrint().getValue() ? View.VISIBLE : View.GONE);
+        }
+
+        if (mvvm.getAutomaticPrint().getValue() != null) {
+            binding.btnSwitchPrintAutomatic.setChecked(mvvm.getAutomaticPrint().getValue());
         }
 
         binding.edtName.addTextChangedListener(new TextWatcher() {
@@ -170,14 +201,13 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
             }
         });
 
-
         binding.arrowBack.setOnClickListener(v -> onBackPressed());
 
         binding.btnSave.setOnClickListener(v -> {
             String name = binding.edtName.getText().toString().trim();
             if (!name.isEmpty()) {
                 binding.txtInput.setError(null);
-                mvvm.addPrinter(false, null, this);
+                mvvm.addPrinter(false,this,getLang());
 
             } else {
                 binding.txtInput.setError(getString(R.string.empty_field));
@@ -186,6 +216,14 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
         binding.btnSwitch.setOnClickListener(v -> {
             mvvm.getCanPrint().setValue(binding.btnSwitch.isChecked());
+            binding.llPrintAutomatic.setVisibility(binding.btnSwitch.isChecked() ? View.VISIBLE : View.GONE);
+            mvvm.getAutomaticPrint().setValue(false);
+            binding.btnSwitchPrintAutomatic.setChecked(false);
+        });
+
+        binding.btnSwitchPrintAutomatic.setOnClickListener(v -> {
+            mvvm.getAutomaticPrint().setValue(binding.btnSwitchPrintAutomatic.isChecked());
+
         });
 
 
@@ -208,6 +246,9 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
                 printUtils.findBluetoothDevice(this);
                 createBluetoothDeviceDialog();
 
+                /*Intent intent = new Intent(this,ScanningActivity.class);
+                launcher.launch(intent);*/
+
 
             } else {
                 Toast.makeText(this, "Bluetooth permission denied", Toast.LENGTH_SHORT).show();
@@ -219,6 +260,19 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
                 printUtils.findBluetoothDevice(this);
                 createBluetoothDeviceDialog();
 
+                Intent intent = new Intent(this,ScanningActivity.class);
+                launcher.launch(intent);
+
+
+
+            } else {
+                Toast.makeText(this, "Bluetooth permission denied", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        permissions3 = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
+            if (!isGranted.containsValue(false)) {
+
 
             } else {
                 Toast.makeText(this, "Bluetooth permission denied", Toast.LENGTH_SHORT).show();
@@ -227,52 +281,70 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
 
         binding.flPrint.setOnClickListener(v -> {
-            mvvm.createBitmap(binding.layoutPrint.scrollView, this);
+            if (mvvm.getSelectedPaperPos().getValue()!=null){
+                mvvm.addPrinter(true,this,getLang());
+
+            }
         });
 
+
+        launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                Log.e("ready", "ready");
+            }
+        });
 
     }
 
 
+
     private void checkBluetoothPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
                     createBluetoothDeviceDialog();
 
                     printUtils.findBluetoothDevice(this);
+
+
+
+
                 } else {
-                    permissions2.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
+                    permissions2.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_ADVERTISE});
 
                 }
             } else {
                 createBluetoothDeviceDialog();
                 printUtils.findBluetoothDevice(this);
 
+
+
+
             }
 
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                permissions2.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
+                permissions2.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_ADVERTISE});
 
             } else {
-                permissions.launch(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN});
+                permissions.launch(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN,Manifest.permission.BLUETOOTH_ADVERTISE});
 
             }
         }
 
     }
 
-
     private void showPopupPrinters() {
         PowerMenuItem item1 = new PowerMenuItem(getString(R.string.no_printers), false);
         PowerMenuItem item2 = new PowerMenuItem("Sunmi", false);
-        PowerMenuItem item3 = new PowerMenuItem(getString(R.string.other_model), false);
+        PowerMenuItem item3 = new PowerMenuItem(getString(R.string.kitchen_display), false);
+        PowerMenuItem item4 = new PowerMenuItem(getString(R.string.other_model), false);
 
         PowerMenu powerMenu = new PowerMenu.Builder(this)
                 .addItem(item1) // add an item.
                 .addItem(item2)
                 .addItem(item3)
+                .addItem(item4)
                 .setAnimation(MenuAnimation.DROP_DOWN) // Animation start point (TOP | LEFT).
                 .setMenuRadius(2f)
                 .setMenuShadow(4f)
@@ -437,7 +509,6 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
             hidePinCodeView();
         }
     }
-
 
 
     @Override

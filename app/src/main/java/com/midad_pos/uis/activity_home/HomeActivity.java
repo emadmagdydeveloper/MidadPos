@@ -62,6 +62,7 @@ import com.midad_pos.model.DiscountModel;
 import com.midad_pos.model.ItemModel;
 import com.midad_pos.model.ModifierModel;
 import com.midad_pos.model.OrderModel;
+import com.midad_pos.model.UserModel;
 import com.midad_pos.model.VariantModel;
 import com.midad_pos.model.cart.CartList;
 import com.midad_pos.model.cart.ManageCartModel;
@@ -101,6 +102,7 @@ public class HomeActivity extends DrawerBaseActivity {
     private CartDiscountAdapter cartDiscountAdapter;
     private CustomersAdapter customersAdapter;
     private OpenedTicketsAdapter openedTicketsAdapter;
+
 
 
     @Override
@@ -175,6 +177,12 @@ public class HomeActivity extends DrawerBaseActivity {
             mvvm.forNavigation = false;
         });
 
+        mvvm.getUserModelData().observe(this,userModel -> {
+            UserModel model = getUserModel();
+            model.getData().getUser().setAvailable(userModel.getData().getUser().isAvailable());
+            setUserModel(model);
+            binding.setModel(model);
+        });
 
 
         binding.toolBarHomeLayout.setLang(getLang());
@@ -2010,7 +2018,7 @@ public class HomeActivity extends DrawerBaseActivity {
         super.onResume();
         updateSelectedPos(0);
         updateShiftData(getAppSetting());
-
+        binding.setModel(getUserModel());
 
 
 

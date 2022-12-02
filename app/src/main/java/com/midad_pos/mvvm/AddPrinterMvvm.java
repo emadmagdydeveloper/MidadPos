@@ -2,41 +2,33 @@ package com.midad_pos.mvvm;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.telephony.SignalStrength;
 import android.util.Log;
-import android.widget.ScrollView;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.google.zxing.pdf417.encoder.PDF417;
 import com.midad_pos.R;
 import com.midad_pos.database.AppDatabase;
 import com.midad_pos.database.DAO;
-import com.midad_pos.model.DiscountModel;
+import com.midad_pos.databinding.PrintTestLayoutBinding;
 import com.midad_pos.model.PrinterModel;
-import com.midad_pos.model.StatusResponse;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.preferences.Preferences;
 import com.midad_pos.print_utils.PrintUtils;
 import com.midad_pos.print_utils.SunmiPrintHelper;
-import com.midad_pos.remote.Api;
-import com.midad_pos.share.Common;
-import com.midad_pos.tags.Tags;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.SingleObserver;
@@ -44,7 +36,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Response;
 
 public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.PrintResponse {
     private final String TAG = AddPrinterMvvm.class.getName();
@@ -52,6 +43,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     private MutableLiveData<Integer> selectedPaperPos;
     private MutableLiveData<Integer> selectedInterfacePos;
     private MutableLiveData<Boolean> canPrint;
+    private MutableLiveData<Boolean> automaticPrint;
     private MutableLiveData<String> name;
     private MutableLiveData<BluetoothDevice> bluetoothDevice;
     private MutableLiveData<PrinterModel> onAddPrinterSuccess;
@@ -119,6 +111,15 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
         return canPrint;
     }
 
+    public MutableLiveData<Boolean> getAutomaticPrint() {
+        if (automaticPrint == null) {
+            automaticPrint = new MutableLiveData<>();
+            automaticPrint.setValue(false);
+        }
+
+        return automaticPrint;
+    }
+
     public MutableLiveData<String> getName() {
         if (name == null) {
             name = new MutableLiveData<>();
@@ -144,15 +145,15 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     }
 
     @SuppressLint("MissingPermission")
-    public void addPrinter(boolean test, Bitmap bitmap,AppCompatActivity activity) {
+    public void addPrinter(boolean test, AppCompatActivity activity, String lang) {
         String printer_type = "";
         String paper_width = "80";
-        String bluetooth_name = "";
-        String bluetooth_address = "";
         String ip_address = "";
+        String bluetooth_name = "";
         boolean canPrintReceipt = false;
         boolean canPrintOrder = false;
-        boolean isOtherPrinter = false;
+        boolean canPrintAutomatic = false;
+
         if (getSelectedPrinterPos().getValue() != null) {
             int pos = getSelectedPrinterPos().getValue();
             if (pos == 0) {
@@ -161,9 +162,11 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             } else if (pos == 1) {
                 printer_type = "sunmi";
 
+            }else if (pos == 2) {
+                printer_type = "kitchen";
+
             } else {
                 printer_type = "other";
-                isOtherPrinter = true;
             }
         }
 
@@ -176,16 +179,19 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             }
         }
 
-        if (getBluetoothDevice().getValue() != null) {
-            bluetooth_name = getBluetoothDevice().getValue().getName();
-            bluetooth_address = getBluetoothDevice().getValue().getAddress();
-        }
 
         if (getCanPrint().getValue() != null) {
             canPrintReceipt = getCanPrint().getValue();
         }
 
-        PrinterModel printerModel = new PrinterModel(getName().getValue(), printer_type, isOtherPrinter, bluetooth_name, bluetooth_address, ip_address, paper_width, canPrintReceipt, canPrintOrder);
+        if (getAutomaticPrint().getValue()!=null){
+            canPrintAutomatic = getAutomaticPrint().getValue();
+        }
+        if (getBluetoothDevice().getValue()!=null){
+            bluetooth_name = getBluetoothDevice().getValue().getName();
+        }
+
+        PrinterModel printerModel = new PrinterModel(getName().getValue(), printer_type, canPrintReceipt, canPrintOrder,canPrintAutomatic,ip_address,bluetooth_name, getBluetoothDevice().getValue());
 
 
         if (printer_type.equalsIgnoreCase("sunmi"))
@@ -203,6 +209,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
                             @Override
                             public void onSuccess(PrinterModel model) {
+                                Log.e("tt","qq");
                                 if (model != null) {
                                     getOnAddedError().setValue(getApplication().getApplicationContext().getString(R.string.already_added_printer));
 
@@ -211,6 +218,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
                             @Override
                             public void onError(Throwable e) {
+                                Log.e("q",e.getMessage());
                                 if (e.getMessage() != null && e.getMessage().contains("Query returned empty result")) {
 
                                     savePrinter(printerModel);
@@ -219,14 +227,14 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
                         });
 
             } else {
-                printTest(printer_type, paper_width, bluetooth_name, bitmap,activity);
+                printSunmiTest(paper_width,lang);
             }
 
         } else if (printer_type.equalsIgnoreCase("other")) {
             if (getSelectedInterfacePos().getValue() != null) {
                 int pos = getSelectedInterfacePos().getValue();
                 if (pos == 0) {
-                    if (!bluetooth_name.isEmpty()) {
+                    if (getBluetoothDevice().getValue()!=null) {
                         if (!test) {
                             dao.getPrinterBluetoothName(bluetooth_name)
                                     .subscribeOn(Schedulers.io())
@@ -252,7 +260,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
                                         }
                                     });
                         } else {
-                            printTest(printer_type, paper_width, bluetooth_name, bitmap,activity);
+                            printBluetoothTest(paper_width,null,activity);
 
                         }
 
@@ -269,17 +277,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
     }
 
-    private void printTest(String printer_type, String paper_width, String bluetooth_name, Bitmap bitmap, AppCompatActivity activity) {
-        if (printer_type.equalsIgnoreCase("sunmi")) {
-            printSunmiTest(paper_width);
-        } else {
-            if (!bluetooth_name.isEmpty()) {
-                printBluetoothTest(paper_width, bluetooth_name, bitmap,activity);
-            } else {
-                Toast.makeText(getApplication(), "Error bluetooth settings", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+
 
     private void savePrinter(PrinterModel printerModel) {
         dao.addPrinter(printerModel)
@@ -309,21 +307,62 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
     }
 
-    private void printSunmiTest(String paper_width) {
+    private void printSunmiTest(String paper_width,String lang) {
         int paper = 2;
         if (paper_width.equalsIgnoreCase("80")) {
         } else {
             paper = 1;
         }
-        UserModel userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
-        SunmiPrintHelper.getInstance().printTestExample(getApplication().getApplicationContext(), userModel, paper);
 
+
+        UserModel model = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
+        SunmiPrintHelper.getInstance().initPrinter();
+        SunmiPrintHelper.getInstance().printTestExample(getApplication().getApplicationContext(),model,paper,lang);
+        /*SunmiPrintHelper.getInstance().showPrinterStatus(getApplication().getApplicationContext());
+        SunmiPrintHelper.getInstance().printBitmap(bitmap,1);
+        SunmiPrintHelper.getInstance().printBitmap(bitmap,1);
+        SunmiPrintHelper.getInstance().cutpaper();*/
     }
 
-    private void printBluetoothTest(String paper_width, String bluetooth_name, Bitmap bitmap,AppCompatActivity activity) {
+    @SuppressLint("MissingPermission")
+    private void printBluetoothTest(String paper_width, Bitmap bitmap, AppCompatActivity activity) {
         if (getBluetoothDevice().getValue()!=null){
+
+            if (getBluetoothDevice().getValue().getBondState()!=BluetoothDevice.BOND_BONDED){
+                Toast.makeText(activity, "Device not paired", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             try {
-                printUtils.connectBluetoothPrinter(getBluetoothDevice().getValue(),activity,bitmap);
+
+               /* if (bitmap != null) {
+                    double w = 550.0;
+                    if (paper_width.equals("58")){
+                        w = 384;
+                    }
+
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    double h = bitmap.getWidth() / w;
+                    double dstH = bitmap.getHeight() / h;
+                    Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, (int) w, (int) dstH, true);
+                    int width = newBitmap.getWidth();
+                    int height = newBitmap.getHeight();
+                    int newWidth = (width/8+1)*8;
+                    float scaleWidth = ((float) newWidth) / width;
+                    Matrix matrix = new Matrix();
+                    matrix.postScale(scaleWidth, 1);
+                    Bitmap b = Bitmap.createBitmap(newBitmap, 0, 0, width, height, matrix, true);
+
+                    printUtils.connectBluetoothPrinter(getBluetoothDevice().getValue(),activity,b);
+
+
+
+
+
+                }*/
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -346,41 +385,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
     }
 
-    public void createBitmap(ScrollView scrollView,AppCompatActivity activity) {
-        Bitmap bitmap = Bitmap.createBitmap(scrollView.getChildAt(0).getWidth(), scrollView.getChildAt(0).getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        scrollView.draw(canvas);
-
-        float paperWidth = 550;
-        if (getSelectedPaperPos().getValue()!=null&&getSelectedPaperPos().getValue()==1){
-            paperWidth = 400;
-        }
-        if (bitmap != null) {
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-            double h = bitmap.getWidth() / paperWidth;
-            double dstH = bitmap.getHeight() / h;
 
 
-            Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, (int) paperWidth, (int) dstH, true);
 
-
-            int width = newBitmap.getWidth();
-            int height = newBitmap.getHeight();
-            int newWidth = (width / 8 + 1) * 8;
-            float scaleWidth = ((float) newWidth) / width;
-            Matrix matrix = new Matrix();
-            matrix.postScale(scaleWidth, 1);
-            Bitmap b = Bitmap.createBitmap(newBitmap, 0, 0, width, height, matrix, true);
-            if (b != null) {
-                ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 0, byteArray);
-
-                addPrinter(true,bitmap,activity);
-            }
-
-
-        }
-    }
 }

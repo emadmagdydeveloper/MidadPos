@@ -66,9 +66,7 @@ public class SignUp2Activity extends BaseActivity implements OnCountryPickerList
         }
         mvvm = ViewModelProviders.of(this).get(SignUp2Mvvm.class);
         mvvm.setSignUpModel(model);
-        mvvm.getSignUpModel().observe(this, signUpModel -> {
-            binding.setModel(signUpModel);
-        });
+        mvvm.getSignUpModel().observe(this, signUpModel -> binding.setModel(signUpModel));
 
         spinnerBusinessType = new SpinnerBusinessType(this, getLang());
         binding.spinner.setAdapter(spinnerBusinessType);

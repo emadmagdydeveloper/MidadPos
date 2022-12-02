@@ -93,7 +93,12 @@ public class LoginActivity extends BaseActivity {
                     }else {
                         POSModel posModel = wereHouse.getPos().get(0);
                         userModel.getData().setSelectedPos(posModel);
+                        if (!userModel.getData().getUser().isAvailable()){
+                            userModel.getData().setSelectedUser(userModel.getData().getUser());
+                            setUserModel(userModel);
+                        }
                         navigateToHomeActivity(userModel);
+
 
                     }
 

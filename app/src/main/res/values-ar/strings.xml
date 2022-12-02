@@ -252,6 +252,12 @@
 
     <string name="email_sent">تم إرسال بريد إلكتروني</string>
     <string name="check_email">تحقق من صندوق الوارد الخاص بك للمزيد من الإرشادات</string>
+    <string name="email_exist">البريد الإلكتروني موجود من قبل</string>
+    <string name="phone_exits">رقم الجوال موجود من قبل</string>
+    <string name="kitchen_display">عرض المطبخ</string>
+    <string name="kitchen_display_ip_address">عنوان الip الخاص بالمطبخ</string>
+    <string name="automatically_print_receipt">طباعة الإيصال تلقائيا</string>
+    <string name="total_before_tax">Total before tax</string>
 
 
     <string-array name="delivery_options">
