@@ -65,6 +65,8 @@ public class BaseMvvm extends AndroidViewModel {
         return pay_in_out;
     }
 
+
+
     public MutableLiveData<Boolean> getOnUserRefreshed() {
         if (onUserRefreshed == null) {
             onUserRefreshed = new MutableLiveData<>();

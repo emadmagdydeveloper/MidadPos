@@ -861,9 +861,8 @@ public class SunmiPrintHelper {
             for (int index = 1; index < 4; index++) {
                 String text1 = itemField + index;
                 String text2 = "0.00";
-
                 String amount = "1X0.00";
-                printRowData(text1, text2, paperWidth, lang);
+                printRowData(text1, text2, paperWidth-6, lang);
                 printText(amount, lang);
             }
 
@@ -875,7 +874,7 @@ public class SunmiPrintHelper {
                         null);
             }
 
-            printRowWithFontAndStyle(totalBeforeTaxField,"0.00",paperWidth,20,true,lang);
+            printRowWithFontAndStyle(totalBeforeTaxField,"0.00",paperWidth-6,25,true,lang);
 
 
 
@@ -886,7 +885,7 @@ public class SunmiPrintHelper {
                         null);
             }
 
-            printRowWithFontAndStyle(totalWithTaxField,"0.00",paperWidth,20,true,lang);
+            printRowWithFontAndStyle(totalWithTaxField,"0.00",paperWidth-6,25,true,lang);
 
 
 
@@ -933,9 +932,9 @@ public class SunmiPrintHelper {
         String data = "";
 
         if (lang.equals("en")) {
-            data = str1 + spaceBetween(str1, str2, (paperWidth - 1)) + str2;
+            data = str2 + spaceBetween(str1, str2, (paperWidth - 2)) + str1;
         } else {
-            data = str2 + spaceBetween(str1, str2, (paperWidth - 1)) + str1;
+            data = str1 + spaceBetween(str1, str2, (paperWidth - 2)) + str2;
 
         }
 
@@ -969,9 +968,9 @@ public class SunmiPrintHelper {
         String data = "";
 
         if (lang.equals("en")) {
-            data = str1 + spaceBetween(str1, str2, (paperWidth - 1)) + str2;
+            data = str2 + spaceBetween(str1, str2, (paperWidth - 2)) + str1;
         } else {
-            data = str2 + spaceBetween(str1, str2, (paperWidth - 1)) + str1;
+            data = str1 + spaceBetween(str1, str2, (paperWidth - 2)) + str2;
 
         }
         if (isBold){
@@ -985,6 +984,8 @@ public class SunmiPrintHelper {
                 }
             }
         }
+
+
 
         try {
             sunmiPrinterService.printTextWithFont(data + "\n", null,fontSize,null);

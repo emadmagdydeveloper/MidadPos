@@ -101,6 +101,9 @@ public class DrawerBaseActivity extends BaseActivity implements NavigationView.O
 
     }
 
+    public void showShift(boolean visibility){
+        binding.navigationView.getMenu().findItem(R.id.shift).setVisible(visibility);
+    }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 

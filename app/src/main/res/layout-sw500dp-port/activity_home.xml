@@ -28,6 +28,10 @@
         <variable
             name="model"
             type="com.midad_pos.model.UserModel" />
+        <variable
+            name="setting"
+            type="com.midad_pos.model.AppSettingModel" />
+
         <import type="android.view.View"/>
     </data>
 
@@ -196,7 +200,7 @@
                                     android:textSize="18sp"
                                     app:backgroundTint="@null"
                                     android:stateListAnimator="@null"
-                                    android:visibility="@{model.data.user.available?View.VISIBLE:View.GONE}"
+                                    android:visibility='@{setting.advantageModel!=null?(setting.advantageModel.open_tickets.equals("1")?(model.data.user.available?View.VISIBLE:View.GONE):View.GONE):(model.data.user.available?View.VISIBLE:View.GONE)}'
 
 
                                     />
@@ -241,7 +245,10 @@
                                 android:layout_height="48dp"
                                 android:gravity="center_vertical"
                                 android:paddingStart="16dp"
-                                android:paddingEnd="16dp">
+                                android:paddingEnd="16dp"
+                                android:visibility='@{setting!=null?((setting.advantageModel!=null?setting.advantageModel.dining_options.equals("1")?View.VISIBLE:View.GONE:View.VISIBLE)):View.VISIBLE}'
+
+                                >
 
                                 <TextView
                                     android:id="@+id/tvDelivery"
@@ -527,7 +534,6 @@
 
             </FrameLayout>
         </LinearLayout>
-
         <FrameLayout
             android:id="@+id/dialogCustomer"
             android:layout_width="match_parent"
@@ -540,7 +546,6 @@
 
 
         </FrameLayout>
-
         <FrameLayout
             android:id="@+id/flDialogAddPrice"
             android:layout_width="match_parent"
@@ -563,7 +568,6 @@
                 layout="@layout/dialog_item_extras"
                 />
         </FrameLayout>
-
         <FrameLayout
             android:id="@+id/flDialogCartDiscount"
             android:layout_width="match_parent"
@@ -574,7 +578,6 @@
                 android:id="@+id/dialogCartDiscount"
                 layout="@layout/dialog_cart_discounts" />
         </FrameLayout>
-
         <FrameLayout
             android:id="@+id/flDialogOpenedTickets"
             android:layout_width="match_parent"
@@ -585,7 +588,6 @@
                 android:id="@+id/dialogOpenedTickets"
                 layout="@layout/dialog_opened_ticket" />
         </FrameLayout>
-
 
         <LinearLayout
             android:id="@+id/llOpenShift"

@@ -1,5 +1,6 @@
 package com.midad_pos.services;
 
+import com.midad_pos.model.AdvantageDataModel;
 import com.midad_pos.model.CategoryDataModel;
 import com.midad_pos.model.CustomerDataModel;
 import com.midad_pos.model.DeliveryDataModel;
@@ -241,5 +242,9 @@ public interface Service {
     @POST("api/auth/sendEmail")
     Single<Response<StatusResponse>> forgotPassword(@Field("email") String email
 
+    );
+
+    @GET("api/setting/advantage")
+    Single<Response<AdvantageDataModel>> getAdvantage(@Query("user_id") String user_id
     );
 }

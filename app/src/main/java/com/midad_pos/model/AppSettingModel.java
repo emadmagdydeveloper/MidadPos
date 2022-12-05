@@ -7,6 +7,7 @@ public class AppSettingModel implements Serializable {
     private int home_layout_type = 1; //1 grid 2 linear
     private int isShiftOpen;
     private String shift_id;
+    private AdvantageModel advantageModel;
     public boolean isScan() {
         return isScan;
     }
@@ -37,5 +38,13 @@ public class AppSettingModel implements Serializable {
 
     public void setShift_id(String shift_id) {
         this.shift_id = shift_id;
+    }
+
+    public AdvantageModel getAdvantageModel() {
+        return advantageModel;
+    }
+
+    public void setAdvantageModel(AdvantageModel advantageModel) {
+        this.advantageModel = advantageModel;
     }
 }

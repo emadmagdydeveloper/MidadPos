@@ -25,6 +25,9 @@
         <variable
             name="model"
             type="com.midad_pos.model.UserModel" />
+        <variable
+            name="setting"
+            type="com.midad_pos.model.AppSettingModel" />
         <import type="android.view.View"/>
 
     </data>
@@ -255,7 +258,10 @@
                         android:layout_height="48dp"
                         android:gravity="center_vertical"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:paddingEnd="16dp"
+                        android:visibility='@{setting!=null?((setting.advantageModel!=null?setting.advantageModel.dining_options.equals("1")?View.VISIBLE:View.GONE:View.VISIBLE)):View.VISIBLE}'
+
+                        >
 
                         <TextView
                             android:id="@+id/tvDelivery"
@@ -459,7 +465,7 @@
                             android:background="@color/transparent"
                             app:backgroundTint="@null"
                             android:stateListAnimator="@null"
-                            android:visibility="@{model.data.user.available?View.VISIBLE:View.GONE}"
+                            android:visibility='@{setting.advantageModel!=null?(setting.advantageModel.open_tickets.equals("1")?(model.data.user.available?View.VISIBLE:View.GONE):View.GONE):(model.data.user.available?View.VISIBLE:View.GONE)}'
 
                             />
 
@@ -522,6 +528,7 @@
                 layout="@layout/dialog_item_extras"
                 />
         </FrameLayout>
+
 
         <FrameLayout
             android:id="@+id/flDialogCartDiscount"

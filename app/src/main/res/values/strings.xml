@@ -259,6 +259,7 @@
     <string name="kitchen_display_ip_address">Kitchen display IP-address</string>
     <string name="automatically_print_receipt">Automatically print receipt</string>
     <string name="total_before_tax">Total before tax</string>
+    <string name="daily_close">Daily close</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

@@ -134,6 +134,7 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
 
+
     private void initView() {
 
         baseMvvm = ViewModelProviders.of(this).get(BaseMvvm.class);
@@ -264,6 +265,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
         mvvm.getAppSettingModel().observe(this, this::updateShiftData);
+
         mvvm.getIsCustomerLoading().observe(this, isLoading -> binding.addCustomerDialog.searchDialog.loader.setVisibility(isLoading ? View.VISIBLE : View.GONE));
 
         binding.addCustomerDialog.searchDialog.recView.setLayoutManager(new LinearLayoutManager(this));
@@ -358,6 +360,8 @@ public class HomeActivity extends DrawerBaseActivity {
             mvvm.addAllDraftTicketToDelete(binding.dialogOpenedTickets.checkboxSelectAllOpenedTickets.isChecked());
         });
         ///////////////////////////////////////////////////////////////////////////////
+
+
 
         mvvm.getCustomersInstance().observe(this, customers -> {
             binding.addCustomerDialog.searchDialog.tvNoCustomer.setVisibility(customers.size() > 0 ? View.GONE : View.VISIBLE);
@@ -982,6 +986,7 @@ public class HomeActivity extends DrawerBaseActivity {
             mvvm.getIsDialogPriceOpened().setValue(false);
         });
 
+
         binding.dialogItemExtras.close.setOnClickListener(v -> {
             mvvm.getIsDialogExtrasOpened().setValue(false);
             mvvm.getItemForPricePos().setValue(-1);
@@ -1286,7 +1291,8 @@ public class HomeActivity extends DrawerBaseActivity {
         return false;
     }
     private void updateShiftData(AppSettingModel appSetting) {
-
+        binding.setSetting(appSetting);
+        showShift((appSetting.getAdvantageModel()!=null&&appSetting.getAdvantageModel().getShifts().equals("1")));
         if (getAppSetting().getIsShiftOpen() == 0) {
             binding.llOpenShift.setVisibility(View.VISIBLE);
             mvvm.clearCart();
@@ -1306,7 +1312,9 @@ public class HomeActivity extends DrawerBaseActivity {
                 binding.llNoItems.setVisibility(View.GONE);
 
             }
-        } else if (getAppSetting().getIsShiftOpen() == 1) {
+        }
+
+        else if (getAppSetting().getIsShiftOpen() == 1) {
             binding.llOpenShift.setVisibility(View.GONE);
             if (binding.recView != null) {
                 binding.recView.setVisibility(View.VISIBLE);
@@ -1321,6 +1329,8 @@ public class HomeActivity extends DrawerBaseActivity {
                 binding.recViewPort.setVisibility(View.VISIBLE);
             }
         }
+
+
     }
 
     private void navigateToChargeActivity() {

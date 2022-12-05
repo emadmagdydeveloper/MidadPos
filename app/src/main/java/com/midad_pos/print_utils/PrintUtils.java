@@ -14,11 +14,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.util.Log;
+import android.util.Xml;
 import android.widget.Toast;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,9 +35,17 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+
+import com.ganesh.intermecarabic.Arabic864;
+import com.mazenrashed.printooth.Printooth;
+import com.mazenrashed.printooth.data.printable.Printable;
+import com.mazenrashed.printooth.data.printable.TextPrintable;
+import com.mazenrashed.printooth.data.printer.DefaultPrinter;
 import com.midad_pos.R;
 import com.midad_pos.model.UserModel;
 import com.midad_pos.preferences.Preferences;
+
+import okio.Utf8;
 
 public class PrintUtils {
     private BluetoothAdapter bluetoothAdapter;
@@ -47,6 +58,7 @@ public class PrintUtils {
     private int readBufferPosition;
     private volatile boolean stopWorker;
     private PrintResponse response;
+    private BluetoothDevice device;
 
 
     public PrintUtils(PrintResponse response) {
@@ -97,7 +109,7 @@ public class PrintUtils {
 
     }
 
-    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, AppCompatActivity context, Bitmap bitmap) {
+    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, int paper, AppCompatActivity context, String lang,Bitmap bitmap) {
         try {
 
             //Standard uuid from string //
@@ -111,8 +123,7 @@ public class PrintUtils {
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
             beginListenData();
-            printImage(bitmap);
-            //printTestDataText(paper,context);
+            printTestDataText(bitmap,paper);
 
         } catch (Exception ex) {
 
@@ -168,41 +179,330 @@ public class PrintUtils {
         }
     }
 
-    public void printTestDataText(int paper, Context context) {
+    public void printTestDataText(Bitmap bitmap,int paper) {
         try {
-            UserModel userModel = Preferences.getInstance().getUserData(context);
-            String msg = "";
-            msg += userModel.getData().getSelectedUser().getCompany_name() + "\n";
-            msg += context.getString(R.string.simp_tax_inv) + "\n";
+            int paper_width = 576;
+            if (paper ==58){
+                paper_width = 384;
+            }
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
 
-            msg += "\n";
-            msg += "\n";
 
-            msg += context.getString(R.string.receipt) + "#" + "\n";
+            byte[]  bitmapData = PrintPicture.POS_PrintBMP(bitmap, paper_width, 4);
 
-            msg += context.getString(R.string.inv_date) + "\n";
-            msg += context.getString(R.string.cashier) + "\n";
-            msg += context.getString(R.string.pos) + "\n";
+            outputStream.write(bitmapData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            msg += "--------------------------------\n";
-            msg += "\n";
-            msg += "Delivery\n";
-            msg += "\n";
 
-            msg += "--------------------------------\n";
+       /* try {
+            UserModel model = Preferences.getInstance().getUserData(context);
+            String vatField = "";
+            String invoiceField = "";
+            String deliveryField = "";
+            String name = "";
+            String receiptField = "";
+            String receiptDateField = "";
+            String cashierField = "";
+            String posField = "";
+            String totalBeforeTaxField = "";
+            String totalWithTaxField = "";
+            String itemField = "";
+            String thx = "";
 
-            msg += "test           0.00\n";
-            msg += "1 X 0.00\n";
+            if (lang.equals("ar")){
+                name = "مداد";
+                vatField = "الرقم الضريبي#";
+                invoiceField = "فاتورة ضريبية مبسطة";
+                deliveryField = "التوصيل";
+                receiptField = "التذكرة #:#####";
+                receiptDateField = "تاريخ الفاتورة :dd-MMM-YYYY hh:mm:ss";
+                cashierField = "الكاشير :" + model.getData().getSelectedUser().getName();
+                posField = "نقطة بيع :" + model.getData().getSelectedPos().getTitle();
+                totalBeforeTaxField = "الإجمالى قبل الضريبة";
+                totalWithTaxField = "الإجمالي شامل الضريبة";
+                itemField = "عنصر";
+                thx = "شكرا لزيارتكم";
+            }else {
+                name = "Midad";
+                vatField = "VAT#";
+                invoiceField = "Simplified tax invoice";
+                deliveryField = "Delivery";
+                receiptField = "Receipt #:#####";
+                receiptDateField = "Invoice date :dd-MMM-YYYY hh:mm:ss";
+                cashierField = "Cashier :" + model.getData().getSelectedUser().getName();
+                posField = "POS :" + model.getData().getSelectedPos().getTitle();
+                totalBeforeTaxField = "Total before tax";
+                totalWithTaxField = "Total with tax";
+                itemField = "item";
+                thx = "Thank you";
+            }
 
-            msg += "--------------------------------\n";
-
-            msg += "     " + context.getString(R.string.thank_you) + "     \n";
-
+            String msg = "\n";
+            Arabic864 arabic = new Arabic864();
 
             outputStream.write(msg.getBytes());
+            outputStream.write(arabic.Convert(name,false));
+            outputStream.write(arabic.Convert(vatField,false));
+            outputStream.write(arabic.Convert(invoiceField,false));
+
+
+
+           *//* msg += name + "\n";
+            msg += vatField + "#0000000000000\n";
+            msg += invoiceField + "\n";
+            if (lang.equals("ar")) {
+                outputStream.write(ESCUtil.alignRight());
+
+            } else {
+                outputStream.write(ESCUtil.alignLeft());
+
+            }
+            msg += "\n";
+            msg += "\n";
+
+            msg += receiptField + "#" + "\n";
+            msg += receiptDateField + "\n";
+            msg += cashierField + "\n";
+            msg += posField + "\n";
+
+            if (paper == 58) {
+                msg += "--------------------------------\n";
+
+            } else {
+                msg += "------------------------------------------------\n";
+
+            }
+            msg += "\n";
+            msg += deliveryField;
+            msg += "\n";
+
+            if (paper == 58) {
+                msg += "--------------------------------\n";
+
+            } else {
+                msg += "------------------------------------------------\n";
+
+            }
+            for (int i = 1; i < 4; i++) {
+                msg += buildRow(itemField + i, "0.00", paper, lang);
+                msg += "1 X 0.00\n";
+            }
+
+            if (paper == 58) {
+                msg += "--------------------------------\n";
+
+            } else {
+                msg += "------------------------------------------------\n";
+
+            }
+            outputStream.write(ESCUtil.boldOn());
+            msg += buildRow(totalBeforeTaxField, "0.00", paper, lang);
+
+            outputStream.write(ESCUtil.boldOff());
+
+            if (paper == 58) {
+                msg += "--------------------------------\n";
+
+            } else {
+                msg += "------------------------------------------------\n";
+
+            }
+
+            outputStream.write(ESCUtil.boldOn());
+
+            msg += buildRow(totalWithTaxField, "0.00", paper, lang);
+
+
+            outputStream.write(ESCUtil.boldOff());
+
+            if (paper == 58) {
+                msg += "--------------------------------\n";
+
+            } else {
+                msg += "------------------------------------------------\n";
+
+            }
+            outputStream.write(ESCUtil.alignCenter());
+            outputStream.write(ESCUtil.boldOn());
+
+            msg += thx + "\n";
+            msg += "\n";
+            msg += "\n";
+            msg += "\n";
+            outputStream.write(msg.getBytes(StandardCharsets.US_ASCII));*//*
         } catch (Exception ex) {
             ex.printStackTrace();
+        }*/
+       /* lang = "en";
+        Log.e("lang","ss");
+
+        if (lang.equals("en")){
+            new Thread(() -> {
+                UserModel model = Preferences.getInstance().getUserData(context);
+                String vatField = "";
+                String invoiceField = "";
+                String deliveryField = "";
+                String name = "";
+                String receiptField = "";
+                String receiptDateField = "";
+                String cashierField = "";
+                String posField = "";
+                String totalBeforeTaxField = "";
+                String totalWithTaxField = "";
+                String itemField = "";
+                String thx = "";
+
+                name = "Midad";
+                vatField = "VAT#";
+                invoiceField = "Simplified tax invoice";
+                deliveryField = "Delivery";
+                receiptField = "Receipt #:#####";
+                receiptDateField = "Invoice date :dd-MMM-YYYY hh:mm:ss";
+                cashierField = "Cashier :" + model.getData().getSelectedUser().getName();
+                posField = "POS :" + model.getData().getSelectedPos().getTitle();
+                totalBeforeTaxField = "Total before tax";
+                totalWithTaxField = "Total with tax";
+                itemField = "item";
+                thx = "Thank you";
+
+                try {
+                    DeviceConnection connection = new BluetoothConnection(device);
+                    EscPosPrinter printer = new EscPosPrinter(connection, 203, 48f, 32);
+                    String items ="";
+                    for (int i = 1;i<4;i++){
+                        items = "[L]"+itemField+i+"[R]"+"0.00"+"\n";
+                        items +="[L]1X0.00\n";
+                    }
+                    printer.printFormattedText("[C]<b><font size= 'big'>" + name + "</font></b>\n" +
+                            "[C]"+vatField+"#0000000000000\n"+
+                            "[C]"+invoiceField+"\n"+
+                            "[L]"+receiptField+"#\n"+
+                            "[L]"+receiptDateField+"\n"+
+                            "[L]"+cashierField+"\n"+
+                            "[L]"+posField+"\n"+
+                            "[C]"+"\n"+
+                            "[C]--------------------------------\n"+
+                            "[L]"+deliveryField+"\n"+
+                            "[C]"+"--------------------------------\n"+
+                            "[C]"+"\n"+
+                            items+
+                            "[C]--------------------------------\n"+
+                            "[L]<b>"+totalBeforeTaxField+"</b>[R]<b>"+"0.00</b>\n"+
+                            "[C]--------------------------------\n"+
+                            "[L]<b>"+totalWithTaxField+"</b>[R]<b>"+"0.00</b>\n"+
+                            "[C]\n"+
+                            "[C]<b><font size= 'big'>"+thx+"</font></b>\n"+
+                            "[C]" +"\n"+
+                            "[C]" +"\n"+
+                            "[C]" +"\n"+
+                            "[C]" +"\n"+
+                            "[C]" +"\n"
+                    );
+                } catch (EscPosConnectionException | EscPosEncodingException | EscPosBarcodeException | EscPosParserException e) {
+                    e.printStackTrace();
+
+                }
+            }).start();
+
+        }else {
+            new Thread(() -> {
+                UserModel model = Preferences.getInstance().getUserData(context);
+                String vatField = "";
+                String invoiceField = "";
+                String deliveryField = "";
+                String name = "";
+                String receiptField = "";
+                String receiptDateField = "";
+                String cashierField = "";
+                String posField = "";
+                String totalBeforeTaxField = "";
+                String totalWithTaxField = "";
+                String itemField = "";
+                String thx = "";
+
+                name = "مداد";
+                vatField = "الرقم الضريبي#";
+                invoiceField = "فاتورة ضريبية مبسطة";
+                deliveryField = "التوصيل";
+                receiptField = "التذكرة #:#####";
+                receiptDateField = "تاريخ الفاتورة :dd-MMM-YYYY hh:mm:ss";
+                cashierField = "الكاشير :" + model.getData().getSelectedUser().getName();
+                posField = "نقطة بيع :" + model.getData().getSelectedPos().getTitle();
+                totalBeforeTaxField = "الإجمالى قبل الضريبة";
+                totalWithTaxField = "الإجمالي شامل الضريبة";
+                itemField = "عنصر";
+                thx = "شكرا لزيارتكم";
+
+                try {
+                    DeviceConnection connection = new BluetoothConnection(device);
+                    EscPosPrinter printer = new EscPosPrinter(connection, 203, 48f, 32);
+                    String items ="";
+                    for (int i = 1;i<4;i++){
+                        items = "[R]"+itemField+i+"[L]"+"0.00"+"\n";
+                        items +="[R]1X0.00\n";
+                    }
+                    printer.printFormattedText("[C]<b><font size= 'big'>" + name + "</font></b>\n" +
+                            "[C]" + vatField + "#0000000000000\n" +
+                            "[C]" + invoiceField + "\n" +
+                            "[R]" + receiptField + "#\n" +
+                            "[R]" + receiptDateField + "\n" +
+                            "[R]" + cashierField + "\n" +
+                            "[R]" + posField + "\n" +
+                            "[R]" +"\n"+
+                            "[R]" + "--------------------------------\n"+
+                            "[R]" +deliveryField+"\n"+
+                            "[C]" + "--------------------------------\n"+
+                            "[C]" +"\n"+
+                            items+
+                            "[C]" + "--------------------------------\n"+
+                            "[R]<b>" + totalBeforeTaxField+"</b>[L]<b>"+"0.00</b>\n"+
+                            "[C]" + "--------------------------------\n"+
+                            "[R]<b>" + totalWithTaxField+"</b>[L]<b>"+"0.00</b>\n"+
+                            "[C]" +"\n"+
+                            "[C]<b><font size= 'big'>"+thx+"</font></b>\n"+
+                            "[C]" +"\n"+
+                            "[C]" +"\n"+
+                            "[C]" +"\n"+
+                            "[C]" +"\n"+
+                            "[C]" +"\n"
+
+
+
+                    );
+                } catch (EscPosConnectionException | EscPosParserException | EscPosBarcodeException | EscPosEncodingException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+        }*/
+
+
+    }
+
+    private String space(String str1, String str2, int paperWidth) {
+        int sp = paperWidth - (str1.length() + str2.length());
+        sp = Math.abs(sp);
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < sp; i++) {
+            s.append(" ");
         }
+
+        return s.toString();
+    }
+
+    private String buildRow(String str1, String str2, int paperWidth, String lang) {
+        String msg = "";
+        if (lang.equals("ar")) {
+            msg = str2 + space(str1, str2, (paperWidth - 8)) + str1;
+
+        } else {
+            msg = str1 + space(str1, str2, (paperWidth - 8)) + str2;
+
+        }
+        return msg + "\n";
     }
 
     public void printImage(Bitmap bitmap) {

@@ -145,7 +145,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     }
 
     @SuppressLint("MissingPermission")
-    public void addPrinter(boolean test, AppCompatActivity activity, String lang) {
+    public void addPrinter(boolean test, AppCompatActivity activity, String lang,PrintTestLayoutBinding binding) {
         String printer_type = "";
         String paper_width = "80";
         String ip_address = "";
@@ -230,7 +230,8 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
                 printSunmiTest(paper_width,lang);
             }
 
-        } else if (printer_type.equalsIgnoreCase("other")) {
+        }
+        else if (printer_type.equalsIgnoreCase("other")) {
             if (getSelectedInterfacePos().getValue() != null) {
                 int pos = getSelectedInterfacePos().getValue();
                 if (pos == 0) {
@@ -260,7 +261,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
                                         }
                                     });
                         } else {
-                            printBluetoothTest(paper_width,null,activity);
+                            printBluetoothTest(paper_width,activity,lang,binding);
 
                         }
 
@@ -325,7 +326,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     }
 
     @SuppressLint("MissingPermission")
-    private void printBluetoothTest(String paper_width, Bitmap bitmap, AppCompatActivity activity) {
+    private void printBluetoothTest(String paper_width, AppCompatActivity activity,String lang,PrintTestLayoutBinding binding) {
         if (getBluetoothDevice().getValue()!=null){
 
             if (getBluetoothDevice().getValue().getBondState()!=BluetoothDevice.BOND_BONDED){
@@ -333,34 +334,45 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
                 return;
             }
 
+
+
             try {
 
-               /* if (bitmap != null) {
-                    double w = 550.0;
-                    if (paper_width.equals("58")){
-                        w = 384;
-                    }
+                Bitmap bitmap = Bitmap.createBitmap(576,binding.scrollViewBluetooth576.getChildAt(0).getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                binding.scrollViewBluetooth576.draw(canvas);
 
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                    double h = bitmap.getWidth() / w;
-                    double dstH = bitmap.getHeight() / h;
-                    Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, (int) w, (int) dstH, true);
-                    int width = newBitmap.getWidth();
-                    int height = newBitmap.getHeight();
-                    int newWidth = (width/8+1)*8;
-                    float scaleWidth = ((float) newWidth) / width;
-                    Matrix matrix = new Matrix();
-                    matrix.postScale(scaleWidth, 1);
-                    Bitmap b = Bitmap.createBitmap(newBitmap, 0, 0, width, height, matrix, true);
+                double w = 576.0;
+                if (paper_width.equals("58")){
+                    w = 384;
+                    bitmap = Bitmap.createBitmap(384,binding.scrollViewBluetooth384.getChildAt(0).getHeight(), Bitmap.Config.ARGB_8888);
 
-                    printUtils.connectBluetoothPrinter(getBluetoothDevice().getValue(),activity,b);
+                    canvas = new Canvas(bitmap);
+                    binding.scrollViewBluetooth384.draw(canvas);
+
+                }
 
 
 
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
+                double h = bitmap.getWidth() / w;
+                double dstH = bitmap.getHeight() / h;
+                Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, (int) w, (int) dstH, true);
+                int width = newBitmap.getWidth();
+                int height = newBitmap.getHeight();
+                int newWidth = (width/8+1)*8;
+                float scaleWidth = ((float) newWidth) / width;
+                Matrix matrix = new Matrix();
+                matrix.postScale(scaleWidth, 1);
+                Bitmap b = Bitmap.createBitmap(newBitmap, 0, 0, width, height, matrix, true);
+
+                printUtils.connectBluetoothPrinter(getBluetoothDevice().getValue(),Integer.parseInt(paper_width),activity,lang,b);
 
 
-                }*/
+
+
 
 
             } catch (Exception e) {

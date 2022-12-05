@@ -15,6 +15,8 @@ import com.budiyev.android.codescanner.CodeScanner;
 import com.midad_pos.R;
 import com.midad_pos.database.AppDatabase;
 import com.midad_pos.database.DAO;
+import com.midad_pos.model.AdvantageDataModel;
+import com.midad_pos.model.AdvantageModel;
 import com.midad_pos.model.AppSettingModel;
 import com.midad_pos.model.CustomerDataModel;
 import com.midad_pos.model.CustomerModel;
@@ -128,7 +130,7 @@ public class HomeMvvm extends AndroidViewModel {
     private List<String> deletedSales = new ArrayList<>();
     private MutableLiveData<Boolean> isDeleteAllDraftTicketsSelected;
     private MutableLiveData<Boolean> canDeleteOpenedTickets;
-
+    private MutableLiveData<AdvantageModel> advantage;
 
     //////////////////////////////////////////////////////////////////////////
     private ManageCartModel manageCartModel;
@@ -165,6 +167,7 @@ public class HomeMvvm extends AndroidViewModel {
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
 
         if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null && userModel.getData().getSelectedWereHouse() != null && userModel.getData().getSelectedPos() != null) {
+            getAdvantageSettings();
             getCurrentShift();
         }
 
@@ -234,6 +237,15 @@ public class HomeMvvm extends AndroidViewModel {
         }
         return isTicketModel;
     }
+
+    public MutableLiveData<AdvantageModel> getAdvantage() {
+        if (advantage == null) {
+            advantage = new MutableLiveData<>();
+
+        }
+        return advantage;
+    }
+
 
     public MutableLiveData<List<DeliveryModel>> getDeliveryOptions() {
         if (deliveryOptions == null) {
@@ -402,6 +414,8 @@ public class HomeMvvm extends AndroidViewModel {
         return isDialogOpenedTicketsOpened;
     }
 
+
+
     public MutableLiveData<Integer> getItemForPricePos() {
         if (itemForPricePos == null) {
             itemForPricePos = new MutableLiveData<>();
@@ -556,6 +570,58 @@ public class HomeMvvm extends AndroidViewModel {
                     @Override
                     public void onError(Throwable e) {
 
+                    }
+                });
+    }
+
+
+    public void getAdvantageSettings() {
+        Api.getService(Tags.base_url)
+                .getAdvantage(userModel.getData().getSelectedUser().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<AdvantageDataModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<AdvantageDataModel> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
+
+                                if (response.body().getStatus() == 200) {
+                                    settingModel.setAdvantageModel(response.body().getData());
+                                    Preferences.getInstance().createUpdateAppSetting(getApplication().getApplicationContext(), settingModel);
+                                    getAppSettingModel().setValue(settingModel);
+
+                                }
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
                     }
                 });
     }

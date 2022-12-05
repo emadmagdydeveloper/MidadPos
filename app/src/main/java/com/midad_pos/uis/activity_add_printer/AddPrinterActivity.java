@@ -207,7 +207,7 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
             String name = binding.edtName.getText().toString().trim();
             if (!name.isEmpty()) {
                 binding.txtInput.setError(null);
-                mvvm.addPrinter(false,this,getLang());
+                mvvm.addPrinter(false,this,getLang(),null);
 
             } else {
                 binding.txtInput.setError(getString(R.string.empty_field));
@@ -282,7 +282,8 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
         binding.flPrint.setOnClickListener(v -> {
             if (mvvm.getSelectedPaperPos().getValue()!=null){
-                mvvm.addPrinter(true,this,getLang());
+
+                mvvm.addPrinter(true,this,getLang(),binding.layoutPrint);
 
             }
         });
