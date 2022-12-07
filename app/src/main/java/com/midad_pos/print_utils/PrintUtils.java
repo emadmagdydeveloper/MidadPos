@@ -4,17 +4,14 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.util.Log;
-import android.util.Xml;
+import android.view.View;
 import android.widget.Toast;
 
 
@@ -36,16 +33,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 
-import com.ganesh.intermecarabic.Arabic864;
-import com.mazenrashed.printooth.Printooth;
-import com.mazenrashed.printooth.data.printable.Printable;
-import com.mazenrashed.printooth.data.printable.TextPrintable;
-import com.mazenrashed.printooth.data.printer.DefaultPrinter;
-import com.midad_pos.R;
-import com.midad_pos.model.UserModel;
-import com.midad_pos.preferences.Preferences;
-
-import okio.Utf8;
+import com.midad_pos.databinding.ActivityAddPrinterBinding;
+import com.midad_pos.databinding.PrintTestLayoutBinding;
 
 public class PrintUtils {
     private BluetoothAdapter bluetoothAdapter;
@@ -123,7 +112,7 @@ public class PrintUtils {
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
             beginListenData();
-            printTestDataText(bitmap,paper);
+            //printTestDataText(bitmap,paper, binding);
 
         } catch (Exception ex) {
 
@@ -179,22 +168,27 @@ public class PrintUtils {
         }
     }
 
-    public void printTestDataText(Bitmap bitmap,int paper) {
+    public void printTestDataText(Bitmap bitmap, int paper, ActivityAddPrinterBinding binding) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        byte[]  bitmapData = PrintPicture.POS_PrintBMP(bitmap, paper, 4);
         try {
-            int paper_width = 576;
-            if (paper ==58){
-                paper_width = 384;
-            }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-
-
-            byte[]  bitmapData = PrintPicture.POS_PrintBMP(bitmap, paper_width, 4);
-
             outputStream.write(bitmapData);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        /*binding.layoutPrint.image.setImageBitmap(bitmap1);
+        binding.layoutPrint.image.setVisibility(View.VISIBLE);
+        binding.flPrintTest.setVisibility(View.VISIBLE);*/
+
+        /*try {
+            byte[]  bitmapData = PrintPicture.POS_PrintBMP(bitmap, paper, 4);
+            outputStream.write(bitmapData);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
 
        /* try {

@@ -281,11 +281,8 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
 
         binding.flPrint.setOnClickListener(v -> {
-            if (mvvm.getSelectedPaperPos().getValue()!=null){
+            mvvm.addPrinter(true,this,getLang(),binding);
 
-                mvvm.addPrinter(true,this,getLang(),binding.layoutPrint);
-
-            }
         });
 
 

@@ -8,7 +8,7 @@
         >
         <ScrollView
             android:id="@+id/scrollViewBluetooth384"
-            android:layout_width="384dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity = "center_horizontal"
             android:fillViewport="true"
@@ -16,7 +16,7 @@
             android:background="@color/white"
             >
             <LinearLayout
-                android:layout_width="384dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
@@ -272,7 +272,7 @@
 
         <ScrollView
             android:id="@+id/scrollViewBluetooth576"
-            android:layout_width="576dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity = "center_horizontal"
             android:fillViewport="true"
@@ -281,7 +281,7 @@
             >
 
             <LinearLayout
-                android:layout_width="576dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
