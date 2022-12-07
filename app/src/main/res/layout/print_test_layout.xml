@@ -6,15 +6,19 @@
         android:layout_height="match_parent"
         android:background="@color/white"
         >
+
         <ScrollView
             android:id="@+id/scrollViewBluetooth384"
-            android:layout_width="match_parent"
+            android:layout_width="384px"
             android:layout_height="match_parent"
             android:layout_gravity = "center_horizontal"
             android:fillViewport="true"
             android:scrollbars="none"
             android:background="@color/white"
+            android:visibility="invisible"
+
             >
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -25,8 +29,8 @@
                 android:background="@color/white"
                 >
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="150px"
+                    android:layout_height="150px"
                     android:layout_marginTop="24dp"
                     android:src="@color/black"
                     />
@@ -34,7 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:textSize="22sp"
+                    android:textSize="25px"
                     android:textColor="@color/black"
                     android:text="Midad"
                     android:textStyle="bold"
@@ -44,7 +48,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="20sp"
+                    android:textSize="28px"
                     android:textColor="@color/black"
                     android:text='@{@string/vat+"#000000"}'
                     android:textStyle="bold"
@@ -55,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="22sp"
+                    android:textSize="28px"
                     android:textColor="@color/black"
                     android:text='Midad soft point of sale'
                     android:textStyle="bold"
@@ -66,7 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:textSize="22sp"
+                    android:textSize="25px"
                     android:textColor="@color/black"
                     android:text="@string/simp_tax_inv"
                     android:textStyle="bold"
@@ -79,7 +83,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="36dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="25px"
                     android:text='@{@string/receipt}'
                     android:textStyle="bold"
 
@@ -91,7 +95,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="25px"
                     android:textStyle="bold"
                     android:text='@{@string/inv_date +" "+"dd-MMM-yyyy hh:mm ss"}'
                     />
@@ -101,7 +105,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="25px"
                     android:text='@string/cashier'
                     android:textStyle="bold"
 
@@ -113,7 +117,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="25px"
                     android:text='@string/pos'
                     android:textStyle="bold"
 
@@ -121,7 +125,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="2px"
                     android:background="@color/black"
                     android:layout_marginTop="24dp"
                     />
@@ -132,7 +136,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="16dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="28px"
                     android:text='@string/delivery'
                     android:textStyle="bold"
 
@@ -140,7 +144,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="2px"
                     android:background="@color/black"
                     android:layout_marginTop="16dp"
                     />
@@ -156,7 +160,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:textColor="@color/black"
-                        android:textSize="22sp"
+                        android:textSize="25px"
                         android:text="Test"
                         android:lines="1"
                         android:maxEms="10"
@@ -174,7 +178,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:textColor="@color/black"
-                        android:textSize="24sp"
+                        android:textSize="28px"
                         android:text="0.00"
                         android:lines="1"
                         android:textStyle="bold"
@@ -187,7 +191,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
+                    android:textSize="25px"
                     android:text="1X0.00"
                     android:lines="1"
                     android:maxEms="10"
@@ -197,7 +201,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="2px"
                     android:background="@color/black"
                     android:layout_marginTop="16dp"
                     />
@@ -213,7 +217,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:textColor="@color/black"
-                        android:textSize="22sp"
+                        android:textSize="26px"
                         android:text="@string/total_with_tax"
                         android:lines="1"
                         android:maxEms="10"
@@ -230,7 +234,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:textColor="@color/black"
-                        android:textSize="24sp"
+                        android:textSize="28px"
                         android:text="0.00"
                         android:lines="1"
                         android:textStyle="bold"
@@ -241,7 +245,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="2px"
                     android:background="@color/black"
                     android:layout_marginTop="16dp"
                     />
@@ -250,7 +254,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:textSize="28sp"
+                    android:textSize="40px"
                     android:text="@string/thank_you"
                     android:lines="1"
                     android:textStyle="bold"
@@ -260,8 +264,8 @@
 
 
                 <ImageView
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="250px"
+                    android:layout_height="250px"
                     android:layout_marginTop="36dp"
                     android:layout_marginBottom="125dp"
                     android:src="@color/black"
@@ -272,12 +276,14 @@
 
         <ScrollView
             android:id="@+id/scrollViewBluetooth576"
-            android:layout_width="match_parent"
+            android:layout_width="576px"
             android:layout_height="match_parent"
             android:layout_gravity = "center_horizontal"
             android:fillViewport="true"
             android:scrollbars="none"
             android:background="@color/white"
+            android:visibility="invisible"
+
             >
 
             <LinearLayout
@@ -290,8 +296,8 @@
                 android:background="@color/white"
                 >
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="200px"
+                    android:layout_height="200px"
                     android:layout_marginTop="24dp"
                     android:src="@color/black"
                     />
@@ -299,7 +305,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:textSize="22sp"
+                    android:textSize="40px"
                     android:textColor="@color/black"
                     android:text="Midad"
                     android:textStyle="bold"
@@ -309,7 +315,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="20sp"
+                    android:textSize="36px"
                     android:textColor="@color/black"
                     android:text='@{@string/vat+"#000000"}'
                     android:textStyle="bold"
@@ -320,7 +326,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="22sp"
+                    android:textSize="36px"
                     android:textColor="@color/black"
                     android:text='Midad soft point of sale'
                     android:textStyle="bold"
@@ -331,7 +337,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:textSize="22sp"
+                    android:textSize="40px"
                     android:textColor="@color/black"
                     android:text="@string/simp_tax_inv"
                     android:textStyle="bold"
@@ -344,7 +350,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="36dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="36px"
                     android:text='@{@string/receipt}'
                     android:textStyle="bold"
 
@@ -356,7 +362,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="36px"
                     android:textStyle="bold"
                     android:text='@{@string/inv_date +" "+"dd-MMM-yyyy hh:mm ss"}'
                     />
@@ -366,7 +372,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="36px"
                     android:text='@string/cashier'
                     android:textStyle="bold"
 
@@ -378,7 +384,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="36px"
                     android:text='@string/pos'
                     android:textStyle="bold"
 
@@ -386,7 +392,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="2px"
                     android:background="@color/black"
                     android:layout_marginTop="24dp"
                     />
@@ -397,7 +403,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="16dp"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="42px"
                     android:text='@string/delivery'
                     android:textStyle="bold"
 
@@ -405,7 +411,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="2px"
                     android:background="@color/black"
                     android:layout_marginTop="16dp"
                     />
@@ -421,7 +427,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:textColor="@color/black"
-                        android:textSize="22sp"
+                        android:textSize="40px"
                         android:text="Test"
                         android:lines="1"
                         android:maxEms="10"
@@ -439,7 +445,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:textColor="@color/black"
-                        android:textSize="24sp"
+                        android:textSize="42px"
                         android:text="0.00"
                         android:lines="1"
                         android:textStyle="bold"
@@ -452,7 +458,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
+                    android:textSize="40px"
                     android:text="1X0.00"
                     android:lines="1"
                     android:maxEms="10"
@@ -462,7 +468,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="2px"
                     android:background="@color/black"
                     android:layout_marginTop="16dp"
                     />
@@ -478,7 +484,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:textColor="@color/black"
-                        android:textSize="22sp"
+                        android:textSize="42px"
                         android:text="@string/total_with_tax"
                         android:lines="1"
                         android:maxEms="10"
@@ -495,7 +501,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:textColor="@color/black"
-                        android:textSize="24sp"
+                        android:textSize="44px"
                         android:text="0.00"
                         android:lines="1"
                         android:textStyle="bold"
@@ -506,7 +512,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="2px"
                     android:background="@color/black"
                     android:layout_marginTop="16dp"
                     />
@@ -515,7 +521,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:textSize="28sp"
+                    android:textSize="50px"
                     android:text="@string/thank_you"
                     android:lines="1"
                     android:textStyle="bold"
@@ -525,8 +531,8 @@
 
 
                 <ImageView
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="400px"
+                    android:layout_height="400px"
                     android:layout_marginTop="36dp"
                     android:layout_marginBottom="125dp"
                     android:src="@color/black"
@@ -539,9 +545,11 @@
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:visibility="gone"
+            android:layout_gravity="center"
+            android:src="@color/grey2"
             />
     </FrameLayout>
 

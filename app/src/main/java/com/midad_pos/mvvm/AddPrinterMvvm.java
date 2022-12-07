@@ -258,7 +258,11 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
                                         }
                                     });
                         } else {
-                            printBluetoothTest(paper_width,activity,lang,binding);
+                            int paper = 576;
+                            if (paper_width.equals("58")){
+                                paper = 348;
+                            }
+                            printBluetoothTest(paper,activity,lang,binding);
 
                         }
 
@@ -323,44 +327,30 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     }
 
     @SuppressLint("MissingPermission")
-    private void printBluetoothTest(String paper_width, AppCompatActivity activity,String lang,ActivityAddPrinterBinding binding) {
+    private void printBluetoothTest(int paper_width, AppCompatActivity activity,String lang,ActivityAddPrinterBinding binding) {
         Log.e("1","1");
         if (getBluetoothDevice().getValue()!=null){
 
 
-           /* if (getBluetoothDevice().getValue().getBondState()!=BluetoothDevice.BOND_BONDED){
+            if (getBluetoothDevice().getValue().getBondState()!=BluetoothDevice.BOND_BONDED){
                 Toast.makeText(activity, "Device not paired", Toast.LENGTH_SHORT).show();
                 return;
-            }*/
+            }
 
 
 
             try {
 
                 Log.e("2","2");
-                Bitmap bitmap = Bitmap.createBitmap(binding.layoutPrint.scrollViewBluetooth576.getChildAt(0).getWidth(),binding.layoutPrint.scrollViewBluetooth576.getChildAt(0).getHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                binding.layoutPrint.scrollViewBluetooth576.draw(canvas);
+                printUtils.connectBluetoothPrinter(getBluetoothDevice().getValue(), paper_width,activity,lang,binding);
 
-                double w = 576.0;
-               /* if (paper_width.equals("58")){
-                    w = 384;
-                    bitmap = Bitmap.createBitmap(binding.layoutPrint.scrollViewBluetooth384.getChildAt(0).getWidth(),binding.layoutPrint.scrollViewBluetooth384.getChildAt(0).getHeight(), Bitmap.Config.ARGB_8888);
-
-                    canvas = new Canvas(bitmap);
-                    binding.layoutPrint.scrollViewBluetooth384.draw(canvas);
-
-                }*/
-
-
-                //new Thread(() -> printUtils.connectBluetoothPrinter(getBluetoothDevice().getValue(), (int) w,activity,lang,b)).start();
-                printUtils.printTestDataText(bitmap, (int) w,binding);
-
+                //printUtils.printTestDataText(activity,80,binding);
 
 
 
 
             } catch (Exception e) {
+                Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("err",e.getMessage());
                 e.printStackTrace();
             }

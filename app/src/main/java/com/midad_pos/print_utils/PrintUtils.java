@@ -6,9 +6,13 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -17,9 +21,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -33,8 +37,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 
+import com.midad_pos.R;
 import com.midad_pos.databinding.ActivityAddPrinterBinding;
-import com.midad_pos.databinding.PrintTestLayoutBinding;
 
 public class PrintUtils {
     private BluetoothAdapter bluetoothAdapter;
@@ -98,7 +102,7 @@ public class PrintUtils {
 
     }
 
-    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, int paper, AppCompatActivity context, String lang,Bitmap bitmap) {
+    public void connectBluetoothPrinter(BluetoothDevice bluetoothDevice, int paper, AppCompatActivity context, String lang, ActivityAddPrinterBinding binding) {
         try {
 
             //Standard uuid from string //
@@ -108,11 +112,11 @@ public class PrintUtils {
             }
             bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuidSting);
             bluetoothSocket.connect();
-            Toast.makeText(context, "connected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, device.getName() + "connected", Toast.LENGTH_SHORT).show();
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
             beginListenData();
-            //printTestDataText(bitmap,paper, binding);
+            printTestDataText(context, paper, binding);
 
         } catch (Exception ex) {
 
@@ -168,15 +172,155 @@ public class PrintUtils {
         }
     }
 
-    public void printTestDataText(Bitmap bitmap, int paper, ActivityAddPrinterBinding binding) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        byte[]  bitmapData = PrintPicture.POS_PrintBMP(bitmap, paper, 4);
-        try {
-            outputStream.write(bitmapData);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void printTestDataText(Context context, int paper, ActivityAddPrinterBinding binding) {
+
+        float width;
+        float height;
+
+        if (paper==576){
+            width = binding.layoutPrint.scrollViewBluetooth576.getChildAt(0).getWidth();
+            height = dpToPx(binding.layoutPrint.scrollViewBluetooth576.getChildAt(0).getHeight(),context);
+
+        }else {
+             width = binding.layoutPrint.scrollViewBluetooth384.getChildAt(0).getWidth();
+             height = dpToPx(binding.layoutPrint.scrollViewBluetooth384.getChildAt(0).getHeight(),context);
+
         }
+
+
+        Bitmap b = Bitmap.createBitmap((int) width, (int) height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(b);
+        if (paper==576){
+            binding.layoutPrint.scrollViewBluetooth576.draw(canvas);
+
+        }else {
+            binding.layoutPrint.scrollViewBluetooth384.draw(canvas);
+
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        b.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        double h = b.getWidth() / width;
+        double dstH = b.getHeight() / h;
+
+
+        Bitmap newBitmap = Bitmap.createScaledBitmap(b, (int) width, (int) dstH, true);
+
+
+        int w = newBitmap.getWidth();
+        int h2 = newBitmap.getHeight();
+        int newWidth = (w/8+1)*8;
+        float scaleWidth = ((float) newWidth) / w;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, 1);
+        Bitmap b2 = Bitmap.createBitmap(newBitmap, 0, 0, w, h2, matrix, true);
+
+        printImage(b2);
+
+
+        /*float scale = context.getResources().getDisplayMetrics().density;
+        int textSize = (int) (10*scale);
+        int space_top = 250;
+        int spaceBetween40 = 40;
+        int spaceBetween50 = 50;
+        int spaceBetween100 = 100;
+        int paddingLeftRight = (int) (16*scale);
+
+        int spaceBillTopBottom = (space_top*2)+440;
+        int height = 0;
+
+        Paint paint1 = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
+        paint1.setColor(Color.BLACK);
+        paint1.setTextSize(textSize);
+        Rect rect1 = new Rect();
+        paint1.getTextBounds("midad", 0, "midad".length(), rect1);
+        height += rect1.height();
+        Rect rect2 = new Rect();
+        paint1.getTextBounds("VAT#0000000000", 0, "VAT#0000000000".length(), rect2);
+        height += rect2.height();
+
+        Rect rect3 = new Rect();
+        paint1.getTextBounds("Midad point of sale", 0, "Midad point of sale".length(), rect3);
+        height += rect3.height();
+
+        Rect rect4 = new Rect();
+        Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
+        paint2.setColor(Color.BLACK);
+        paint2.setTextSize(textSize);
+        paint2.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint2.getTextBounds("Simplified tax invoice", 0, "Simplified tax invoice".length(), rect4);
+        height += rect4.height();
+
+
+        Rect rect5 = new Rect();
+        paint1.getTextBounds("Receipt #:0", 0, "Receipt #:0".length(), rect5);
+        height += rect5.height();
+
+        Rect rect6 = new Rect();
+        paint1.setTextSize(textSize);
+        paint1.getTextBounds("Invoice date:dd-mmm-yyyy hh:mm:ss", 0, "Invoice date:dd-mmm-yyyy hh:mm:ss".length(), rect6);
+        height += rect6.height();
+        paint1.setTextSize(textSize);
+
+        Rect rect7 = new Rect();
+        paint1.getTextBounds("Cashier : ", 0, "Cashier : ".length(), rect7);
+        height += rect7.height();
+
+        Rect rect8 = new Rect();
+        paint1.getTextBounds("POS : ", 0, "POS : ".length(), rect8);
+        height += rect8.height();
+
+
+
+
+        height +=spaceBillTopBottom;
+
+        Bitmap b = Bitmap.createBitmap(576, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(b);
+        Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bg.setColor(ContextCompat.getColor(context,R.color.grey3));
+        canvas.drawPaint(bg);
+        float dx1 = (float) ((576.0-rect1.width())/2.0);
+        float dx2 = (float) ((576.0-rect2.width())/2.0);
+        float dx3 = (float) ((576.0-rect3.width())/2.0);
+        float dx4 = (float) ((576.0-rect4.width())/2.0);
+
+        float dy =0;
+        dy +=space_top;
+        Paint paint = new Paint();
+        paint.setColor(ContextCompat.getColor(context,R.color.transparent));
+        canvas.drawText("midad",dx1,dy,paint1);
+        dy += rect1.height()+spaceBetween40;
+        canvas.drawText("VAT#0000000000",dx2,dy,paint1);
+        dy +=rect2.height()+spaceBetween40;
+        canvas.drawText("Midad point of sale",dx3,dy,paint1);
+        dy +=rect3.height()+spaceBetween40;
+        canvas.drawText("Simplified tax invoice",dx4,dy,paint2);
+        dy += rect4.height()+spaceBetween100;
+        canvas.drawText("Receipt #:0",paddingLeftRight,dy,paint1);
+        dy += rect5.height()+spaceBetween40;
+        canvas.drawText("Cashier : ",paddingLeftRight,dy,paint1);
+        dy += rect6.height()+spaceBetween40;
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
+        p.setColor(Color.BLACK);
+        p.setTextSize(textSize);
+        canvas.drawText("Invoice date:dd-mmm-yyyy hh:mm:ss",paddingLeftRight,dy,p);
+
+        dy += rect7.height()+spaceBetween40;
+        canvas.drawText("POS : ",paddingLeftRight,dy,paint1);
+        dy += rect8.height()+spaceBetween50;
+        canvas.drawText(createDiscreteLine(576,textSize, (int) context.getResources().getDisplayMetrics().density),paddingLeftRight,dy,paint1);
+
+
+
+        canvas.save();
+        canvas.translate(0,0);
+        canvas.restore();
+
+        binding.layoutPrint.image.setImageBitmap(b);
+        binding.layoutPrint.image.setVisibility(View.VISIBLE);
+        binding.flPrintTest.setVisibility(View.VISIBLE);
+*/
 
         /*binding.layoutPrint.image.setImageBitmap(bitmap1);
         binding.layoutPrint.image.setVisibility(View.VISIBLE);
@@ -476,6 +620,11 @@ public class PrintUtils {
 
     }
 
+    private int dpToPx(int dp,Context context){
+
+        return (int) (context.getResources().getDisplayMetrics().density*dp);
+    }
+
     private String space(String str1, String str2, int paperWidth) {
         int sp = paperWidth - (str1.length() + str2.length());
         sp = Math.abs(sp);
@@ -485,6 +634,22 @@ public class PrintUtils {
         }
 
         return s.toString();
+    }
+
+    private String createDiscreteLine(int width, int textSize,int denisty){
+        Rect rect = new Rect();
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.LINEAR_TEXT_FLAG);
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(textSize);
+        paint.getTextBounds("-", 0, "-".length(), rect);
+        int count = (width/rect.width())-10;
+        Log.e("count",count+"__"+width+"__"+rect.width());
+        String s="";
+        for (int i=0;i<count;i++){
+            s +="-";
+        }
+
+        return s;
     }
 
     private String buildRow(String str1, String str2, int paperWidth, String lang) {
