@@ -9,6 +9,7 @@ public class WereHouse implements Serializable {
     private String phone;
     private String email;
     private String address;
+    private String tax_number;
     private List<POSModel> pos;
 
     public String getId() {
@@ -40,4 +41,7 @@ public class WereHouse implements Serializable {
         return name.toString();
     }
 
-  }
+    public String getTax_number() {
+        return tax_number;
+    }
+}

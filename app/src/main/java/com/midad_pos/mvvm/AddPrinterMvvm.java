@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,7 +27,10 @@ import com.midad_pos.print_utils.PrintUtils;
 import com.midad_pos.print_utils.SunmiPrintHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -34,7 +38,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.PrintResponse {
+public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.PrintResponse , PrintUtils.PrinterConnectListener {
     private final String TAG = AddPrinterMvvm.class.getName();
     private MutableLiveData<Integer> selectedPrinterPos;
     private MutableLiveData<Integer> selectedPaperPos;
@@ -50,6 +54,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     private AppDatabase database;
     private DAO dao;
     private PrintUtils printUtils;
+    private UserModel model;
 
 
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -60,6 +65,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
         database = AppDatabase.getInstance(application);
         dao = database.getDAO();
         printUtils = new PrintUtils(this);
+        model = Preferences.getInstance().getUserData(application.getApplicationContext());
     }
 
 
@@ -320,10 +326,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
         UserModel model = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
         SunmiPrintHelper.getInstance().initPrinter();
         SunmiPrintHelper.getInstance().printTestExample(getApplication().getApplicationContext(),model,paper,lang);
-        /*SunmiPrintHelper.getInstance().showPrinterStatus(getApplication().getApplicationContext());
-        SunmiPrintHelper.getInstance().printBitmap(bitmap,1);
-        SunmiPrintHelper.getInstance().printBitmap(bitmap,1);
-        SunmiPrintHelper.getInstance().cutpaper();*/
+
     }
 
     @SuppressLint("MissingPermission")
@@ -342,7 +345,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             try {
 
                 Log.e("2","2");
-                printUtils.connectBluetoothPrinter(getBluetoothDevice().getValue(), paper_width,activity,lang,binding);
+                printUtils.connectPrinter(this,getBluetoothDevice().getValue(), paper_width,activity,lang);
 
                 //printUtils.printTestDataText(activity,80,binding);
 
@@ -374,6 +377,35 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     }
 
 
+    @Override
+    public void onConnected() {
+        Toast.makeText(getApplication().getApplicationContext(), "connected", Toast.LENGTH_SHORT).show();
+        printTestBluetoothData();
+    }
 
 
+
+    @Override
+    public void onFailed() {
+        Toast.makeText(getApplication().getApplicationContext(), "fail to connect printer", Toast.LENGTH_SHORT).show();
+
+    }
+
+    private void printTestBluetoothData() {
+
+        printUtils.printMultiLangText("Midad", Paint.Align.CENTER,28);
+        printUtils.printMultiLangText("الرقم الضريبي"+":"+model.getData().getSelectedWereHouse().getTax_number(), Paint.Align.CENTER,24);
+        printUtils.printMultiLangText(model.getData().getSelectedWereHouse().getName(), Paint.Align.CENTER,24);
+        printUtils.printMultiLangText("فاتورة ضريبية مبسطة", Paint.Align.CENTER,24);
+
+        printUtils.printMultiLangText("رقم الإيصال:#", Paint.Align.RIGHT,24);
+        printUtils.printMultiLangText("التاريخ:"+getNow(), Paint.Align.RIGHT,24);
+        printUtils.printMultiLangText("امين الصندوق:"+model.getData().getSelectedUser().getName(), Paint.Align.RIGHT,24);
+        printUtils.printMultiLangText("نقطة بيع:"+model.getData().getSelectedPos().getTitle(), Paint.Align.RIGHT,24);
+        printUtils.printLine();
+    }
+
+    private String getNow(){
+        return new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.ENGLISH).format(new Date());
+    }
 }
