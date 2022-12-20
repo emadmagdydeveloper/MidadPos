@@ -32,6 +32,7 @@ import com.midad_app_pos.databinding.ActivityAddDiscountBinding;
 import com.midad_app_pos.databinding.ActivityAddPrinterBinding;
 import com.midad_app_pos.databinding.DialogBluetoothDevicesBinding;
 import com.midad_app_pos.mvvm.AddPrinterMvvm;
+import com.midad_app_pos.print_utils.BytesUtil;
 import com.midad_app_pos.print_utils.PrintUtils;
 import com.midad_app_pos.share.Common;
 import com.midad_app_pos.uis.activity_base.BaseActivity;
@@ -39,6 +40,8 @@ import com.skydoves.powermenu.MenuAnimation;
 import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
 
+
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class AddPrinterActivity extends BaseActivity implements PrintUtils.PrintResponse {
@@ -254,7 +257,7 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
 
         binding.flPrint.setOnClickListener(v -> {
-            mvvm.addPrinter(true,this,getLang(),binding);
+             mvvm.addPrinter(true,this,getLang(),binding);
 
         });
 
@@ -524,4 +527,6 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
     protected void onDestroy() {
         super.onDestroy();
     }
+
+
 }
