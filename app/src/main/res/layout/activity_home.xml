@@ -19,10 +19,10 @@
             type="Double" />
         <variable
             name="model"
-            type="com.midad_pos.model.UserModel" />
+            type="com.midad_app_pos.model.UserModel" />
         <variable
             name="setting"
-            type="com.midad_pos.model.AppSettingModel" />
+            type="com.midad_app_pos.model.AppSettingModel" />
 
         <import type="android.view.View"/>
 

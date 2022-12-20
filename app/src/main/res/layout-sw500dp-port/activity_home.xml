@@ -14,7 +14,7 @@
 
         <variable
             name="deliveryOption"
-            type="com.midad_pos.model.DeliveryModel" />
+            type="com.midad_app_pos.model.DeliveryModel" />
 
         <variable
             name="totalVat"
@@ -27,10 +27,10 @@
             type="Double" />
         <variable
             name="model"
-            type="com.midad_pos.model.UserModel" />
+            type="com.midad_app_pos.model.UserModel" />
         <variable
             name="setting"
-            type="com.midad_pos.model.AppSettingModel" />
+            type="com.midad_app_pos.model.AppSettingModel" />
 
         <import type="android.view.View"/>
     </data>

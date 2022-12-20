@@ -6,7 +6,7 @@
 
         <variable
             name="model"
-            type="com.midad_pos.model.OrderModel.Detail" />
+            type="com.midad_app_pos.model.OrderModel.Detail" />
 
         <import type="android.view.View" />
     </data>

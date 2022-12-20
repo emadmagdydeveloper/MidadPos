@@ -6,7 +6,7 @@
     <data>
         <variable
             name="model"
-            type="com.midad_pos.model.OrderModel.Sale" />
+            type="com.midad_app_pos.model.OrderModel.Sale" />
         <variable
             name="lang"
             type="String" />

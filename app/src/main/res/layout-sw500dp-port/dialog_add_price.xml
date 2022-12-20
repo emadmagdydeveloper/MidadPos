@@ -6,7 +6,7 @@
 
         <variable
             name="item"
-            type="com.midad_pos.model.ItemModel" />
+            type="com.midad_app_pos.model.ItemModel" />
 
         <variable
             name="price"

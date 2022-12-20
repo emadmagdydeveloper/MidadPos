@@ -11,7 +11,7 @@
             type="String" />
         <variable
             name="model"
-            type="com.midad_pos.model.AddItemModel" />
+            type="com.midad_app_pos.model.AddItemModel" />
 
         <variable
             name="title"

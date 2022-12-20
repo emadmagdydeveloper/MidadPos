@@ -5,7 +5,7 @@
 
         <variable
             name="model"
-            type="com.midad_pos.model.TaxModel" />
+            type="com.midad_app_pos.model.TaxModel" />
     </data>
 
     <com.google.android.material.switchmaterial.SwitchMaterial

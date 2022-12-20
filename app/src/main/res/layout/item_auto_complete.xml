@@ -3,7 +3,7 @@
     <data>
         <variable
             name="model"
-            type="com.midad_pos.model.WereHouse" />
+            type="com.midad_app_pos.model.WereHouse" />
 
     </data>
     <TextView

@@ -4,7 +4,7 @@
     <data>
         <variable
             name="model"
-            type="com.midad_pos.model.PrinterModel" />
+            type="com.midad_app_pos.model.PrinterModel" />
         <import type="android.view.View"/>
     </data>
     <LinearLayout

@@ -5,7 +5,7 @@
 
         <variable
             name="model"
-            type="com.midad_pos.model.DiscountModel" />
+            type="com.midad_app_pos.model.DiscountModel" />
     </data>
 
     <com.google.android.material.switchmaterial.SwitchMaterial

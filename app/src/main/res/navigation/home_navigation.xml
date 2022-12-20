@@ -7,14 +7,14 @@
 
     <fragment
         android:id="@+id/sales"
-        android:name="com.midad_pos.uis.activity_home.fragments.SalesFragment"
+        android:name="com.midad_app_pos.uis.activity_home.fragments.SalesFragment"
         android:label=""
         tools:layout="@layout/fragment_sales"
 
         />
     <fragment
         android:id="@+id/receipts"
-        android:name="com.midad_pos.uis.activity_home.fragments.ReceiptFragment"
+        android:name="com.midad_app_pos.uis.activity_home.fragments.ReceiptFragment"
         android:label=""
         tools:layout="@layout/fragment_receipt" />
 

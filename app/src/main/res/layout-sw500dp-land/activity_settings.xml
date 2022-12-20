@@ -6,7 +6,7 @@
     <data>
         <variable
             name="model"
-            type="com.midad_pos.model.UserModel" />
+            type="com.midad_app_pos.model.UserModel" />
     </data>
 
     <LinearLayout

@@ -9,7 +9,7 @@
             type="String" />
         <variable
             name="model"
-            type="com.midad_pos.model.AddCustomerModel" />
+            type="com.midad_app_pos.model.AddCustomerModel" />
     </data>
 
     <FrameLayout

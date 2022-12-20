@@ -3,7 +3,7 @@
     <data>
         <variable
             name="model"
-            type="com.midad_pos.model.ModifierModel.Data" />
+            type="com.midad_app_pos.model.ModifierModel.Data" />
     </data>
     <FrameLayout
         android:layout_width="match_parent"

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="model"
-            type="com.midad_pos.model.SignUpModel" />
+            type="com.midad_app_pos.model.SignUpModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

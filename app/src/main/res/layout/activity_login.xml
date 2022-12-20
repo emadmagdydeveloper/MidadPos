@@ -7,7 +7,7 @@
     <data>
         <variable
             name="model"
-            type="com.midad_pos.model.LoginModel" />
+            type="com.midad_app_pos.model.LoginModel" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"

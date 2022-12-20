@@ -6,7 +6,7 @@
 
         <variable
             name="model"
-            type="com.midad_pos.model.CategoryModel" />
+            type="com.midad_app_pos.model.CategoryModel" />
         <import type="android.view.View"/>
     </data>
 

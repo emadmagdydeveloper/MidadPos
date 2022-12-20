@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdk 33
     defaultConfig {
-        applicationId "com.midad_pos"
+        applicationId "com.midad_app_pos"
         minSdkVersion 21
         targetSdkVersion 33
         minSdk 21
@@ -41,7 +41,7 @@ android {
         dataBinding true
 
     }
-    namespace 'com.midad_pos'
+    namespace 'com.midad_app_pos'
 
 
 }

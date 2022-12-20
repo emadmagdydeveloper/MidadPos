@@ -4,7 +4,7 @@
     <data>
         <variable
             name="model"
-            type="com.midad_pos.model.ChargeModel" />
+            type="com.midad_app_pos.model.ChargeModel" />
         <variable
             name="pos"
             type="Integer" />
