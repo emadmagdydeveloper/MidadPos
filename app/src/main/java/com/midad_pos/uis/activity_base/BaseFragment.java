@@ -28,7 +28,7 @@ public class BaseFragment extends Fragment {
 
     protected UserModel getUserModel() {
         Preferences preferences = Preferences.getInstance();
-        return preferences.getUserData(context);
+        return preferences.getUserData(context.getApplicationContext());
 
     }
 
@@ -40,7 +40,7 @@ public class BaseFragment extends Fragment {
 
     protected void setUserModel(UserModel userModel) {
         Preferences preferences = Preferences.getInstance();
-        preferences.createUpdateUserData(context, userModel);
+        preferences.createUpdateUserData(context.getApplicationContext(), userModel);
     }
 
     protected AppSettingModel getAppSetting() {

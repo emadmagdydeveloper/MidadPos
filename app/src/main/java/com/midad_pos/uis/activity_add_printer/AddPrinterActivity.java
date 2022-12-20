@@ -260,8 +260,8 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
                 printUtils.findBluetoothDevice(this);
                 createBluetoothDeviceDialog();
 
-                Intent intent = new Intent(this,ScanningActivity.class);
-                launcher.launch(intent);
+               /* Intent intent = new Intent(this,ScanningActivity.class);
+                launcher.launch(intent);*/
 
 
 

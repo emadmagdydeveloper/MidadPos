@@ -20,6 +20,7 @@ public class PrinterModel implements Serializable {
     private boolean canPrintAutomatic;
     private String ip_address;
     private String bluetooth_name;
+    private String paperWidth;
     private BluetoothDevice device;
     @Ignore
     private boolean isSelected;
@@ -29,7 +30,8 @@ public class PrinterModel implements Serializable {
     public PrinterModel() {
     }
 
-    public PrinterModel(String name, String printer_type, boolean can_print_receipt_and_bill, boolean can_print_orders, boolean canPrintAutomatic, String ip_address, String bluetooth_name, BluetoothDevice device) {
+    public PrinterModel(String name, String printer_type, boolean can_print_receipt_and_bill, boolean can_print_orders, boolean canPrintAutomatic, String ip_address, String bluetooth_name, BluetoothDevice device,String paperWidth) {
+        this.paperWidth = paperWidth;
         this.name = name;
         this.printer_type = printer_type;
         this.can_print_receipt_and_bill = can_print_receipt_and_bill;
@@ -120,5 +122,13 @@ public class PrinterModel implements Serializable {
     @Ignore
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    public String getPaperWidth() {
+        return paperWidth;
+    }
+
+    public void setPaperWidth(String paperWidth) {
+        this.paperWidth = paperWidth;
     }
 }

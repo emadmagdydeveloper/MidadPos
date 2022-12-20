@@ -212,6 +212,8 @@ public class BaseActivity extends AppCompatActivity {
                                         updatePinView("");
                                     },500);
                         }else {
+
+                            Log.e("selectedUSer",user.getName());
                             userModel.getData().setSelectedUser(user);
                             setUserModel(userModel);
 
@@ -275,12 +277,12 @@ public class BaseActivity extends AppCompatActivity {
 
     protected UserModel getUserModel() {
         Preferences preferences = Preferences.getInstance();
-        return preferences.getUserData(this);
+        return preferences.getUserData(this.getApplicationContext());
     }
 
     protected void setUserModel(UserModel userModel) {
         Preferences preferences = Preferences.getInstance();
-        preferences.createUpdateUserData(this, userModel);
+        preferences.createUpdateUserData(this.getApplicationContext(), userModel);
     }
 
     protected void clearUserModel() {
