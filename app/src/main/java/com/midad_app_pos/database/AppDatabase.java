@@ -10,7 +10,6 @@ import androidx.room.TypeConverters;
 import com.midad_app_pos.model.PrinterModel;
 
 @Database(entities = {PrinterModel.class}, exportSchema = false, version = 1)
-@TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
     public static AppDatabase instance = null;
 

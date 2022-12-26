@@ -823,7 +823,7 @@ public class PrintUtils {
 
     }
 
-    public Bitmap printTestData(UserModel userModel){
+    public Bitmap printTestData(UserModel userModel,boolean isOrder){
         Bitmap b = Bitmap.createBitmap(paperWidth, paper_height+500, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(b);
         Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
@@ -836,22 +836,25 @@ public class PrintUtils {
 
         }
 
-        ZatcaQRCodeGeneration.Builder builder = new ZatcaQRCodeGeneration.Builder();
-        builder.sellerName(userModel.getData().getSelectedUser().getName()) // Shawrma House
-                .taxNumber(userModel.getData().getSelectedWereHouse().getTax_number()) // 1234567890
-                .invoiceDate(getNow()) //..> 22/11/2021 03:00 am
-                .totalAmount(String.format(Locale.US,"%.2f",0.00)) // 100
-                .taxAmount(String.format(Locale.US,"%.2f",0.00));
+        if (!isOrder){
+            ZatcaQRCodeGeneration.Builder builder = new ZatcaQRCodeGeneration.Builder();
+            builder.sellerName(userModel.getData().getSelectedUser().getName()) // Shawrma House
+                    .taxNumber(userModel.getData().getSelectedWereHouse().getTax_number()) // 1234567890
+                    .invoiceDate(getNow()) //..> 22/11/2021 03:00 am
+                    .totalAmount(String.format(Locale.US,"%.2f",0.00)) // 100
+                    .taxAmount(String.format(Locale.US,"%.2f",0.00));
 
-        BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-        try {
-            int center = (paperWidth-300)/2;
-            Bitmap Qrcode = barcodeEncoder.encodeBitmap(builder.getBase64(), BarcodeFormat.QR_CODE, 300, 300);
-            canvas.drawBitmap(Qrcode,center,paperYPos,null);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            try {
+                int center = (paperWidth-300)/2;
+                Bitmap Qrcode = barcodeEncoder.encodeBitmap(builder.getBase64(), BarcodeFormat.QR_CODE, 300, 300);
+                canvas.drawBitmap(Qrcode,center,paperYPos,null);
 
-        } catch (WriterException e) {
-            e.printStackTrace();
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
         }
+
 
         printImageBitmap(b);
         return b;

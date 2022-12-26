@@ -31,6 +31,7 @@ import com.midad_app_pos.adapter.DevicesBluetoothAdapter;
 import com.midad_app_pos.databinding.ActivityAddDiscountBinding;
 import com.midad_app_pos.databinding.ActivityAddPrinterBinding;
 import com.midad_app_pos.databinding.DialogBluetoothDevicesBinding;
+import com.midad_app_pos.model.PrinterModel;
 import com.midad_app_pos.mvvm.AddPrinterMvvm;
 import com.midad_app_pos.print_utils.BytesUtil;
 import com.midad_app_pos.print_utils.PrintUtils;
@@ -52,22 +53,57 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
     private DevicesBluetoothAdapter adapter = new DevicesBluetoothAdapter(this);
     private AlertDialog dialog;
     private ActivityResultLauncher<Intent> launcher;
+    private PrinterModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_printer);
         setContentView(binding.getRoot());
+        getDataFromIntent();
         initView();
+    }
+
+    private void getDataFromIntent() {
+        Intent intent = getIntent();
+        model = (PrinterModel) intent.getSerializableExtra("data");
     }
 
     private void initView() {
 
         mvvm = ViewModelProviders.of(this).get(AddPrinterMvvm.class);
         binding.setLang(getLang());
+
         baseMvvm.getOnPinSuccess().observe(this, aBoolean -> {
             mvvm.showPin = false;
         });
+
+        if (model!=null){
+            binding.tvTitle.setText(R.string.edit_printer);
+            binding.btnSearch.setVisibility(View.GONE);
+            binding.llMainModel.setVisibility(View.GONE);
+            binding.btnKitchenSearch.setVisibility(View.GONE);
+            binding.cardDelete.setVisibility(View.VISIBLE);
+            mvvm.getName().setValue(model.getName());
+            mvvm.getAutomaticPrint().setValue(model.isCanPrintAutomatic());
+            mvvm.getCanPrint().setValue(model.isCan_print_receipt_and_bill());
+            mvvm.getSelectedPaperPos().setValue(model.getPaperWidth().equals("80")?0:1);
+            if (model.getPrinter_type().equals("sunmi")){
+                mvvm.getSelectedPrinterPos().setValue(1);
+            }else if (model.getPrinter_type().equals("kitchen")){
+                mvvm.getSelectedPrinterPos().setValue(2);
+                binding.setPrinterKitchenName(model.getBluetooth_name());
+
+            }else if (model.getPrinter_type().equals("other")){
+                mvvm.getSelectedPrinterPos().setValue(3);
+                binding.setPrinterBluetoothName(model.getBluetooth_name());
+
+
+            }else {
+                mvvm.getSelectedPrinterPos().setValue(0);
+
+            }
+        }
 
         mvvm.getSelectedPrinterPos().observe(this, pos -> {
             if (pos == 0) {
@@ -149,6 +185,7 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
         if (mvvm.getName().getValue() != null) {
             binding.edtName.setText(mvvm.getName().getValue());
         }
+
         if (mvvm.getCanPrint().getValue() != null) {
             binding.btnSwitch.setChecked(mvvm.getCanPrint().getValue());
             binding.llPrintAutomatic.setVisibility(mvvm.getCanPrint().getValue() ? View.VISIBLE : View.GONE);
@@ -183,7 +220,13 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
             String name = binding.edtName.getText().toString().trim();
             if (!name.isEmpty()) {
                 binding.txtInput.setError(null);
-                mvvm.addPrinter(false,this,getLang(),null);
+                if (model==null){
+                    mvvm.addPrinter(false,0,this,getLang(),null);
+
+                }else {
+                    mvvm.addPrinter(false,model.getId(),this,getLang(),null);
+
+                }
 
             } else {
                 binding.txtInput.setError(getString(R.string.empty_field));
@@ -202,7 +245,6 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
         });
 
-
         binding.llModel.setOnClickListener(v -> showPopupPrinters());
 
         binding.llPaperWidth.setOnClickListener(v -> showPopupPaperWidth());
@@ -215,6 +257,15 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
         });
 
+        binding.btnKitchenSearch.setOnClickListener(v -> {
+            checkBluetoothPermission();
+
+
+        });
+
+        binding.cardDelete.setOnClickListener(v -> {
+            mvvm.deletePrinter(model);
+        });
 
         permissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
             if (!isGranted.containsValue(false)) {
@@ -257,9 +308,10 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
 
         binding.flPrint.setOnClickListener(v -> {
-             mvvm.addPrinter(true,this,getLang(),binding);
+             mvvm.addPrinter(true,0,this,getLang(),binding);
 
         });
+
 
 
         launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -452,10 +504,22 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
     @SuppressLint("MissingPermission")
     public void selectBluetoothDevice(BluetoothDevice bluetoothDevice) {
         mvvm.getBluetoothDevice().setValue(bluetoothDevice);
-        binding.setPrinterBluetoothName(bluetoothDevice.getName());
+        if (mvvm.getSelectedPrinterPos().getValue()!=null){
+            if (mvvm.getSelectedPrinterPos().getValue()==3){
+                binding.setPrinterBluetoothName(bluetoothDevice.getName());
+
+            }else  if (mvvm.getSelectedPrinterPos().getValue()==2){
+                binding.setPrinterKitchenName(bluetoothDevice.getName());
+
+            }
+
+
+        }
+
         if (dialog != null) {
             dialog.dismiss();
         }
+
 
     }
 
@@ -500,6 +564,8 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
         }
 
     }
+
+
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {

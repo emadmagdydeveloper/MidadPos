@@ -719,6 +719,13 @@ public class SettingsActivity extends DrawerBaseActivity {
 
             }
             printerAdapter.notifyItemChanged(adapterPosition);
+        }else {
+            mvvm.forNavigation = true;
+            Intent intent = new Intent(this,AddPrinterActivity.class);
+            intent.putExtra("data",printerModel);
+            startActivity(intent);
+            overridePendingTransition(0,0);
+
         }
     }
 }

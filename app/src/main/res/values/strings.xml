@@ -260,6 +260,8 @@
     <string name="automatically_print_receipt">Automatically print receipt</string>
     <string name="total_before_tax">Total before tax</string>
     <string name="daily_close">Daily close</string>
+    <string name="edit_printer">Edit printer</string>
+    <string name="delete_printer">Delete printer</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

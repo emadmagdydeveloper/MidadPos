@@ -259,6 +259,8 @@
     <string name="automatically_print_receipt">طباعة الإيصال تلقائيا</string>
     <string name="total_before_tax">الإجمالي بدون ضريبة</string>
     <string name="daily_close">قفل اليومية</string>
+    <string name="edit_printer">تعديل الطابعة</string>
+    <string name="delete_printer">حذف الطابعة</string>
 
 
     <string-array name="delivery_options">

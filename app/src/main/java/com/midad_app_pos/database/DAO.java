@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.midad_app_pos.model.PrinterModel;
 
@@ -28,4 +29,11 @@ public interface DAO {
 
     @Query("SELECT * FROM printers WHERE bluetooth_name =:name LIMIT 1")
     Single<PrinterModel> getPrinterBluetoothName(String name);
+
+    @Update
+    Completable updatePrinter(PrinterModel printerModel);
+
+    @Delete
+    Completable deletePrinter(PrinterModel printerModel);
+
 }

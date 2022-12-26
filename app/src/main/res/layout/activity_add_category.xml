@@ -438,7 +438,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/ic_delete"
-                                android:tint="@color/grey4"
+                                app:tint="@color/grey4"
                                 android:padding="3dp"
                                 />
                             <TextView

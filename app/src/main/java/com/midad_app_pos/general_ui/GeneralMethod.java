@@ -1,6 +1,7 @@
 package com.midad_app_pos.general_ui;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -25,6 +26,7 @@ import com.midad_app_pos.model.DiscountModel;
 import com.midad_app_pos.model.ItemModel;
 import com.midad_app_pos.model.ModifierModel;
 import com.midad_app_pos.model.OrderModel;
+import com.midad_app_pos.model.PrinterModel;
 import com.midad_app_pos.model.ShiftModel;
 
 import java.text.ParseException;
@@ -651,6 +653,37 @@ public class GeneralMethod {
             String price = String.format(Locale.US,"%.2f",Double.parseDouble(model.getGrand_total()));
             String amount =price+"-";
             view.setText(amount);
+        }
+
+    }
+
+    @BindingAdapter("printerType")
+    public static void printerType(TextView view, PrinterModel model) {
+        Context context = view.getContext();
+        if (model!=null){
+            if (model.getPrinter_type().equals("sunmi")){
+                view.setText("Sunmi");
+            }else if (model.getPrinter_type().equals("kitchen")){
+                if (model.getBluetooth_name()!=null){
+                    String text = context.getString(R.string.kitchen_display) + " - " + model.getBluetooth_name();
+                    view.setText(text);
+
+                }else {
+                    view.setText(context.getString(R.string.kitchen_display));
+
+                }
+
+            }else if (model.getPrinter_type().equals("other")){
+                if (model.getBluetooth_name()!=null){
+                    String text = context.getString(R.string.other_model) + " - " + model.getBluetooth_name();
+                    view.setText(text);
+
+                }else {
+                    view.setText(context.getString(R.string.other_model));
+
+                }
+
+            }
         }
 
     }

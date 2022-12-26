@@ -19,8 +19,8 @@ public class PrinterModel implements Serializable {
     private boolean canPrintAutomatic;
     private String ip_address;
     private String bluetooth_name;
+    private String bluetooth_mac_address;
     private String paperWidth;
-    private BluetoothDevice device;
     @Ignore
     private boolean isSelected;
 
@@ -29,7 +29,7 @@ public class PrinterModel implements Serializable {
     public PrinterModel() {
     }
 
-    public PrinterModel(String name, String printer_type, boolean can_print_receipt_and_bill, boolean can_print_orders, boolean canPrintAutomatic, String ip_address, String bluetooth_name, BluetoothDevice device,String paperWidth) {
+    public PrinterModel(String name, String printer_type, boolean can_print_receipt_and_bill, boolean can_print_orders, boolean canPrintAutomatic, String ip_address, String bluetooth_name, String bluetooth_mac_address,String paperWidth) {
         this.paperWidth = paperWidth;
         this.name = name;
         this.printer_type = printer_type;
@@ -38,8 +38,9 @@ public class PrinterModel implements Serializable {
         this.canPrintAutomatic = canPrintAutomatic;
         this.ip_address = ip_address;
         this.bluetooth_name = bluetooth_name;
-        this.device = device;
+        this.bluetooth_mac_address = bluetooth_mac_address;
     }
+
 
     public long getId() {
         return id;
@@ -89,12 +90,12 @@ public class PrinterModel implements Serializable {
         this.canPrintAutomatic = canPrintAutomatic;
     }
 
-    public BluetoothDevice getDevice() {
-        return device;
+    public String getBluetooth_mac_address() {
+        return bluetooth_mac_address;
     }
 
-    public void setDevice(BluetoothDevice device) {
-        this.device = device;
+    public void setBluetooth_mac_address(String bluetooth_mac_address) {
+        this.bluetooth_mac_address = bluetooth_mac_address;
     }
 
     public String getIp_address() {
