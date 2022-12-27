@@ -1113,7 +1113,7 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
                         paper = 1;
                     }
                     SunmiPrintHelper.getInstance().initPrinter();
-                    SunmiPrintHelper.getInstance().printInvoice(userModel, paper, lang, cartModel, 0);
+                    SunmiPrintHelper.getInstance().printInvoice(getApplication().getApplicationContext(),userModel, paper, lang, cartModel, 0);
                 }else if (printerModel.getPrinter_type().equals("other")){
 
                 }else if (printerModel.getPrinter_type().equals("kitchen")){

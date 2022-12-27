@@ -2,10 +2,17 @@ package com.midad_app_pos.print_utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.RemoteException;
 import android.widget.Toast;
 
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
@@ -13,6 +20,7 @@ import com.midad_app_pos.R;
 import com.midad_app_pos.model.UserModel;
 import com.midad_app_pos.model.cart.CartList;
 import com.midad_app_pos.model.cart.CartModel;
+import com.midad_app_pos.tags.Tags;
 import com.sunmi.peripheral.printer.InnerLcdCallback;
 import com.sunmi.peripheral.printer.InnerPrinterCallback;
 import com.sunmi.peripheral.printer.InnerPrinterException;
@@ -916,7 +924,7 @@ public class SunmiPrintHelper {
 
     }
 
-    public void printInvoice(UserModel model, int paper, String lang, CartModel cartModel, int invoice_id) {
+    public void printInvoice(Context context,UserModel model, int paper, String lang, CartModel cartModel, int invoice_id) {
 
 
         if (sunmiPrinterService == null) {
@@ -933,7 +941,26 @@ public class SunmiPrintHelper {
             sunmiPrinterService.printerInit(null);
             sunmiPrinterService.setAlignment(1, null);
 
+            if (model.getData().getInvoiceSettings()!=null&&model.getData().getInvoiceSettings().getPrinted_receipts()!=null){
+                Glide.with(context)
+                        .asBitmap()
+                        .load(Uri.parse(Tags.base_url+model.getData().getInvoiceSettings().getPrinted_receipts()))
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                try {
+                                    sunmiPrinterService.printBitmap(resource,null);
+                                } catch (RemoteException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+            }
+
             for (CartModel.Cart cart : cartModel.getData()) {
+
+
                 printText(model.getData().getSelectedUser().getCompany_name(), "ar");
                 String vatField = "";
                 String invoiceField = "";
@@ -977,7 +1004,6 @@ public class SunmiPrintHelper {
                 printText(vatField, "");
                 printText(invoiceField, "");
 
-                ///sunmiPrinterService.printBitmap(bitmap, null);
                 sunmiPrinterService.lineWrap(1, null);
                 sunmiPrinterService.setAlignment(0, null);
 
