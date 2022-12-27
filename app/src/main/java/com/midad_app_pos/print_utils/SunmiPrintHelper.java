@@ -1118,6 +1118,7 @@ public class SunmiPrintHelper {
         } else {
             data = str1 + spaceBetween(str1, str2, (paperWidth - 2)) + str2;
 
+
         }
 
         try {
