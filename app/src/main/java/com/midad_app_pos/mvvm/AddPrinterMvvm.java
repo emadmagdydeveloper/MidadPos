@@ -66,6 +66,9 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
         model = Preferences.getInstance().getUserData(application.getApplicationContext());
         database = AppDatabase.getInstance(application);
         dao = database.getDAO();
+        if (model.getData().getInvoiceSettings()!=null){
+            lang = model.getData().getInvoiceSettings().getReceipt_language();
+        }
     }
 
 
@@ -147,9 +150,8 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     }
 
     @SuppressLint("MissingPermission")
-    public void addPrinter(boolean test, long printer_id, AppCompatActivity activity, String lang, ActivityAddPrinterBinding binding) {
+    public void addPrinter(boolean test, long printer_id, AppCompatActivity activity, ActivityAddPrinterBinding binding) {
         this.binding = binding;
-        this.lang = lang;
         String printer_type = "";
         String paper_width = "80";
         String ip_address = "";
@@ -405,7 +407,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
                         paper = 384;
                     }
 
-                    printBluetoothTest(paper, activity, lang, binding);
+                    printBluetoothOrderTest(paper, activity, lang, binding);
 
                 }
 

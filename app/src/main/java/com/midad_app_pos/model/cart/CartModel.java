@@ -67,6 +67,7 @@ public class CartModel implements Serializable {
         private double order_discount;
         private double grand_total;
         private String dining_id;
+        private String delivery_name ="";
         private String pos_id;
         private String sale_status;
         private String sale_id;
@@ -75,7 +76,7 @@ public class CartModel implements Serializable {
         private List<Discount> discounts;
         private List<Detail> details;
 
-        public Cart(String name,String cash_register_id, String date, double total_price, double order_tax, double order_discount, double grand_total, String dining_id, String pos_id,String sale_id, String sale_status, String draft, List<Payment> payments, List<Discount> discounts, List<Detail> details) {
+        public Cart(String name,String cash_register_id, String date, double total_price, double order_tax, double order_discount, double grand_total, String dining_id,String delivery_name, String pos_id,String sale_id, String sale_status, String draft, List<Payment> payments, List<Discount> discounts, List<Detail> details) {
             this.name = name;
             this.cash_register_id = cash_register_id;
             this.date = date;
@@ -84,6 +85,7 @@ public class CartModel implements Serializable {
             this.order_discount = order_discount;
             this.grand_total = grand_total;
             this.dining_id = dining_id;
+            this.delivery_name = delivery_name;
             this.pos_id = pos_id;
             this.sale_id = sale_id;
             this.sale_status = sale_status;
@@ -153,6 +155,14 @@ public class CartModel implements Serializable {
             return dining_id;
         }
 
+        public String getDelivery_name() {
+            return delivery_name;
+        }
+
+        public void setDelivery_name(String delivery_name) {
+            this.delivery_name = delivery_name;
+        }
+
         public void setDining_id(String dining_id) {
             this.dining_id = dining_id;
         }
@@ -216,7 +226,9 @@ public class CartModel implements Serializable {
 
     public static class Detail implements Serializable{
         private String product_id;
+        private String product_name;
         private String variant_id;
+        private String totalPrice;
         private int qty;
         private double net_unit_price;
         private String discount;
@@ -225,8 +237,10 @@ public class CartModel implements Serializable {
         private List<Modifier> modifiers;
         private List<Discount> discounts;
 
-        public Detail(String product_id, String variant_id, int qty, double net_unit_price, String discount, String tax_rate, String comment, List<Modifier> modifiers, List<Discount> discounts) {
+        public Detail(String product_id,String product_name,String totalPrice, String variant_id, int qty, double net_unit_price, String discount, String tax_rate, String comment, List<Modifier> modifiers, List<Discount> discounts) {
             this.product_id = product_id;
+            this.product_name = product_name;
+            this.totalPrice = totalPrice;
             this.variant_id = variant_id;
             this.qty = qty;
             this.net_unit_price = net_unit_price;
@@ -312,9 +326,21 @@ public class CartModel implements Serializable {
             this.discounts = discounts;
         }
 
+        public String getProduct_name() {
+            return product_name;
+        }
 
+        public void setProduct_name(String product_name) {
+            this.product_name = product_name;
+        }
 
+        public String getTotalPrice() {
+            return totalPrice;
+        }
 
+        public void setTotalPrice(String totalPrice) {
+            this.totalPrice = totalPrice;
+        }
     }
 
     public static class Discount implements Serializable{

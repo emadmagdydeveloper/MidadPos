@@ -261,6 +261,9 @@
     <string name="daily_close">قفل اليومية</string>
     <string name="edit_printer">تعديل الطابعة</string>
     <string name="delete_printer">حذف الطابعة</string>
+    <string name="more_settings_are_available_in_the_back_office">تتوفر المزيد من الإعدادت في المكتب الخلفي</string>
+    <string name="go_to_back_office">الذهاب إلى المكتب الخلفي</string>
+    <string name="got_it">حسناً</string>
 
 
     <string-array name="delivery_options">

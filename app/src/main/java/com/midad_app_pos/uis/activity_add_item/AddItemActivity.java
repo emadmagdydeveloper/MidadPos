@@ -644,7 +644,7 @@ public class AddItemActivity extends BaseActivity {
         }
 
         if (!forImageIntent){
-            mvvm.getCategoryData(getUserModel().getData().getUser().getId());
+            mvvm.getCategoryData(getUserModel().getData().getSelectedUser().getId(),getUserModel().getData().getSelectedPos().getId(),getUserModel().getData().getSelectedWereHouse().getId());
             forImageIntent = false;
         }
 

@@ -2,7 +2,9 @@ package com.midad_app_pos.mvvm;
 
 import android.app.Application;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.telephony.SignalStrength;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,6 +13,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.midad_app_pos.R;
+import com.midad_app_pos.database.AppDatabase;
+import com.midad_app_pos.database.DAO;
 import com.midad_app_pos.model.AddCustomerModel;
 import com.midad_app_pos.model.AppSettingModel;
 import com.midad_app_pos.model.ChargeModel;
@@ -22,6 +26,7 @@ import com.midad_app_pos.model.ItemModel;
 import com.midad_app_pos.model.ModifierModel;
 import com.midad_app_pos.model.PaymentDataModel;
 import com.midad_app_pos.model.PaymentModel;
+import com.midad_app_pos.model.PrinterModel;
 import com.midad_app_pos.model.SingleCustomerModel;
 import com.midad_app_pos.model.StatusResponse;
 import com.midad_app_pos.model.UserModel;
@@ -29,6 +34,8 @@ import com.midad_app_pos.model.cart.CartList;
 import com.midad_app_pos.model.cart.CartModel;
 import com.midad_app_pos.model.cart.ManageCartModel;
 import com.midad_app_pos.preferences.Preferences;
+import com.midad_app_pos.print_utils.PrintUtils;
+import com.midad_app_pos.print_utils.SunmiPrintHelper;
 import com.midad_app_pos.remote.Api;
 import com.midad_app_pos.share.Common;
 import com.midad_app_pos.tags.Tags;
@@ -51,7 +58,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
-public class ChargeMvvm extends AndroidViewModel {
+public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResponse, PrintUtils.PrinterConnectListener {
     private final String TAG = ChargeMvvm.class.getName();
     private ManageCartModel manageCartModel;
     private MutableLiveData<CartList> cartList;
@@ -85,13 +92,18 @@ public class ChargeMvvm extends AndroidViewModel {
     public ChargeModel itemForPaid;
     private MutableLiveData<String> itemSplitPrice;
     private MutableLiveData<Boolean> onTicketAddedSuccess;
-
-
+    private MutableLiveData<List<PrinterModel>> printers;
+    private AppDatabase database;
+    private DAO dao;
     private CompositeDisposable disposable = new CompositeDisposable();
+    private PrintUtils printUtils;
+    private String lang = "ar";
 
     public ChargeMvvm(@NonNull Application application) {
         super(application);
         manageCartModel = ManageCartModel.newInstance();
+        database = AppDatabase.getInstance(application);
+        dao = database.getDAO();
         getCartListInstance().setValue(manageCartModel.getCartModel(application.getApplicationContext()));
         getPaidAmount().setValue(manageCartModel.getCartModel(application.getApplicationContext()).getTotalPrice() + "");
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
@@ -100,7 +112,9 @@ public class ChargeMvvm extends AndroidViewModel {
         getCountryPos().setValue(0);
         getAddCustomerModel();
         getCustomers();
+        getAllPrinters();
     }
+
 
     public MutableLiveData<CartList> getCartListInstance() {
         if (cartList == null) {
@@ -157,6 +171,12 @@ public class ChargeMvvm extends AndroidViewModel {
         return paymentType;
     }
 
+    public MutableLiveData<List<PrinterModel>> getPrinters() {
+        if (printers == null) {
+            printers = new MutableLiveData<>();
+        }
+        return printers;
+    }
 
     public MutableLiveData<List<ChargeModel>> getSplitList() {
         if (splitList == null) {
@@ -296,6 +316,29 @@ public class ChargeMvvm extends AndroidViewModel {
             onTicketAddedSuccess = new MutableLiveData<>();
         }
         return onTicketAddedSuccess;
+    }
+
+    private void getAllPrinters() {
+        dao.getPrinters().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<List<PrinterModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(List<PrinterModel> list) {
+                        getPrinters().setValue(list);
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
+
     }
 
     public void getCustomers() {
@@ -649,8 +692,8 @@ public class ChargeMvvm extends AndroidViewModel {
         if (getCartListInstance().getValue() != null) {
             if (getSplitList().getValue() != null) {
                 ChargeModel chargeModel = getSplitList().getValue().get(adapterPos);
-                if (chargeModel.isPaid()&&getRemaining().getValue()!=null){
-                    getRemaining().setValue((getRemaining().getValue()+Double.parseDouble(chargeModel.getPrice())));
+                if (chargeModel.isPaid() && getRemaining().getValue() != null) {
+                    getRemaining().setValue((getRemaining().getValue() + Double.parseDouble(chargeModel.getPrice())));
                 }
                 getSplitList().getValue().remove(adapterPos);
                 getSplitList().setValue(getSplitList().getValue());
@@ -894,7 +937,7 @@ public class ChargeMvvm extends AndroidViewModel {
 
     }
 
-    public void addTicket(Context context,boolean withSplit) {
+    public void addTicket(Context context, boolean withSplit) {
         ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
@@ -902,6 +945,7 @@ public class ChargeMvvm extends AndroidViewModel {
 
         manageCartModel = ManageCartModel.newInstance();
         CartList cartList = manageCartModel.getCartModel(getApplication().getApplicationContext());
+
 
         if (cartList != null && getPaymentType().getValue() != null && getRemaining().getValue() != null && getPaidAmount().getValue() != null) {
             String customer_id = null;
@@ -955,7 +999,8 @@ public class ChargeMvvm extends AndroidViewModel {
                 }
 
 
-                CartModel.Detail detail = new CartModel.Detail(itemModel.getId(), variant_id, itemModel.getAmount(), price, totalDiscount + "", tax_rate + "", itemModel.getComment(), modifiers, discountsItem);
+                itemModel.calculateTotal();
+                CartModel.Detail detail = new CartModel.Detail(itemModel.getId(), itemModel.getName(), itemModel.getTotalPrice() + "", variant_id, itemModel.getAmount(), price, totalDiscount + "", tax_rate + "", itemModel.getComment(), modifiers, discountsItem);
                 detailList.add(detail);
             }
 
@@ -963,21 +1008,20 @@ public class ChargeMvvm extends AndroidViewModel {
             AppSettingModel settingModel = Preferences.getInstance().getAppSetting(getApplication().getApplicationContext());
             List<CartModel.Payment> payments = new ArrayList<>();
 
-            if (withSplit){
-                if (getSplitList().getValue()!=null&&getSplitList().getValue().size()>0){
-                    for (ChargeModel chargeModel:getSplitList().getValue()){
+            if (withSplit) {
+                if (getSplitList().getValue() != null && getSplitList().getValue().size() > 0) {
+                    for (ChargeModel chargeModel : getSplitList().getValue()) {
 
-                        double remaining = chargeModel.getPaidAmount()-Double.parseDouble(chargeModel.getPrice().replace(",",""));
+                        double remaining = chargeModel.getPaidAmount() - Double.parseDouble(chargeModel.getPrice().replace(",", ""));
 
-                        CartModel.Payment payment = new CartModel.Payment(Double.parseDouble(chargeModel.getPrice().replace(",","")), chargeModel.getPaidAmount(),remaining,chargeModel.getPaymentModel().getId());
+                        CartModel.Payment payment = new CartModel.Payment(Double.parseDouble(chargeModel.getPrice().replace(",", "")), chargeModel.getPaidAmount(), remaining, chargeModel.getPaymentModel().getId());
                         payments.add(payment);
                     }
                 }
-            }else {
+            } else {
                 CartModel.Payment payment = new CartModel.Payment(cartList.getTotalPrice(), Double.parseDouble(getPaidAmount().getValue().replace(",", "")), getRemaining().getValue(), getPaymentType().getValue() + "");
                 payments.add(payment);
             }
-
 
 
             List<CartModel.Discount> discounts = new ArrayList<>();
@@ -996,7 +1040,7 @@ public class ChargeMvvm extends AndroidViewModel {
                 draft = "1";
             }
 
-            CartModel.Cart cart = new CartModel.Cart(getTicketName(),settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
+            CartModel.Cart cart = new CartModel.Cart(getTicketName(), settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), cartList.getDelivery_id(), cartList.getDelivery_name(), userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
 
             List<CartModel.Cart> carts = new ArrayList<>();
             carts.add(cart);
@@ -1023,7 +1067,8 @@ public class ChargeMvvm extends AndroidViewModel {
 
                                     if (response.body().getStatus() == 200) {
                                         manageCartModel.clearCart(context);
-                                        getOnTicketAddedSuccess().setValue(true);
+                                        //getOnTicketAddedSuccess().setValue(true);
+                                        print(cartModel);
                                     }
 
                                 }
@@ -1056,14 +1101,57 @@ public class ChargeMvvm extends AndroidViewModel {
         }
     }
 
+    private void print(CartModel cartModel) {
+        printUtils = new PrintUtils(this);
+
+        if (getPrinters().getValue() != null && getPrinters().getValue().size() > 0) {
+            for (PrinterModel printerModel : getPrinters().getValue()) {
+                if (printerModel.getPrinter_type().equals("sunmi") && printerModel.isCanPrintAutomatic()) {
+                    int paper = 2;
+                    if (printerModel.getPaperWidth().equalsIgnoreCase("80")) {
+                    } else {
+                        paper = 1;
+                    }
+                    SunmiPrintHelper.getInstance().initPrinter();
+                    SunmiPrintHelper.getInstance().printInvoice(userModel, paper, lang, cartModel, 0);
+                }else if (printerModel.getPrinter_type().equals("other")){
+
+                }else if (printerModel.getPrinter_type().equals("kitchen")){
+
+                }
+            }
+        } else {
+            getOnTicketAddedSuccess().setValue(true);
+        }
+    }
+
 
     private String getDate() {
-       return String.valueOf(new Date().getTime());
+        return String.valueOf(new Date().getTime());
     }
 
     private String getTicketName() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm aa",Locale.ENGLISH);
-        return "Ticket - "+simpleDateFormat.format(new Date());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
+        return "Ticket - " + simpleDateFormat.format(new Date());
     }
 
+    @Override
+    public void onConnected() {
+
+    }
+
+    @Override
+    public void onFailed() {
+
+    }
+
+    @Override
+    public void onDevices(List<BluetoothDevice> list) {
+
+    }
+
+    @Override
+    public void onStartIntent() {
+
+    }
 }

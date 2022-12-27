@@ -157,7 +157,7 @@ public class AddItemMvvm extends AndroidViewModel {
         return deletedSuccess;
     }
 
-    public void getCategoryData(String user_id) {
+    public void getCategoryData(String user_id,String pos_id,String warehouse_id) {
         getIsLoading().setValue(true);
         List<CategoryModel> list = new ArrayList<>();
 
@@ -185,7 +185,7 @@ public class AddItemMvvm extends AndroidViewModel {
                                     list.add(new CategoryModel(-2, getApplication().getApplicationContext().getString(R.string.create_category)));
                                     list.addAll(response.body().getData());
                                     getCategories().setValue(list);
-                                    getHomeData(user_id);
+                                    getHomeData(user_id,pos_id,warehouse_id);
                                 } else {
                                     getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
                                 }
@@ -222,10 +222,10 @@ public class AddItemMvvm extends AndroidViewModel {
                 });
     }
 
-    public void getHomeData(String user_id) {
+    public void getHomeData(String user_id,String pos_id,String warehouse_id) {
 
         Api.getService(Tags.base_url)
-                .homeIndex(user_id)
+                .homeIndex(user_id,pos_id,warehouse_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<HomeIndexModel>>() {

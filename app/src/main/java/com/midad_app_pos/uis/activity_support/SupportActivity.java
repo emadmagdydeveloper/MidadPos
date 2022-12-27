@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.midad_app_pos.R;
 import com.midad_app_pos.databinding.ActivitySupportBinding;
 import com.midad_app_pos.mvvm.SupportMvvm;
+import com.midad_app_pos.tags.Tags;
 import com.midad_app_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_app_pos.uis.activity_web_view.WebViewActivity;
 
@@ -74,7 +75,7 @@ public class SupportActivity extends DrawerBaseActivity {
                 mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
-                intent.putExtra("url","https://www.google.com");
+                intent.putExtra("url", Tags.base_url);
                 startActivity(intent);
             });
         }
@@ -84,7 +85,7 @@ public class SupportActivity extends DrawerBaseActivity {
                 mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
-                intent.putExtra("url","https://www.google.com");
+                intent.putExtra("url",Tags.base_url);
                 startActivity(intent);
             });
         }
@@ -95,7 +96,7 @@ public class SupportActivity extends DrawerBaseActivity {
                 mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
-                intent.putExtra("url","https://www.google.com");
+                intent.putExtra("url",Tags.base_url);
                 startActivity(intent);
             });
         }
@@ -105,7 +106,7 @@ public class SupportActivity extends DrawerBaseActivity {
                 mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
-                intent.putExtra("url","https://www.google.com");
+                intent.putExtra("url",Tags.base_url);
                 startActivity(intent);
             });
         }
@@ -115,7 +116,7 @@ public class SupportActivity extends DrawerBaseActivity {
                 mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
-                intent.putExtra("url","https://www.google.com");
+                intent.putExtra("url",Tags.base_url);
                 startActivity(intent);
             });
         }
@@ -125,7 +126,7 @@ public class SupportActivity extends DrawerBaseActivity {
                 mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
-                intent.putExtra("url","https://www.google.com");
+                intent.putExtra("url",Tags.base_url);
                 startActivity(intent);
             });
         }
@@ -136,7 +137,7 @@ public class SupportActivity extends DrawerBaseActivity {
                 mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
-                intent.putExtra("url","https://www.google.com");
+                intent.putExtra("url",Tags.base_url);
                 startActivity(intent);
             });
         }
@@ -146,7 +147,7 @@ public class SupportActivity extends DrawerBaseActivity {
                 mvvm.forNavigation = true;
 
                 Intent intent =new Intent(this, WebViewActivity.class);
-                intent.putExtra("url","https://www.google.com");
+                intent.putExtra("url",Tags.base_url);
                 startActivity(intent);
             });
         }

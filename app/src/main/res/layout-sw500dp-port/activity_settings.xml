@@ -7,6 +7,7 @@
         <variable
             name="model"
             type="com.midad_app_pos.model.UserModel" />
+        <import type="android.view.View"/>
     </data>
 
 
@@ -58,9 +59,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingTop="16dp"
+
                     >
                     <LinearLayout
                         android:id="@+id/printers"
@@ -68,6 +67,9 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginTop="8dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="16dp"
 
                         >
                         <ImageView
@@ -107,7 +109,8 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginTop="16dp"
-
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         >
                         <ImageView
                             android:layout_width="24dp"
@@ -147,6 +150,8 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginTop="16dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
 
                         >
                         <ImageView
@@ -177,9 +182,85 @@
                                 android:layout_height="1dp"
                                 android:background="@color/grey3"
                                 android:layout_marginTop="16dp"
+                                android:visibility="@{model.data.user.available?View.VISIBLE:View.GONE}"
+
                                 />
                         </LinearLayout>
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llOfficeAlert"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp"
+                        android:visibility="@{model.data.user.available?View.GONE:View.VISIBLE}"
+
+                        >
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/grey3"
+
+                            />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:background="@color/grey0"
+
+                            >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:text="@string/more_settings_are_available_in_the_back_office"
+                                />
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="8dp"
+                                >
+                                <TextView
+                                    android:id="@+id/office"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:textAllCaps="true"
+                                    android:textColor="@color/colorPrimary"
+                                    android:text="@string/go_to_back_office"
+                                    />
+                                <androidx.legacy.widget.Space
+                                    android:layout_width="36dp"
+                                    android:layout_height="0dp"/>
+
+                                <TextView
+                                    android:id="@+id/gotIt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:textAllCaps="true"
+                                    android:textColor="@color/colorPrimary"
+                                    android:text="@string/got_it"
+                                    />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/grey3"
+                            />
+
+                    </LinearLayout>
+
 
                     <androidx.legacy.widget.Space
                         android:layout_width="0dp"

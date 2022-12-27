@@ -2,6 +2,7 @@ package com.midad_app_pos.uis.activity_settings;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -18,9 +19,11 @@ import com.midad_app_pos.databinding.DialogHomeItemLayoutBinding;
 import com.midad_app_pos.model.AppSettingModel;
 import com.midad_app_pos.model.PrinterModel;
 import com.midad_app_pos.mvvm.SettingsMvvm;
+import com.midad_app_pos.tags.Tags;
 import com.midad_app_pos.uis.activity_add_printer.AddPrinterActivity;
 import com.midad_app_pos.uis.activity_drawer_base.DrawerBaseActivity;
 import com.midad_app_pos.uis.activity_splash.SplashActivity;
+import com.midad_app_pos.uis.activity_web_view.WebViewActivity;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -273,6 +276,15 @@ public class SettingsActivity extends DrawerBaseActivity {
         if (binding.printersDetailsLayout!=null){
             binding.printersDetailsLayout.imageDelete.setOnClickListener(v -> mvvm.deletePrinters());
         }
+
+        binding.gotIt.setOnClickListener(v -> binding.llOfficeAlert.setVisibility(View.GONE));
+        binding.office.setOnClickListener(v ->{
+            mvvm.forNavigation = true;
+
+            Intent intent =new Intent(this, WebViewActivity.class);
+            intent.putExtra("url", Tags.dashboardLogin);
+            startActivity(intent);
+        });
 
     }
 

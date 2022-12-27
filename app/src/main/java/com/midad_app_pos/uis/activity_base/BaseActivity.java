@@ -208,7 +208,7 @@ public class BaseActivity extends AppCompatActivity {
                                     },500);
                         }else {
 
-                            Log.e("selectedUSer",user.getName());
+                            Log.e("selectedUSer",user.getName()+"__"+user.getId());
                             userModel.getData().setSelectedUser(user);
                             setUserModel(userModel);
 
@@ -232,7 +232,6 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void showPinCodeView(){
-
         if (binding!=null&&getUserModel()!=null&&getUserModel().getData().getUser().isAvailable()){
             binding.pinContainer.setVisibility(View.VISIBLE);
             updatePinView("");
@@ -319,7 +318,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (binding.pinContainer.getVisibility()==View.GONE){
+        if (binding!=null&&binding.pinContainer.getVisibility()==View.GONE){
             if (this instanceof ItemsActivity || this instanceof ReceiptsActivity|| this instanceof  ShiftActivity || this instanceof SettingsActivity|| this instanceof SupportActivity){
                 App app = (App) getApplicationContext();
                 app.killAllActivities();
@@ -328,6 +327,10 @@ public class BaseActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
 
             }
+        }else {
+            super.onBackPressed();
+            overridePendingTransition(0, 0);
+
         }
 
 

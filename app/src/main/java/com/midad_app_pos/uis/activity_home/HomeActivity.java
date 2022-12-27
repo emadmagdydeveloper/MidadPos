@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -172,9 +173,16 @@ public class HomeActivity extends DrawerBaseActivity {
             mvvm.forNavigation = false;
         });
 
-        mvvm.getUserModelData().observe(this,userModel -> {
+        mvvm.getUserModelData().observe(this,data -> {
             UserModel model = getUserModel();
-            model.getData().getUser().setAvailable(userModel.getData().getUser().isAvailable());
+            model.getData().getUser().setAvailable(data.getUser().isAvailable());
+            setUserModel(model);
+            binding.setModel(model);
+        });
+
+        mvvm.getInvoiceSettings().observe(this,invoiceSettings -> {
+            UserModel model = getUserModel();
+            model.getData().setInvoiceSettings(invoiceSettings);
             setUserModel(model);
             binding.setModel(model);
         });
@@ -1287,7 +1295,43 @@ public class HomeActivity extends DrawerBaseActivity {
     private void updateShiftData(AppSettingModel appSetting) {
         binding.setSetting(appSetting);
         showShift((appSetting.getAdvantageModel()!=null&&appSetting.getAdvantageModel().getShifts().equals("1")));
-        if (getAppSetting().getIsShiftOpen() == 0) {
+
+        if (appSetting.getAdvantageModel()!=null&&appSetting.getIsShiftOpen()==1){
+            binding.llOpenShift.setVisibility(View.GONE);
+            if (binding.recView != null) {
+                binding.recView.setVisibility(View.VISIBLE);
+
+            }
+
+            if (binding.recViewLand != null) {
+                binding.recViewLand.setVisibility(View.VISIBLE);
+            }
+
+            if (binding.recViewPort != null) {
+                binding.recViewPort.setVisibility(View.VISIBLE);
+            }
+        }else {
+            binding.llOpenShift.setVisibility(View.VISIBLE);
+            mvvm.clearCart();
+            if (binding.recView != null) {
+                binding.recView.setVisibility(View.GONE);
+                binding.llNoItems.setVisibility(View.GONE);
+            }
+
+            if (binding.recViewLand != null) {
+                binding.recViewLand.setVisibility(View.GONE);
+                binding.llNoItems.setVisibility(View.GONE);
+
+            }
+
+            if (binding.recViewPort != null) {
+                binding.recViewPort.setVisibility(View.GONE);
+                binding.llNoItems.setVisibility(View.GONE);
+
+            }
+        }
+
+       /* if (getAppSetting().getIsShiftOpen() == 0) {
             binding.llOpenShift.setVisibility(View.VISIBLE);
             mvvm.clearCart();
             if (binding.recView != null) {
@@ -1323,7 +1367,7 @@ public class HomeActivity extends DrawerBaseActivity {
                 binding.recViewPort.setVisibility(View.VISIBLE);
             }
         }
-
+*/
 
     }
 
@@ -2021,7 +2065,7 @@ public class HomeActivity extends DrawerBaseActivity {
     protected void onResume() {
         super.onResume();
         updateSelectedPos(0);
-        updateShiftData(getAppSetting());
+        //updateShiftData(getAppSetting());
         binding.setModel(getUserModel());
 
 

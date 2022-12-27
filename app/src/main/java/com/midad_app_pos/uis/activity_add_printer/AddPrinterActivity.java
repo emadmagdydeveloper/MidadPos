@@ -221,10 +221,10 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
             if (!name.isEmpty()) {
                 binding.txtInput.setError(null);
                 if (model==null){
-                    mvvm.addPrinter(false,0,this,getLang(),null);
+                    mvvm.addPrinter(false,0,this,null);
 
                 }else {
-                    mvvm.addPrinter(false,model.getId(),this,getLang(),null);
+                    mvvm.addPrinter(false,model.getId(),this,null);
 
                 }
 
@@ -308,7 +308,7 @@ public class AddPrinterActivity extends BaseActivity implements PrintUtils.Print
 
 
         binding.flPrint.setOnClickListener(v -> {
-             mvvm.addPrinter(true,0,this,getLang(),binding);
+             mvvm.addPrinter(true,0,this,binding);
 
         });
 

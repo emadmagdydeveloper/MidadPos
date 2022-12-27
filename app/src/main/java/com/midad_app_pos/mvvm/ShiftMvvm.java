@@ -20,6 +20,7 @@ import com.midad_app_pos.remote.Api;
 import com.midad_app_pos.tags.Tags;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -295,6 +296,12 @@ public class ShiftMvvm extends AndroidViewModel {
     public void getCurrentShift() {
         getIsLoading().setValue(true);
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
+        if (userModel.getData().getSelectedUser()!=null&&userModel.getData().getSelectedWereHouse()!=null&&userModel.getData().getSelectedPos()!=null){
+            getIsLoading().setValue(false);
+
+            return;
+        }
+
         Api.getService(Tags.base_url)
                 .currentShift(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), userModel.getData().getSelectedPos().getId())
                 .subscribeOn(Schedulers.io())
@@ -346,6 +353,13 @@ public class ShiftMvvm extends AndroidViewModel {
     public void getShiftsData() {
         getIsLoadingShifts().setValue(true);
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
+        if (userModel.getData().getSelectedUser()!=null&&userModel.getData().getSelectedWereHouse()!=null&&userModel.getData().getSelectedPos()!=null){
+            getIsLoadingShifts().setValue(false);
+            getShifts().setValue(new ArrayList<>());
+
+            return;
+        }
+
         Api.getService(Tags.base_url)
                 .shifts(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), userModel.getData().getSelectedPos().getId())
                 .subscribeOn(Schedulers.io())

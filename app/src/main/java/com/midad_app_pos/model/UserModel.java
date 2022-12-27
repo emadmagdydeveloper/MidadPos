@@ -15,6 +15,7 @@ public class UserModel extends StatusResponse implements Serializable {
         private User selectedUser;
         private WereHouse selectedWereHouse;
         private POSModel selectedPos;
+        private InvoiceSettings invoiceSettings;
 
 
         public User getUser() {
@@ -47,6 +48,14 @@ public class UserModel extends StatusResponse implements Serializable {
 
         public void setSelectedPos(POSModel selectedPos) {
             this.selectedPos = selectedPos;
+        }
+
+        public InvoiceSettings getInvoiceSettings() {
+            return invoiceSettings;
+        }
+
+        public void setInvoiceSettings(InvoiceSettings invoiceSettings) {
+            this.invoiceSettings = invoiceSettings;
         }
     }
 

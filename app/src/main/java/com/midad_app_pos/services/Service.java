@@ -83,7 +83,9 @@ public interface Service {
     Single<Response<CategoryDataModel>> categories(@Query("user_id") String user_id);
 
     @GET("api/home/index")
-    Single<Response<HomeIndexModel>> homeIndex(@Query("user_id") String user_id);
+    Single<Response<HomeIndexModel>> homeIndex(@Query("user_id") String user_id,
+                                               @Query("pos_id") String pos_id,
+                                               @Query("warehouse_id") String warehouse_id);
 
     @Multipart
     @POST("api/items/storeItems")
