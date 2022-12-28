@@ -2,6 +2,7 @@ package com.midad_app_pos.print_utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.widget.Toast;
@@ -29,6 +30,9 @@ import com.sunmi.peripheral.printer.InnerResultCallback;
 import com.sunmi.peripheral.printer.SunmiPrinterService;
 import com.sunmi.peripheral.printer.WoyouConsts;
 
+import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 public class SunmiPrintHelper {
@@ -814,7 +818,6 @@ public class SunmiPrintHelper {
             String totalWithTaxField = "";
             String itemField = "";
             String thx = "";
-
             if (lang.equals("en")) {
                 name = "Midad";
                 vatField = "VAT#";
@@ -924,7 +927,7 @@ public class SunmiPrintHelper {
 
     }
 
-    public void printInvoice(Context context,UserModel model, int paper, String lang, CartModel cartModel, int invoice_id) {
+    public void printInvoice(Context context, UserModel model, int paper, String lang, CartModel cartModel, List<Integer> ids, Bitmap logo) {
 
 
         if (sunmiPrinterService == null) {
@@ -940,27 +943,18 @@ public class SunmiPrintHelper {
 
             sunmiPrinterService.printerInit(null);
             sunmiPrinterService.setAlignment(1, null);
-
-            if (model.getData().getInvoiceSettings()!=null&&model.getData().getInvoiceSettings().getPrinted_receipts()!=null){
-                Glide.with(context)
-                        .asBitmap()
-                        .load(Uri.parse(Tags.base_url+model.getData().getInvoiceSettings().getPrinted_receipts()))
-                        .into(new SimpleTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                try {
-                                    sunmiPrinterService.printBitmap(resource,null);
-                                } catch (RemoteException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+            if (logo!=null){
+                Bitmap scaleLogo = Bitmap.createBitmap(logo,0,0,150,150,new Matrix(),true);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                scaleLogo.compress(Bitmap.CompressFormat.PNG,0,outputStream);
+                sunmiPrinterService.printBitmap(scaleLogo,null);
 
             }
 
+            int index = 0;
             for (CartModel.Cart cart : cartModel.getData()) {
 
-
+                int invoice_id = ids.get(index);
                 printText(model.getData().getSelectedUser().getCompany_name(), "ar");
                 String vatField = "";
                 String invoiceField = "";
@@ -973,26 +967,26 @@ public class SunmiPrintHelper {
                 String totalBeforeTaxField = "";
                 String totalWithTaxField = "";
 
+                String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss",Locale.ENGLISH).format(Long.parseLong(cart.getDate()));
 
+                name = model.getData().getSelectedUser()!=null?model.getData().getSelectedUser().getCompany_name():(lang.equals("ar")?"مداد":"Midad");
                 if (lang.equals("en")) {
-                    name = "Midad";
                     vatField = "VAT#" + (model.getData().getSelectedWereHouse() != null ? model.getData().getSelectedWereHouse().getTax_number() : "");
                     invoiceField = "Simplified tax invoice";
                     deliveryField = cart.getDelivery_name();
                     receiptField = "Receipt #:" + invoice_id;
-                    receiptDateField = "Invoice date :" + cart.getDate();
+                    receiptDateField = "Invoice date :" + date;
                     cashierField = "Cashier :" + model.getData().getSelectedUser().getName();
                     posField = "POS :" + model.getData().getSelectedPos().getTitle();
                     totalBeforeTaxField = "Total before tax";
                     totalWithTaxField = "Total with tax";
 
                 } else {
-                    name = "مداد";
                     vatField = "الرقم الضريبي#" + (model.getData().getSelectedWereHouse() != null ? model.getData().getSelectedWereHouse().getTax_number() : "");
                     invoiceField = "فاتورة ضريبية مبسطة";
                     deliveryField = cart.getDelivery_name();
                     receiptField = "التذكرة #:" + invoice_id;
-                    receiptDateField = "تاريخ الفاتورة :" + cart.getDate();
+                    receiptDateField = "تاريخ الفاتورة :" + date;
                     cashierField = "الكاشير :" + model.getData().getSelectedUser().getName();
                     posField = "نقطة بيع :" + model.getData().getSelectedPos().getTitle();
                     totalBeforeTaxField = "الإجمالى قبل الضريبة";
@@ -1000,6 +994,7 @@ public class SunmiPrintHelper {
 
 
                 }
+                sunmiPrinterService.setAlignment(1, null);
                 printText(name, "");
                 printText(vatField, "");
                 printText(invoiceField, "");
@@ -1013,13 +1008,17 @@ public class SunmiPrintHelper {
                 printText(cashierField, lang);
                 printText(posField, lang);
                 sunmiPrinterService.lineWrap(1, null);
-                if (paper == 1) {
-                    sunmiPrinterService.printText("--------------------------------\n", null);
-                } else {
-                    sunmiPrinterService.printText("------------------------------------------------\n",
-                            null);
+
+                if (deliveryField!=null&&!deliveryField.isEmpty()){
+                    if (paper == 1) {
+                        sunmiPrinterService.printText("--------------------------------\n", null);
+                    } else {
+                        sunmiPrinterService.printText("------------------------------------------------\n",
+                                null);
+                    }
+                    printText(deliveryField, lang);
                 }
-                printText(deliveryField, lang);
+
 
                 if (paper == 1) {
                     sunmiPrinterService.printText("--------------------------------\n", null);
@@ -1032,7 +1031,7 @@ public class SunmiPrintHelper {
                     String text1 = detail.getProduct_name();
                     String text2 = detail.getTotalPrice();
                     String amount = detail.getQty() + "X" + detail.getNet_unit_price();
-                    printRowData(text1, text2, paperWidth - 6, lang);
+                    printRowData(text1, text2, paperWidth - 5, lang);
                     printText(amount, lang);
                 }
 
@@ -1043,7 +1042,7 @@ public class SunmiPrintHelper {
                             null);
                 }
 
-                printRowWithFontAndStyle(totalBeforeTaxField, cart.getTotal_price() + "", paperWidth - 5, 25, true, lang);
+                printRowWithFontAndStyle(totalBeforeTaxField, String.format(Locale.US, "%.2f", cart.getTotal_price()), paperWidth - 5, 25, true, lang);
 
 
                 if (paper == 1) {
@@ -1053,7 +1052,7 @@ public class SunmiPrintHelper {
                             null);
                 }
 
-                printRowWithFontAndStyle(totalWithTaxField, cart.getGrand_total() + "", paperWidth - 5, 25, true, lang);
+                printRowWithFontAndStyle(totalWithTaxField, String.format(Locale.US, "%.2f", cart.getGrand_total()) , paperWidth - 5, 25, true, lang);
 
 
                 if (paper == 1) {
@@ -1071,21 +1070,21 @@ public class SunmiPrintHelper {
                 }
 
                 sunmiPrinterService.printTextWithFont((model.getData().getInvoiceSettings() != null ? "" : model.getData().getInvoiceSettings().getFooter()) + "\n", null, 30, null);
-                sunmiPrinterService.lineWrap(24, null);
+                sunmiPrinterService.lineWrap(1, null);
 
                 ZatcaQRCodeGeneration.Builder builder = new ZatcaQRCodeGeneration.Builder();
                 builder.sellerName(model.getData().getSelectedUser().getName()) // Shawrma House
                         .taxNumber(model.getData().getSelectedWereHouse().getTax_number()) // 1234567890
-                        .invoiceDate(cart.getDate()) //..> 22/11/2021 03:00 am
+                        .invoiceDate(date) //..> 22/11/2021 03:00 am
                         .totalAmount(String.format(Locale.US, "%.2f", cart.getGrand_total())) // 100
                         .taxAmount(String.format(Locale.US, "%.2f", cart.getOrder_tax()));
 
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
                 Bitmap Qrcode = barcodeEncoder.encodeBitmap(builder.getBase64(), BarcodeFormat.QR_CODE, 300, 300);
                 sunmiPrinterService.printBitmap(Qrcode, null);
-
-                sunmiPrinterService.autoOutPaper(null);
+                feedPaper();
                 sunmiPrinterService.cutPaper(null);
+                index++;
             }
 
 

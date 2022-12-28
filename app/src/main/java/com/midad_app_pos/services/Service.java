@@ -6,6 +6,7 @@ import com.midad_app_pos.model.CustomerDataModel;
 import com.midad_app_pos.model.DeliveryDataModel;
 import com.midad_app_pos.model.DiscountDataModel;
 import com.midad_app_pos.model.HomeIndexModel;
+import com.midad_app_pos.model.InvoiceIdsModel;
 import com.midad_app_pos.model.ItemsDataModel;
 import com.midad_app_pos.model.OrderDataModel;
 import com.midad_app_pos.model.PaymentDataModel;
@@ -197,7 +198,7 @@ public interface Service {
 
 
     @POST("api/orders/storeOrder")
-    Single<Response<StatusResponse>> storeOrder(@Body CartModel cartModel);
+    Single<Response<InvoiceIdsModel>> storeOrder(@Body CartModel cartModel);
 
     @FormUrlEncoded
     @POST("api/shift/storeShiftData")

@@ -24,6 +24,7 @@ import com.midad_app_pos.model.CustomerModel;
 import com.midad_app_pos.model.DeliveryDataModel;
 import com.midad_app_pos.model.DeliveryModel;
 import com.midad_app_pos.model.HomeIndexModel;
+import com.midad_app_pos.model.InvoiceIdsModel;
 import com.midad_app_pos.model.InvoiceSettings;
 import com.midad_app_pos.model.ModifierModel;
 import com.midad_app_pos.model.OrderDataModel;
@@ -1902,14 +1903,14 @@ public class HomeMvvm extends AndroidViewModel {
                     .storeOrder(cartModel)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new SingleObserver<Response<StatusResponse>>() {
+                    .subscribe(new SingleObserver<Response<InvoiceIdsModel>>() {
                         @Override
                         public void onSubscribe(Disposable d) {
                             disposable.add(d);
                         }
 
                         @Override
-                        public void onSuccess(Response<StatusResponse> response) {
+                        public void onSuccess(Response<InvoiceIdsModel> response) {
                             dialog.dismiss();
                             if (response.isSuccessful()) {
                                 if (response.body() != null) {

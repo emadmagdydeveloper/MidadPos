@@ -4,16 +4,20 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.gson.Gson;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.midad_app_pos.R;
 import com.midad_app_pos.database.AppDatabase;
 import com.midad_app_pos.database.DAO;
@@ -23,6 +27,7 @@ import com.midad_app_pos.model.UserModel;
 import com.midad_app_pos.preferences.Preferences;
 import com.midad_app_pos.print_utils.PrintUtils;
 import com.midad_app_pos.print_utils.SunmiPrintHelper;
+import com.midad_app_pos.tags.Tags;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +60,6 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     private UserModel model;
     private ActivityAddPrinterBinding binding;
     private String lang = "ar";
-    private boolean printOrder = false;
 
 
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -66,7 +70,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
         model = Preferences.getInstance().getUserData(application.getApplicationContext());
         database = AppDatabase.getInstance(application);
         dao = database.getDAO();
-        if (model.getData().getInvoiceSettings()!=null){
+        if (model.getData().getInvoiceSettings() != null) {
             lang = model.getData().getInvoiceSettings().getReceipt_language();
         }
     }
@@ -207,7 +211,8 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
         }
 
-        if (printer_type.equalsIgnoreCase("sunmi")) {
+        if (printer_type.equalsIgnoreCase("sunmi"))
+        {
 
             if (!test) {
 
@@ -258,7 +263,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
                                 @Override
                                 public void onError(Throwable e) {
-                                    Log.e("upd",e.getMessage()+"");
+                                    Log.e("upd", e.getMessage() + "");
                                 }
                             });
 
@@ -269,8 +274,8 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             }
 
         }
-        else if (printer_type.equalsIgnoreCase("other")) {
-            printOrder = false;
+        else if (printer_type.equalsIgnoreCase("other"))
+        {
             if (getSelectedInterfacePos().getValue() != null) {
                 int pos = getSelectedInterfacePos().getValue();
                 if (pos == 0) {
@@ -323,7 +328,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
                                             @Override
                                             public void onError(Throwable e) {
-                                                Log.e("upd",e.getMessage()+"");
+                                                Log.e("upd", e.getMessage() + "");
                                             }
                                         });
                             }
@@ -346,11 +351,10 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             }
         }
         else if (printer_type.equalsIgnoreCase("kitchen")) {
-            printOrder = true;
             if (getBluetoothDevice().getValue() != null) {
                 if (!test) {
 
-                    if (printer_id==0){
+                    if (printer_id == 0) {
                         dao.getPrinterBluetoothName(bluetooth_name)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -377,7 +381,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
                                         }
                                     }
                                 });
-                    }else {
+                    } else {
                         dao.updatePrinter(printerModel)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -395,7 +399,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
                                     @Override
                                     public void onError(Throwable e) {
-                                        Log.e("upd",e.getMessage()+"");
+                                        Log.e("upd", e.getMessage() + "");
                                     }
                                 });
 
@@ -415,15 +419,14 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             } else {
                 Toast.makeText(getApplication().getApplicationContext(), R.string.choose_bluetooth_printer, Toast.LENGTH_SHORT).show();
             }
-        }
-        else {
+        } else {
             Toast.makeText(getApplication().getApplicationContext(), R.string.choose_printer, Toast.LENGTH_SHORT).show();
         }
 
 
     }
 
-    public void deletePrinter(PrinterModel printerModel){
+    public void deletePrinter(PrinterModel printerModel) {
         dao.deletePrinter(printerModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -441,7 +444,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("upd",e.getMessage()+"");
+                        Log.e("upd", e.getMessage() + "");
                     }
                 });
 
@@ -503,7 +506,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
 
             try {
-                printUtils.connectPrinter(this, getBluetoothDevice().getValue(), paper_width, activity, lang);
+                printUtils.connectPrinter(this, false, getBluetoothDevice().getValue(), paper_width, activity, lang);
 
 
             } catch (Exception e) {
@@ -528,7 +531,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
 
             try {
-                printUtils.connectPrinter(this, getBluetoothDevice().getValue(), paper_width, activity, lang);
+                printUtils.connectPrinter(this, true, getBluetoothDevice().getValue(), paper_width, activity, lang);
 
 
             } catch (Exception e) {
@@ -557,11 +560,12 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
 
     @Override
-    public void onConnected() {
+    public void onConnected(boolean printKitchen) {
         Toast.makeText(getApplication().getApplicationContext(), "connected", Toast.LENGTH_SHORT).show();
-        if (printOrder){
+        if (printKitchen) {
             printTestBluetoothOrderData();
-        }else {
+
+        } else {
             printTestBluetoothData();
 
         }
@@ -582,26 +586,86 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
     }
 
     private void printTestBluetoothData() {
-        if (lang.equals("ar")) {
-            printArBluetoothTest();
-        } else {
-            printEnBluetoothTest();
+
+        if (model.getData().getInvoiceSettings()!=null&&model.getData().getInvoiceSettings().getPrinted_receipts()!=null){
+
+            Glide.with(getApplication().getApplicationContext())
+                    .asBitmap()
+                    .load(Uri.parse(Tags.base_url+model.getData().getInvoiceSettings().getPrinted_receipts()))
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            if (lang.equals("ar")) {
+                                printArBluetoothTest(resource);
+                            } else {
+                                printEnBluetoothTest(resource);
+                            }
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            if (lang.equals("ar")) {
+                                printArBluetoothOrderTest(null);
+                            } else {
+                                printEnBluetoothOrderTest(null);
+                            }
+                        }
+                    });
+
+        }else {
+            if (lang.equals("ar")) {
+                printArBluetoothTest(null);
+            } else {
+                printEnBluetoothTest(null);
+            }
         }
+
+
 
 
     }
 
     private void printTestBluetoothOrderData() {
-        if (lang.equals("ar")) {
-            printArBluetoothOrderTest();
-        } else {
-            printEnBluetoothOrderTest();
+        if (model.getData().getInvoiceSettings()!=null&&model.getData().getInvoiceSettings().getPrinted_receipts()!=null){
+
+            Glide.with(getApplication().getApplicationContext())
+                    .asBitmap()
+                    .load(Uri.parse(Tags.base_url+model.getData().getInvoiceSettings().getPrinted_receipts()))
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            if (lang.equals("ar")) {
+                                printArBluetoothOrderTest(resource);
+                            } else {
+                                printEnBluetoothOrderTest(resource);
+                            }
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            if (lang.equals("ar")) {
+                                printArBluetoothOrderTest(null);
+                            } else {
+                                printEnBluetoothOrderTest(null);
+                            }
+                        }
+                    });
+
+        }else {
+            if (lang.equals("ar")) {
+                printArBluetoothOrderTest(null);
+            } else {
+                printEnBluetoothOrderTest(null);
+            }
         }
+
 
 
     }
 
-    private void printArBluetoothTest() {
+    private void printArBluetoothTest(Bitmap logo) {
 
         try {
             //Log.e("ddd",model.getData().getSelectedWereHouse().getName()+"___"+model.getData().getSelectedWereHouse().getTax_number()+"__"+model.getData().getSelectedUser().getName()+"__"+model.getData().getSelectedPos().getTitle());
@@ -648,7 +712,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             printUtils.addItem(40.0f, true, "شكرا لزيارتكم", PrintUtils.ALIGN_CENTER);
             printUtils.addLineWithHeight(50);
 
-            Bitmap bitmap = printUtils.printTestData(model,false);
+            Bitmap bitmap = printUtils.printTestData(model, false, logo);
        /* binding.flPrintTest.setVisibility(View.VISIBLE);
         binding.layoutPrint.image.setImageBitmap(bitmap);*/
             printUtils.clear();
@@ -660,7 +724,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
     }
 
-    private void printEnBluetoothTest() {
+    private void printEnBluetoothTest(Bitmap logo) {
 
         printUtils.addLineWithHeight(50);
         printUtils.addItem(28.0f, true, "Midad", PrintUtils.ALIGN_CENTER);
@@ -705,18 +769,17 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
         printUtils.addItem(40.0f, true, "Thank you", PrintUtils.ALIGN_CENTER);
         printUtils.addLineWithHeight(50);
 
-        Bitmap bitmap = printUtils.printTestData(model,false);
+        Bitmap bitmap = printUtils.printTestData(model, false, logo);
     }
 
-
-    private void printArBluetoothOrderTest() {
+    private void printArBluetoothOrderTest(Bitmap logo) {
 
         try {
             //Log.e("ddd",model.getData().getSelectedWereHouse().getName()+"___"+model.getData().getSelectedWereHouse().getTax_number()+"__"+model.getData().getSelectedUser().getName()+"__"+model.getData().getSelectedPos().getTitle());
             printUtils.addLineWithHeight(50);
             printUtils.addItem(28.0f, true, "مداد", PrintUtils.ALIGN_CENTER);
-            printUtils.addItem(28.0f, false, "طلب" + "#" , PrintUtils.ALIGN_CENTER);
-            printUtils.addItem(28.0f, false, "تاريخ الطلب" + getNow() , PrintUtils.ALIGN_CENTER);
+            printUtils.addItem(28.0f, false, "طلب" + "#", PrintUtils.ALIGN_CENTER);
+            printUtils.addItem(28.0f, false, "تاريخ الطلب" + getNow(), PrintUtils.ALIGN_CENTER);
             printUtils.addLineWithHeight(50);
 
             printUtils.addLineSeparator();
@@ -728,7 +791,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             printUtils.addRowItem(25.0f, false, "عنصر2", "X2", PrintUtils.ALIGN_RIGHT);
             printUtils.addLineWithHeight(50);
 
-            Bitmap bitmap = printUtils.printTestData(model,true);
+            Bitmap bitmap = printUtils.printTestData(model, true, logo);
        /* binding.flPrintTest.setVisibility(View.VISIBLE);
         binding.layoutPrint.image.setImageBitmap(bitmap);*/
             printUtils.clear();
@@ -740,14 +803,14 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
 
     }
 
-    private void printEnBluetoothOrderTest() {
+    private void printEnBluetoothOrderTest(Bitmap logo) {
 
         try {
             //Log.e("ddd",model.getData().getSelectedWereHouse().getName()+"___"+model.getData().getSelectedWereHouse().getTax_number()+"__"+model.getData().getSelectedUser().getName()+"__"+model.getData().getSelectedPos().getTitle());
             printUtils.addLineWithHeight(50);
             printUtils.addItem(28.0f, true, "Midad", PrintUtils.ALIGN_CENTER);
-            printUtils.addItem(28.0f, false, "OrderNum" + "#" , PrintUtils.ALIGN_CENTER);
-            printUtils.addItem(28.0f, false, "Date:" + getNow() , PrintUtils.ALIGN_CENTER);
+            printUtils.addItem(28.0f, false, "OrderNum" + "#", PrintUtils.ALIGN_CENTER);
+            printUtils.addItem(28.0f, false, "Date:" + getNow(), PrintUtils.ALIGN_CENTER);
 
             printUtils.addLineWithHeight(50);
 
@@ -760,7 +823,7 @@ public class AddPrinterMvvm extends AndroidViewModel implements PrintUtils.Print
             printUtils.addRowItem(25.0f, false, "item2", "X2", PrintUtils.ALIGN_RIGHT);
             printUtils.addLineWithHeight(50);
 
-            Bitmap bitmap = printUtils.printTestData(model,true);
+            Bitmap bitmap = printUtils.printTestData(model, true, logo);
        /* binding.flPrintTest.setVisibility(View.VISIBLE);
         binding.layoutPrint.image.setImageBitmap(bitmap);*/
             printUtils.clear();

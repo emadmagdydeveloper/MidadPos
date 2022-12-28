@@ -4,14 +4,21 @@ import android.app.Application;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.telephony.SignalStrength;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.midad_app_pos.R;
 import com.midad_app_pos.database.AppDatabase;
 import com.midad_app_pos.database.DAO;
@@ -22,13 +29,13 @@ import com.midad_app_pos.model.CountryModel;
 import com.midad_app_pos.model.CustomerDataModel;
 import com.midad_app_pos.model.CustomerModel;
 import com.midad_app_pos.model.DiscountModel;
+import com.midad_app_pos.model.InvoiceIdsModel;
 import com.midad_app_pos.model.ItemModel;
 import com.midad_app_pos.model.ModifierModel;
 import com.midad_app_pos.model.PaymentDataModel;
 import com.midad_app_pos.model.PaymentModel;
 import com.midad_app_pos.model.PrinterModel;
 import com.midad_app_pos.model.SingleCustomerModel;
-import com.midad_app_pos.model.StatusResponse;
 import com.midad_app_pos.model.UserModel;
 import com.midad_app_pos.model.cart.CartList;
 import com.midad_app_pos.model.cart.CartModel;
@@ -791,7 +798,6 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
         return 0.0;
     }
 
-
     public double getTotalPaidPrice() {
         if (getSplitList().getValue() != null) {
             double total = 0.0;
@@ -937,7 +943,7 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
 
     }
 
-    public void addTicket(Context context, boolean withSplit) {
+    public void addTicket(AppCompatActivity context, boolean withSplit) {
         ProgressDialog dialog = Common.createProgressDialog(context, context.getString(R.string.wait));
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
@@ -1051,24 +1057,52 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
                     .storeOrder(cartModel)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new SingleObserver<Response<StatusResponse>>() {
+                    .subscribe(new SingleObserver<Response<InvoiceIdsModel>>() {
                         @Override
                         public void onSubscribe(Disposable d) {
                             disposable.add(d);
                         }
 
                         @Override
-                        public void onSuccess(Response<StatusResponse> response) {
+                        public void onSuccess(Response<InvoiceIdsModel> response) {
                             dialog.dismiss();
                             if (response.isSuccessful()) {
                                 if (response.body() != null) {
 
                                     Log.e(TAG, response.body().getStatus() + "" + response.body().getMessage().toString());
 
+
                                     if (response.body().getStatus() == 200) {
                                         manageCartModel.clearCart(context);
                                         //getOnTicketAddedSuccess().setValue(true);
-                                        print(cartModel);
+
+                                        if (userModel.getData().getInvoiceSettings() != null && userModel.getData().getInvoiceSettings().getPrinted_receipts() != null) {
+                                            Glide.with(context)
+                                                    .asBitmap()
+                                                    .load(Uri.parse(Tags.base_url + userModel.getData().getInvoiceSettings().getPrinted_receipts()))
+                                                    .into(new SimpleTarget<Bitmap>() {
+                                                        @Override
+                                                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                                            print(context, cartModel, resource, response.body().getData());
+                                                            Log.e("logo", "success");
+                                                        }
+
+                                                        @Override
+                                                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                                            super.onLoadFailed(errorDrawable);
+                                                            Log.e("logo", "failed");
+                                                            print(context, cartModel, null, response.body().getData());
+                                                        }
+                                                    });
+
+                                        } else {
+                                            Log.e("logo", "null");
+
+                                            print(context, cartModel, null, response.body().getData());
+
+                                        }
+
+
                                     }
 
                                 }
@@ -1101,30 +1135,63 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
         }
     }
 
-    private void print(CartModel cartModel) {
+    private void print(AppCompatActivity context, CartModel cartModel, Bitmap logo, List<Integer> ids) {
         printUtils = new PrintUtils(this);
 
         if (getPrinters().getValue() != null && getPrinters().getValue().size() > 0) {
             for (PrinterModel printerModel : getPrinters().getValue()) {
                 if (printerModel.getPrinter_type().equals("sunmi") && printerModel.isCanPrintAutomatic()) {
                     int paper = 2;
-                    if (printerModel.getPaperWidth().equalsIgnoreCase("80")) {
-                    } else {
+                    if (printerModel.getPaperWidth().equalsIgnoreCase("58")) {
                         paper = 1;
                     }
                     SunmiPrintHelper.getInstance().initPrinter();
-                    SunmiPrintHelper.getInstance().printInvoice(getApplication().getApplicationContext(),userModel, paper, lang, cartModel, 0);
-                }else if (printerModel.getPrinter_type().equals("other")){
+                    SunmiPrintHelper.getInstance().printInvoice(getApplication().getApplicationContext(), userModel, paper, lang, cartModel, ids, logo);
+                } else if (printerModel.getPrinter_type().equals("other")&& printerModel.isCanPrintAutomatic()) {
+                    BluetoothDevice bluetoothDevice = printUtils.getBluetoothDeviceByMacAddress(printerModel.getBluetooth_mac_address(), context);
+                    int paperWidth = 576;
+                    if (printerModel.getPaperWidth().equals("58")) {
+                        paperWidth = 385;
+                    }
+                    if (bluetoothDevice != null) {
+                        printUtils.connectPrinter(this, false, bluetoothDevice, paperWidth, context, lang);
+                        try {
+                            if (lang.equals("ar")) {
+                                printArBluetoothInvoice(cartModel, ids, logo);
+                            } else {
+                                printEnBluetoothInvoice(cartModel, ids, logo);
 
-                }else if (printerModel.getPrinter_type().equals("kitchen")){
+                            }
+                        } catch (Exception e) {
 
+                        }
+                    }
+                } else if (printerModel.getPrinter_type().equals("kitchen")&& printerModel.isCanPrintAutomatic()) {
+                    BluetoothDevice bluetoothDevice = printUtils.getBluetoothDeviceByMacAddress(printerModel.getBluetooth_mac_address(), context);
+                    int paperWidth = 576;
+                    if (printerModel.getPaperWidth().equals("58")) {
+                        paperWidth = 385;
+                    }
+                    if (bluetoothDevice != null) {
+                        printUtils.connectPrinter(this, false, bluetoothDevice, paperWidth, context, lang);
+                        try {
+                            if (lang.equals("ar")) {
+                            } else {
+
+                            }
+                        } catch (Exception e) {
+
+                        }
+                    }
                 }
+
+                getOnTicketAddedSuccess().setValue(true);
+
             }
         } else {
             getOnTicketAddedSuccess().setValue(true);
         }
     }
-
 
     private String getDate() {
         return String.valueOf(new Date().getTime());
@@ -1135,8 +1202,153 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
         return "Ticket - " + simpleDateFormat.format(new Date());
     }
 
+    private void printArBluetoothInvoice(CartModel cartModel, List<Integer> ids, Bitmap logo) {
+
+        int index = 0;
+        for (CartModel.Cart cart : cartModel.getData()) {
+            int invoice_id = ids.get(index);
+            try {
+                String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH).format(cart.getDate());
+                //Log.e("ddd",model.getData().getSelectedWereHouse().getName()+"___"+model.getData().getSelectedWereHouse().getTax_number()+"__"+model.getData().getSelectedUser().getName()+"__"+model.getData().getSelectedPos().getTitle());
+                printUtils.addLineWithHeight(50);
+                printUtils.addItem(28.0f, true, (userModel.getData().getSelectedUser() != null ? userModel.getData().getSelectedUser().getCompany_name() : "مداد"), PrintUtils.ALIGN_CENTER);
+                printUtils.addItem(28.0f, false, "الرقم الضريبي" + ":" + (userModel.getData().getSelectedWereHouse() != null ? (userModel.getData().getSelectedWereHouse().getTax_number() != null ? userModel.getData().getSelectedWereHouse().getTax_number() : "") : ""), PrintUtils.ALIGN_CENTER);
+                printUtils.addItem(28.0f, false, (userModel.getData().getSelectedWereHouse() != null ? (userModel.getData().getSelectedWereHouse().getName() != null ? userModel.getData().getSelectedWereHouse().getName() : "") : ""), PrintUtils.ALIGN_CENTER);
+                printUtils.addItem(28.0f, false, "فاتورة ضريبية مبسطة", PrintUtils.ALIGN_CENTER);
+                printUtils.addLineWithHeight(50);
+                printUtils.addItem(28.0f, false, "رقم الإيصال:#" + invoice_id, PrintUtils.ALIGN_RIGHT);
+                printUtils.addItem(28.0f, false, "التاريخ:" + date, PrintUtils.ALIGN_RIGHT);
+                printUtils.addItem(28.0f, false, "امين الصندوق:" + (userModel.getData().getSelectedUser() != null ? (userModel.getData().getSelectedUser().getName() != null ? userModel.getData().getSelectedUser().getName() : "") : ""), PrintUtils.ALIGN_RIGHT);
+                printUtils.addItem(28.0f, false, "نقطة بيع:" + (userModel.getData().getSelectedPos() != null ? (userModel.getData().getSelectedPos().getTitle() != null ? userModel.getData().getSelectedPos().getTitle() : "") : ""), PrintUtils.ALIGN_RIGHT);
+                printUtils.addLineWithHeight(100);
+                if (cart.getDelivery_name() != null && !cart.getDelivery_name().isEmpty()) {
+                    printUtils.addLineSeparator();
+                    printUtils.addLineWithHeight(15);
+                    printUtils.addItem(28.0f, false, cart.getDelivery_name(), PrintUtils.ALIGN_RIGHT);
+
+                }
+
+                printUtils.addLineWithHeight(50);
+                printUtils.addLineSeparator();
+                printUtils.addLineWithHeight(15);
+
+                for (CartModel.Detail detail : cart.getDetails()) {
+                    String text1 = detail.getProduct_name();
+                    String text2 = detail.getTotalPrice();
+                    String amount = detail.getQty() + "X" + detail.getNet_unit_price();
+
+                    printUtils.addRowItem(25.0f, false, text1, text2, PrintUtils.ALIGN_RIGHT);
+                    printUtils.addItem(25.0f, true, amount, PrintUtils.ALIGN_RIGHT);
+                    printUtils.addLineWithHeight(8);
+
+                }
+
+
+                printUtils.addLineWithHeight(50);
+                printUtils.addLineSeparator();
+                printUtils.addLineWithHeight(15);
+                printUtils.addRowItem(30.0f, true, "الإجمالى قبل الضريبة", String.format(Locale.US, "%.2f", cart.getTotal_price()), PrintUtils.ALIGN_RIGHT);
+
+                printUtils.addLineWithHeight(50);
+                printUtils.addLineSeparator();
+                printUtils.addLineWithHeight(15);
+
+                printUtils.addRowItem(30.0f, true, "الإجمالى شامل الضريبة", String.format(Locale.US, "%.2f", cart.getGrand_total()), PrintUtils.ALIGN_RIGHT);
+
+                printUtils.addLineWithHeight(50);
+                printUtils.addLineSeparator();
+                printUtils.addLineWithHeight(15);
+
+                printUtils.addItem(40.0f, true, userModel.getData().getInvoiceSettings() != null ? userModel.getData().getInvoiceSettings().getFooter() : "", PrintUtils.ALIGN_CENTER);
+                printUtils.addLineWithHeight(50);
+
+                Bitmap bitmap = printUtils.printTestData(userModel, false, logo);
+       /* binding.flPrintTest.setVisibility(View.VISIBLE);
+        binding.layoutPrint.image.setImageBitmap(bitmap);*/
+                printUtils.clear();
+                index++;
+            } catch (Exception e) {
+
+                Toast.makeText(getApplication().getApplicationContext(), e.getMessage() + "_", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+    }
+
+    private void printEnBluetoothInvoice(CartModel cartModel, List<Integer> ids, Bitmap logo) {
+
+        int index = 0;
+        for (CartModel.Cart cart : cartModel.getData()) {
+            int invoice_id = ids.get(index);
+            try {
+                String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH).format(cart.getDate());
+                printUtils.addLineWithHeight(50);
+                printUtils.addItem(28.0f, true, (userModel.getData().getSelectedUser() != null ? userModel.getData().getSelectedUser().getCompany_name() : "Midad"), PrintUtils.ALIGN_CENTER);
+                printUtils.addItem(28.0f, false, "VAT" + ":" + (userModel.getData().getSelectedWereHouse() != null ? (userModel.getData().getSelectedWereHouse().getTax_number() != null ? userModel.getData().getSelectedWereHouse().getTax_number() : "") : ""), PrintUtils.ALIGN_CENTER);
+                printUtils.addItem(28.0f, false, (userModel.getData().getSelectedWereHouse() != null ? (userModel.getData().getSelectedWereHouse().getName() != null ? userModel.getData().getSelectedWereHouse().getName() : "") : ""), PrintUtils.ALIGN_CENTER);
+                printUtils.addItem(28.0f, false, "Simplified tax invoice", PrintUtils.ALIGN_CENTER);
+                printUtils.addLineWithHeight(50);
+                printUtils.addItem(28.0f, false, "Receipt:#" + invoice_id, PrintUtils.ALIGN_RIGHT);
+                printUtils.addItem(28.0f, false, "Date:" + date, PrintUtils.ALIGN_RIGHT);
+                printUtils.addItem(28.0f, false, "Cashier:" + (userModel.getData().getSelectedUser() != null ? (userModel.getData().getSelectedUser().getName() != null ? userModel.getData().getSelectedUser().getName() : "") : ""), PrintUtils.ALIGN_RIGHT);
+                printUtils.addItem(28.0f, false, "POS:" + (userModel.getData().getSelectedPos() != null ? (userModel.getData().getSelectedPos().getTitle() != null ? userModel.getData().getSelectedPos().getTitle() : "") : ""), PrintUtils.ALIGN_RIGHT);
+
+                if (cart.getDelivery_name() != null && !cart.getDelivery_name().isEmpty()) {
+                    printUtils.addLineSeparator();
+                    printUtils.addLineWithHeight(15);
+                    printUtils.addItem(28.0f, false, cart.getDelivery_name(), PrintUtils.ALIGN_RIGHT);
+
+                }
+                printUtils.addLineWithHeight(50);
+                printUtils.addLineSeparator();
+                printUtils.addLineWithHeight(15);
+
+                for (CartModel.Detail detail : cart.getDetails()) {
+                    String text1 = detail.getProduct_name();
+                    String text2 = detail.getTotalPrice();
+                    String amount = detail.getQty() + "X" + detail.getNet_unit_price();
+
+                    printUtils.addRowItem(25.0f, false, text1, text2, PrintUtils.ALIGN_RIGHT);
+                    printUtils.addItem(25.0f, true, amount, PrintUtils.ALIGN_RIGHT);
+                    printUtils.addLineWithHeight(8);
+
+                }
+                printUtils.addLineWithHeight(50);
+                printUtils.addLineSeparator();
+                printUtils.addLineWithHeight(15);
+                printUtils.addRowItem(30.0f, true, "Total before tax", String.format(Locale.US, "%.2f", cart.getTotal_price()), PrintUtils.ALIGN_RIGHT);
+
+                printUtils.addLineWithHeight(50);
+                printUtils.addLineSeparator();
+                printUtils.addLineWithHeight(15);
+
+                printUtils.addRowItem(30.0f, true, "Total with tax", String.format(Locale.US, "%.2f", cart.getGrand_total()), PrintUtils.ALIGN_RIGHT);
+
+                printUtils.addLineWithHeight(50);
+                printUtils.addLineSeparator();
+                printUtils.addLineWithHeight(15);
+
+                printUtils.addItem(40.0f, true, userModel.getData().getInvoiceSettings() != null ? userModel.getData().getInvoiceSettings().getFooter() : "", PrintUtils.ALIGN_CENTER);
+                printUtils.addLineWithHeight(50);
+
+
+                Bitmap bitmap = printUtils.printTestData(userModel, false, logo);
+       /* binding.flPrintTest.setVisibility(View.VISIBLE);
+        binding.layoutPrint.image.setImageBitmap(bitmap);*/
+                printUtils.clear();
+                index++;
+            } catch (Exception e) {
+
+                Toast.makeText(getApplication().getApplicationContext(), e.getMessage() + "_", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+    }
+
     @Override
-    public void onConnected() {
+    public void onConnected(boolean printKitchen) {
 
     }
 
@@ -1154,4 +1366,6 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
     public void onStartIntent() {
 
     }
+
+
 }

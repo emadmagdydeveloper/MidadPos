@@ -117,7 +117,42 @@ public class PrintUtils {
 
     }
 
-    public void connectPrinter(final PrinterConnectListener listener,BluetoothDevice printer,int paperWidth,Context context,String lang) {
+    @SuppressLint("MissingPermission")
+    public BluetoothDevice getBluetoothDeviceByMacAddress(String mac, AppCompatActivity context) {
+        try {
+            BluetoothManager bluetoothManager = null;
+            BluetoothAdapter bluetoothAdapter = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                bluetoothManager = context.getSystemService(BluetoothManager.class);
+                bluetoothAdapter = bluetoothManager.getAdapter();
+            } else {
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            }
+
+
+            if (bluetoothAdapter == null) {
+                Toast.makeText(context, "Device not support bluetooth", Toast.LENGTH_SHORT).show();
+                return null;
+            }
+
+            if (bluetoothAdapter.isEnabled()) {
+                return bluetoothAdapter.getRemoteDevice(mac);
+            } else {
+                response.onStartIntent();
+                Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                context.startActivityForResult(enableBT, 0);
+            }
+
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+    public void connectPrinter(final PrinterConnectListener listener, boolean printKitchen, BluetoothDevice printer, int paperWidth, Context context, String lang) {
         this.paperWidth = paperWidth;
         this.context = context;
         this.lang = lang;
@@ -128,7 +163,7 @@ public class PrintUtils {
                 btSocket = socket;
                 try {
                     btOutputStream = socket.getOutputStream();
-                    listener.onConnected();
+                    listener.onConnected(printKitchen);
                 } catch (IOException e) {
                     listener.onFailed();
                 }
@@ -191,7 +226,7 @@ public class PrintUtils {
     }
 
     public interface PrinterConnectListener {
-        void onConnected();
+        void onConnected(boolean printKitchen);
 
         void onFailed();
     }
@@ -199,7 +234,6 @@ public class PrintUtils {
     public boolean isConnected() {
         return btSocket != null && btSocket.isConnected();
     }
-
 
 
     public boolean printText(String text) {
@@ -320,31 +354,29 @@ public class PrintUtils {
         return printUnicode(command);
     }
 
-    public void printBitmap(Bitmap bitmap){
+    public void printBitmap(Bitmap bitmap) {
         try {
-            byte[]  bitmapData = PrintPicture.Print_1D2A(bitmap);
+            byte[] bitmapData = PrintPicture.Print_1D2A(bitmap);
             btOutputStream.write(bitmapData);
 
             //btOutputStream.write(BytesUtil.getBytesFromBitMap(bitmap));
-        }catch (Exception e){
-            Toast.makeText(context, e.getMessage()+"__", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context, e.getMessage() + "__", Toast.LENGTH_SHORT).show();
         }
     }
 
 
-
-
-    public boolean printMultiLangText(String stringData, Paint.Align align, float textSize)  {
+    public boolean printMultiLangText(String stringData, Paint.Align align, float textSize) {
         return printMultiLangText(stringData, align, textSize, null);
     }
 
-    public boolean printMultiLangText(String stringData, Paint.Align align, float textSize, Typeface typeface)  {
+    public boolean printMultiLangText(String stringData, Paint.Align align, float textSize, Typeface typeface) {
         return printImage(getMultiLangTextAsImage(stringData, align, textSize, typeface));
     }
 
 
     public boolean printBarCode(String message, BarcodeFormat format, int width, int height) throws WriterException {
-        return printImage(createBarCode( message,  format,  width,  height));
+        return printImage(createBarCode(message, format, width, height));
     }
 
     public static byte[] decodeBitmap(Bitmap bmp) {
@@ -469,145 +501,12 @@ public class PrintUtils {
     }
 
 
-    public Bitmap getMultiLangTextAsImage(String text, Paint.Align align, float textSize, Typeface typeface)  {
-/*
-
-
-        Paint paint = new Paint();
-
-        paint.setAntiAlias(true);
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(textSize);
-        if (typeface != null) paint.setTypeface(typeface);
-
-        // A real printlabel width (pixel)
-        float xWidth = 385;
-
-        // A height per text line (pixel)
-        float xHeight = textSize + 5;
-
-        // it can be changed if the align's value is CENTER or RIGHT
-        float xPos = 0f;
-
-        // If the original string data's length is over the width of print label,
-        // or '\n' character included,
-        // it will be increased per line gerneating.
-        float yPos = 27f;
-
-        // If the original string data's length is over the width of print label,
-        // or '\n' character included,
-        // each lines splitted from the original string are added in this list
-        // 'PrintData' class has 3 members, x, y, and splitted string data.
-        List<PrintData> printDataList = new ArrayList<PrintData>();
-
-        // if '\n' character included in the original string
-        String[] tmpSplitList = text.split("\\n");
-        for (int i = 0; i <= tmpSplitList.length - 1; i++) {
-            String tmpString = tmpSplitList[i];
-
-            // calculate a width in each split string item.
-            float widthOfString = paint.measureText(tmpString);
-
-            // If the each split string item's length is over the width of print label,
-            if (widthOfString > xWidth) {
-                String lastString = tmpString;
-                while (!lastString.isEmpty()) {
-
-                    String tmpSubString = "";
-
-                    // retrieve repeatedly until each split string item's length is
-                    // under the width of print label
-                    while (widthOfString > xWidth) {
-                        if (tmpSubString.isEmpty())
-                            tmpSubString = lastString.substring(0, lastString.length() - 1);
-                        else
-                            tmpSubString = tmpSubString.substring(0, tmpSubString.length() - 1);
-
-                        widthOfString = paint.measureText(tmpSubString);
-                    }
-
-                    // this each split string item is finally done.
-                    if (tmpSubString.isEmpty()) {
-                        // this last string to print is need to adjust align
-                        if (align == Paint.Align.CENTER) {
-                            if (widthOfString < xWidth) {
-                                xPos = ((xWidth - widthOfString) / 2);
-                            }
-                        } else if (align == Paint.Align.RIGHT) {
-                            if (widthOfString < xWidth) {
-                                xPos = xWidth - widthOfString;
-                            }
-                        }
-                        //printDataList.add(new PrintData(xPos, yPos, lastString));
-                        lastString = "";
-                    } else {
-                        // When this logic is reached out here, it means,
-                        // it's not necessary to calculate the x position
-                        // 'cause this string line's width is almost the same
-                        // with the width of print label
-                       // printDataList.add(new PrintData(0f, yPos, tmpSubString));
-
-                        // It means line is needed to increase
-                        yPos += 27;
-                        xHeight += 30;
-
-                        lastString = lastString.replaceFirst(tmpSubString, "");
-                        widthOfString = paint.measureText(lastString);
-                    }
-                }
-            } else {
-                // This split string item's length is
-                // under the width of print label already at first.
-                if (align == Paint.Align.CENTER) {
-                    if (widthOfString < xWidth) {
-                        xPos = ((xWidth - widthOfString) / 2);
-                    }
-                } else if (align == Paint.Align.RIGHT) {
-                    if (widthOfString < xWidth) {
-                        xPos = xWidth - widthOfString;
-                    }
-                }
-                //printDataList.add(new PrintData(xPos, yPos, tmpString));
-            }
-
-            if (i != tmpSplitList.length - 1) {
-                // It means the line is needed to increase
-                yPos += 27;
-                xHeight += 30;
-            }
-        }
-
-        // If you want to print the text bold
-        //paint.setTypeface(Typeface.create(null as String?, Typeface.BOLD))
-
-        // create bitmap by calculated width and height as upper.
-        Bitmap bm = Bitmap.createBitmap((int) xWidth, (int) xHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bm);
-        canvas.drawColor(Color.WHITE);
-
-        for (PrintData tmpItem : printDataList)
-            canvas.drawText(tmpItem.text, tmpItem.xPos, tmpItem.yPos, paint);
-*/
+    public Bitmap getMultiLangTextAsImage(String text, Paint.Align align, float textSize, Typeface typeface) {
 
 
         return null;
     }
 
-    /*public void printArabic(){
-        if (btOutputStream!=null){
-            byte [] data = new byte[]{(byte) 0xa8, (byte) 0xe4, (byte) 0xd3, (byte) 0xfa, (byte) 0xe5};
-            try {
-                btOutputStream.write(data);
-                btOutputStream.flush();
-                cut();
-                finish();
-            } catch (IOException e) {
-
-
-            }
-        }
-    }
-    */
     static class PrintData {
         private float xPos;
         private float yPos;
@@ -615,7 +514,7 @@ public class PrintUtils {
         private Paint paint;
 
 
-        public PrintData(float xPos, float yPos, String text,Paint paint) {
+        public PrintData(float xPos, float yPos, String text, Paint paint) {
             this.xPos = xPos;
             this.yPos = yPos;
             this.text = text;
@@ -695,8 +594,8 @@ public class PrintUtils {
         }
     }
 
-    private void cut(){
-        if (btOutputStream!=null){
+    private void cut() {
+        if (btOutputStream != null) {
             byte[] cut = new byte[]{0x1d, 0x56, 0x01};
             try {
                 btOutputStream.write(cut);
@@ -707,7 +606,7 @@ public class PrintUtils {
         }
     }
 
-    public void addItem(float textSize, boolean isBold, String text, int align){
+    public void addItem(float textSize, boolean isBold, String text, int align) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         paint.setAntiAlias(true);
         paint.setColor(Color.BLACK);
@@ -715,31 +614,29 @@ public class PrintUtils {
         Rect rect = new Rect();
         paint.getTextBounds(text, 0, text.length(), rect);
 
-        float dx =0;
-        if (align==ALIGN_CENTER){
-            dx = (float) ((paperWidth-rect.width())/2.0);
+        float dx = 0;
+        if (align == ALIGN_CENTER) {
+            dx = (float) ((paperWidth - rect.width()) / 2.0);
 
-        }else if (align==ALIGN_LEFT){
+        } else if (align == ALIGN_LEFT) {
             dx = 0;
-        }else {
-            dx = (paperWidth-rect.width())-40;
+        } else {
+            dx = (paperWidth - rect.width()) - 40;
         }
-        if (isBold){
+        if (isBold) {
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         }
 
 
-
-
-        paper_height +=rect.height()+10;
-        paperYPos +=rect.height()+10;
-        printDataList.add(new PrintData(dx, paperYPos,text,paint));
+        paper_height += rect.height() + 10;
+        paperYPos += rect.height() + 10;
+        printDataList.add(new PrintData(dx, paperYPos, text, paint));
 
 
     }
 
-    public void addRowItem(float textSize, boolean isBold, String text1,String text2, int align){
+    public void addRowItem(float textSize, boolean isBold, String text1, String text2, int align) {
         Paint paint1 = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         paint1.setAntiAlias(true);
         paint1.setColor(Color.BLACK);
@@ -754,34 +651,34 @@ public class PrintUtils {
         Rect rect2 = new Rect();
         paint2.getTextBounds(text1, 0, text2.length(), rect2);
 
-        float dx1 =0;
-        float dx2 =0;
-        if (isBold){
+        float dx1 = 0;
+        float dx2 = 0;
+        if (isBold) {
             paint1.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             paint2.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         }
 
 
-        if (align==ALIGN_LEFT){
-            dx1 =40;
-            dx2 = (paperWidth-rect2.width())-40;
-        }else {
-            dx2 =40;
-            dx1 = (paperWidth-rect1.width())-40;
+        if (align == ALIGN_LEFT) {
+            dx1 = 40;
+            dx2 = (paperWidth - rect2.width()) - 40;
+        } else {
+            dx2 = 40;
+            dx1 = (paperWidth - rect1.width()) - 40;
         }
 
 
-        paper_height +=rect1.height()+10;
-        paperYPos +=rect1.height()+10;
-        printDataList.add(new PrintData(dx1, paperYPos,text1,paint1));
-        printDataList.add(new PrintData(dx2, paperYPos,text2,paint2));
+        paper_height += rect1.height() + 10;
+        paperYPos += rect1.height() + 10;
+        printDataList.add(new PrintData(dx1, paperYPos, text1, paint1));
+        printDataList.add(new PrintData(dx2, paperYPos, text2, paint2));
 
 
     }
 
 
-    public void addLineWithHeight(int height){
+    public void addLineWithHeight(int height) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         paint.setColor(Color.BLACK);
         paint.setAntiAlias(true);
@@ -791,64 +688,78 @@ public class PrintUtils {
         float dx = 0;
 
 
-
-
-        paper_height +=rect.height()+height;
-        paperYPos +=rect.height()+height;
-        printDataList.add(new PrintData(dx, paperYPos," ",paint));
+        paper_height += rect.height() + height;
+        paperYPos += rect.height() + height;
+        printDataList.add(new PrintData(dx, paperYPos, " ", paint));
 
     }
 
-    public void addLineSeparator(){
+    public void addLineSeparator() {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         paint.setColor(Color.BLACK);
         paint.setAntiAlias(true);
         paint.setTextSize(40);
         Rect rect = new Rect();
-        if (paperWidth==576){
-            paint.getTextBounds("   - - - - - - - - - - - - - - - - - - - - - - - -  ", 0,"   - - - - - - - - - - - - - - - - - - - - - - - -  ".length(), rect);
+        if (paperWidth == 576) {
+            paint.getTextBounds("   - - - - - - - - - - - - - - - - - - - - - - - -  ", 0, "   - - - - - - - - - - - - - - - - - - - - - - - -  ".length(), rect);
 
-            paper_height +=rect.height()+10;
-            paperYPos +=rect.height()+10;
-            printDataList.add(new PrintData(0, paperYPos,"   - - - - - - - - - - - - - - - - - - - - - - - -  ",paint));
+            paper_height += rect.height() + 10;
+            paperYPos += rect.height() + 10;
+            printDataList.add(new PrintData(0, paperYPos, "   - - - - - - - - - - - - - - - - - - - - - - - -  ", paint));
 
-        }else {
-            paint.getTextBounds("    - - - - - - - - - - - - - - - -   ", 0,"    - - - - - - - - - - - - - - - -   ".length(), rect);
+        } else {
+            paint.getTextBounds("    - - - - - - - - - - - - - - - -   ", 0, "    - - - - - - - - - - - - - - - -   ".length(), rect);
 
-            paper_height +=rect.height()+10;
-            paperYPos +=rect.height()+10;
-            printDataList.add(new PrintData(0, paperYPos,"    - - - - - - - - - - - - - - - -   ",paint));
+            paper_height += rect.height() + 10;
+            paperYPos += rect.height() + 10;
+            printDataList.add(new PrintData(0, paperYPos, "    - - - - - - - - - - - - - - - -   ", paint));
 
         }
 
     }
 
-    public Bitmap printTestData(UserModel userModel,boolean isOrder){
-        Bitmap b = Bitmap.createBitmap(paperWidth, paper_height+500, Bitmap.Config.ARGB_8888);
+    public Bitmap printTestData(UserModel userModel, boolean isOrder, Bitmap logo) {
+
+
+        Bitmap b = Bitmap.createBitmap(paperWidth, paper_height + 500, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(b);
         Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         bg.setAntiAlias(true);
-        bg.setColor(ContextCompat.getColor(context,R.color.white));
+        bg.setColor(ContextCompat.getColor(context, R.color.white));
         canvas.drawPaint(bg);
         canvas.drawColor(Color.WHITE);
-        for (PrintData printData:printDataList){
+
+
+        if (logo != null) {
+            if (!isOrder) {
+                Matrix matrix = new Matrix();
+                Bitmap scaleLogo = Bitmap.createBitmap(logo, 0, 0, 200, 200, matrix, true);
+                int center = (paperWidth - 200) / 2;
+                canvas.drawBitmap(scaleLogo, center, paperYPos, null);
+
+            }
+
+        }
+
+
+        for (PrintData printData : printDataList) {
             canvas.drawText(printData.getText(), printData.getxPos(), printData.getyPos(), printData.getPaint());
 
         }
 
-        if (!isOrder){
+        if (!isOrder) {
             ZatcaQRCodeGeneration.Builder builder = new ZatcaQRCodeGeneration.Builder();
             builder.sellerName(userModel.getData().getSelectedUser().getName()) // Shawrma House
                     .taxNumber(userModel.getData().getSelectedWereHouse().getTax_number()) // 1234567890
                     .invoiceDate(getNow()) //..> 22/11/2021 03:00 am
-                    .totalAmount(String.format(Locale.US,"%.2f",0.00)) // 100
-                    .taxAmount(String.format(Locale.US,"%.2f",0.00));
+                    .totalAmount(String.format(Locale.US, "%.2f", 0.00)) // 100
+                    .taxAmount(String.format(Locale.US, "%.2f", 0.00));
 
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             try {
-                int center = (paperWidth-300)/2;
+                int center = (paperWidth - 300) / 2;
                 Bitmap Qrcode = barcodeEncoder.encodeBitmap(builder.getBase64(), BarcodeFormat.QR_CODE, 300, 300);
-                canvas.drawBitmap(Qrcode,center,paperYPos,null);
+                canvas.drawBitmap(Qrcode, center, paperYPos, null);
 
             } catch (WriterException e) {
                 e.printStackTrace();
@@ -864,8 +775,8 @@ public class PrintUtils {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.ENGLISH).format(new Date());
     }
 
-    public void clear(){
-        paper_height =0;
+    public void clear() {
+        paper_height = 0;
         paperYPos = 0;
         printDataList = new ArrayList<>();
         finish();
@@ -886,7 +797,7 @@ public class PrintUtils {
 
         int width = newBitmap.getWidth();
         int height = newBitmap.getHeight();
-        int newWidth = (width/8+1)*8;
+        int newWidth = (width / 8 + 1) * 8;
         float scaleWidth = ((float) newWidth) / width;
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, 1);
@@ -1084,6 +995,7 @@ public class PrintUtils {
         }
 
     }
+
     public interface PrintResponse {
         void onDevices(List<BluetoothDevice> list);
 
