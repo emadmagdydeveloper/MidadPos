@@ -629,7 +629,7 @@ public class ChargeActivity extends BaseActivity {
 
     public void choosePayment(PaymentModel paymentModel) {
         mvvm.getPaymentType().setValue(Integer.valueOf(paymentModel.getId()));
-
+        mvvm.getPaymentName().setValue(paymentModel.getName());
         mvvm.getIsPaidShown().setValue(true);
         if (mvvm.getCartListInstance().getValue() != null && mvvm.getPaidAmount().getValue() != null) {
             double remaining = Double.parseDouble(mvvm.getPaidAmount().getValue()) - mvvm.getCartListInstance().getValue().getTotalPrice();

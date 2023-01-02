@@ -411,12 +411,22 @@ public class CartModel implements Serializable {
         private double paid;
         private double remaining;
         private String pay_id;
+        private String name;
 
-        public Payment(double total, double paid, double remaining, String pay_id) {
+        public Payment(String name,double total, double paid, double remaining, String pay_id) {
             this.total = total;
             this.paid = paid;
             this.remaining = remaining;
             this.pay_id = pay_id;
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
 
         public double getTotal() {

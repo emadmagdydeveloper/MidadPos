@@ -265,6 +265,7 @@
     <string name="more_settings_are_available_in_the_back_office">More settings are available in the Back Office</string>
     <string name="go_to_back_office">go to back office</string>
     <string name="got_it">got it</string>
+    <string name="amount_not_avail">Amount is not available</string>
 
     <string-array name="delivery_options">
         <item>@string/in_place</item>

@@ -879,7 +879,7 @@ public class SunmiPrintHelper {
                 String text1 = itemField + index;
                 String text2 = "0.00";
                 String amount = "1X0.00";
-                printRowData(text1, text2, paperWidth - 6, lang);
+                printRowData(text1, text2, paperWidth - 7, lang);
                 printText(amount, lang);
             }
 
@@ -891,7 +891,7 @@ public class SunmiPrintHelper {
                         null);
             }
 
-            printRowWithFontAndStyle(totalBeforeTaxField, "0.00", paperWidth - 6, 25, true, lang);
+            printRowWithFontAndStyle(totalBeforeTaxField, "0.00", paperWidth - 7, 25, true, lang);
 
 
             if (paper == 1) {
@@ -901,7 +901,7 @@ public class SunmiPrintHelper {
                         null);
             }
 
-            printRowWithFontAndStyle(totalWithTaxField, "0.00", paperWidth - 6, 25, true, lang);
+            printRowWithFontAndStyle(totalWithTaxField, "0.00", paperWidth - 7, 25, true, lang);
 
 
             if (paper == 1) {
@@ -944,10 +944,12 @@ public class SunmiPrintHelper {
             sunmiPrinterService.printerInit(null);
             sunmiPrinterService.setAlignment(1, null);
             if (logo!=null){
-                Bitmap scaleLogo = Bitmap.createBitmap(logo,0,0,150,150,new Matrix(),true);
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                scaleLogo.compress(Bitmap.CompressFormat.PNG,0,outputStream);
-                sunmiPrinterService.printBitmap(scaleLogo,null);
+                logo.compress(Bitmap.CompressFormat.PNG,0,outputStream);
+
+                byte [] rv = new byte[]{};
+                sunmiPrinterService.sendRAWData(BytesUtil.byteMerger(rv,ESCUtil.printBitmap(logo,0)),null);
+                //sunmiPrinterService.printBitmap(logo,null);
 
             }
 
@@ -966,6 +968,7 @@ public class SunmiPrintHelper {
                 String posField = "";
                 String totalBeforeTaxField = "";
                 String totalWithTaxField = "";
+                String discounts = "";
 
                 String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss",Locale.ENGLISH).format(Long.parseLong(cart.getDate()));
 
@@ -980,6 +983,7 @@ public class SunmiPrintHelper {
                     posField = "POS :" + model.getData().getSelectedPos().getTitle();
                     totalBeforeTaxField = "Total before tax";
                     totalWithTaxField = "Total with tax";
+                    discounts = "Discounts";
 
                 } else {
                     vatField = "الرقم الضريبي#" + (model.getData().getSelectedWereHouse() != null ? model.getData().getSelectedWereHouse().getTax_number() : "");
@@ -989,9 +993,9 @@ public class SunmiPrintHelper {
                     receiptDateField = "تاريخ الفاتورة :" + date;
                     cashierField = "الكاشير :" + model.getData().getSelectedUser().getName();
                     posField = "نقطة بيع :" + model.getData().getSelectedPos().getTitle();
-                    totalBeforeTaxField = "الإجمالى قبل الضريبة";
-                    totalWithTaxField = "الإجمالي شامل الضريبة";
-
+                    totalBeforeTaxField = "المجموع قبل الضريبة";
+                    totalWithTaxField = "المجموع شامل الضريبة";
+                    discounts = "الخصومات";
 
                 }
                 sunmiPrinterService.setAlignment(1, null);
@@ -1031,7 +1035,7 @@ public class SunmiPrintHelper {
                     String text1 = detail.getProduct_name();
                     String text2 = detail.getTotalPrice();
                     String amount = detail.getQty() + "X" + detail.getNet_unit_price();
-                    printRowData(text1, text2, paperWidth - 5, lang);
+                    printRowData(text1, text2, paperWidth - 7, lang);
                     printText(amount, lang);
                 }
 
@@ -1042,8 +1046,21 @@ public class SunmiPrintHelper {
                             null);
                 }
 
-                printRowWithFontAndStyle(totalBeforeTaxField, String.format(Locale.US, "%.2f", cart.getTotal_price()), paperWidth - 5, 25, true, lang);
+                printRowWithFontAndStyle(totalBeforeTaxField, String.format(Locale.US, "%.2f", cart.getTotal_price()), paperWidth - 7, 22, true, lang);
 
+                for (CartModel.Detail detail : cart.getDetails()) {
+                    if (Double.parseDouble(detail.getTax_rate())!=0){
+                        String text1 = "VAT "+detail.getTax_rate()+"%";
+                        String text2 = String.format(Locale.US,"%.2f",(detail.getQty()*detail.getNet_unit_price())*Double.parseDouble(detail.getTax_rate())/100);
+                        printRowData(text1, text2, paperWidth - 7, lang);
+                    }
+
+                }
+
+                if (cart.getOrder_discount()!=0){
+                    String text2 = String.format(Locale.US,"%.2f",cart.getOrder_discount());
+                    printRowData(discounts, text2, paperWidth - 7, lang);
+                }
 
                 if (paper == 1) {
                     sunmiPrinterService.printText("--------------------------------\n", null);
@@ -1052,7 +1069,12 @@ public class SunmiPrintHelper {
                             null);
                 }
 
-                printRowWithFontAndStyle(totalWithTaxField, String.format(Locale.US, "%.2f", cart.getGrand_total()) , paperWidth - 5, 25, true, lang);
+                printRowWithFontAndStyle(totalWithTaxField, String.format(Locale.US, "%.2f", cart.getGrand_total()) , paperWidth - 7, 28, true, lang);
+                sunmiPrinterService.lineWrap(1,null);
+                for (CartModel.Payment payment :cart.getPayments()){
+                    printRowData(payment.getName(), String.format(Locale.US, "%.2f", payment.getPaid()) , paperWidth - 7, lang);
+
+                }
 
 
                 if (paper == 1) {
@@ -1069,7 +1091,7 @@ public class SunmiPrintHelper {
 
                 }
 
-                sunmiPrinterService.printTextWithFont((model.getData().getInvoiceSettings() != null ? "" : model.getData().getInvoiceSettings().getFooter()) + "\n", null, 30, null);
+                sunmiPrinterService.printTextWithFont((model.getData().getInvoiceSettings() == null ? "\n" : model.getData().getInvoiceSettings().getFooter()) + "\n", null, 30, null);
                 sunmiPrinterService.lineWrap(1, null);
 
                 ZatcaQRCodeGeneration.Builder builder = new ZatcaQRCodeGeneration.Builder();
@@ -1113,9 +1135,9 @@ public class SunmiPrintHelper {
         String data = "";
 
         if (lang.equals("en")) {
-            data = str2 + spaceBetween(str1, str2, (paperWidth - 2)) + str1;
+            data = str2 + spaceBetween(str1, str2, (paperWidth - 3)) + str1;
         } else {
-            data = str1 + spaceBetween(str1, str2, (paperWidth - 2)) + str2;
+            data = str1 + spaceBetween(str1, str2, (paperWidth - 3)) + str2;
 
 
         }
@@ -1150,9 +1172,9 @@ public class SunmiPrintHelper {
         String data = "";
 
         if (lang.equals("en")) {
-            data = str2 + spaceBetween(str1, str2, (paperWidth - 2)) + str1;
+            data = str2 + spaceBetween(str1, str2, (paperWidth - 3)) + str1;
         } else {
-            data = str1 + spaceBetween(str1, str2, (paperWidth - 2)) + str2;
+            data = str1 + spaceBetween(str1, str2, (paperWidth - 3)) + str2;
 
         }
         if (isBold) {

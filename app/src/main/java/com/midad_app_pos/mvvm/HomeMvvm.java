@@ -25,6 +25,7 @@ import com.midad_app_pos.model.DeliveryDataModel;
 import com.midad_app_pos.model.DeliveryModel;
 import com.midad_app_pos.model.HomeIndexModel;
 import com.midad_app_pos.model.InvoiceIdsModel;
+import com.midad_app_pos.model.InvoiceSettingData;
 import com.midad_app_pos.model.InvoiceSettings;
 import com.midad_app_pos.model.ModifierModel;
 import com.midad_app_pos.model.OrderDataModel;
@@ -163,42 +164,35 @@ public class HomeMvvm extends AndroidViewModel {
 
         userModel = Preferences.getInstance().getUserData(getApplication().getApplicationContext());
 
-       /* if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null && userModel.getData().getSelectedWereHouse() != null && userModel.getData().getSelectedPos() != null) {
-            getAdvantageSettings();
-            getCurrentShift();
-        }
+        if (userModel != null && userModel.getData() != null ) {
 
-        if (userModel != null && userModel.getData() != null) {
+            if (userModel.getData().getSelectedUser() != null){
+                getInvoiceSetting();
+                getCategoryData();
 
-            if (userModel.getData().getSelectedUser() != null) {
-                getCategoryData(userModel.getData().getSelectedUser().getId());
+                if (userModel.getData().getSelectedWereHouse() != null && userModel.getData().getSelectedPos() != null){
+                    getAdvantageSettings();
+                    getCurrentShift();
+                }
+                getDining();
+                getDraftTickets();
+                getCustomers();
+            }
 
-            } else {
-                getCategoryData(userModel.getData().getUser().getId());
+            if (!userModel.getData().getUser().isAvailable()){
+                getProfile();
 
             }
 
         }
 
-        if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null) {
-            getDining();
-        }
-
-        if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null) {
-            getDraftTickets();
-        }
-
-        getItemsData();
-
-        if (userModel != null && userModel.getData() != null && userModel.getData().getSelectedUser() != null) {
-            getCustomers();
-        }
-
-
         getDiscountsData();
+        getItemsData();
+        getCartData();
+        getPrinters();
 
-        */
-        if (userModel!=null){
+
+          /*if (userModel!=null){
             getCartData();
             getPrinters();
             if (userModel.getData().getSelectedUser() != null){
@@ -212,11 +206,6 @@ public class HomeMvvm extends AndroidViewModel {
 
             }
 
-        }
-
-
-        /*if (userModel != null && !userModel.getData().getUser().isAvailable()) {
-            //getProfile();
         }*/
 
     }
@@ -687,13 +676,13 @@ public class HomeMvvm extends AndroidViewModel {
 
                                         }
 
-                                        if (response.body().getData().getItems()!=null){
+                                        if (response.body().getData().getItems() != null) {
                                             mainItemList.clear();
                                             mainItemList.addAll(response.body().getData().getItems());
                                             search(getSearchQuery().getValue());
                                         }
 
-                                        if (response.body().getData().getDiscounts()!=null){
+                                        if (response.body().getData().getDiscounts() != null) {
                                             mainDiscountList.clear();
                                             mainDiscountList.addAll(response.body().getData().getDiscounts());
                                             mainItemDiscountList.setValue(response.body().getData().getDiscounts());
@@ -704,13 +693,13 @@ public class HomeMvvm extends AndroidViewModel {
                                             }
                                         }
 
-                                        if (response.body().getData().getDraft_sales()!=null){
+                                        if (response.body().getData().getDraft_sales() != null) {
                                             updateData(response.body().getData().getDraft_sales());
 
                                         }
 
-                                        if (response.body().getData().getReceipt()!=null){
-                                           getInvoiceSettings().setValue(response.body().getData().getReceipt());
+                                        if (response.body().getData().getReceipt() != null) {
+                                            getInvoiceSettings().setValue(response.body().getData().getReceipt());
                                         }
 
 
@@ -927,6 +916,59 @@ public class HomeMvvm extends AndroidViewModel {
                     }
                 });
     }
+    public void getInvoiceSetting() {
+        Api.getService(Tags.base_url)
+                .getReceiptSetting(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Response<InvoiceSettingData>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<InvoiceSettingData> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    getInvoiceSettings().setValue(response.body().getData());
+
+                                } else {
+                                    getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+                                }
+                            } else {
+
+                                getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            }
+                        } else {
+
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                            try {
+                                Log.e(TAG, response.code() + "__" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        if (e.getMessage() != null && (e.getMessage().contains("host") || e.getMessage().contains("connection"))) {
+                            Log.e("error", e.getMessage() + "");
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.check_network));
+                        } else {
+                            getOnError().setValue(getApplication().getApplicationContext().getString(R.string.something_wrong));
+
+                        }
+                    }
+                });
+    }
+
 
     public void getCustomers() {
         getIsCustomerLoading().setValue(true);
@@ -1119,7 +1161,7 @@ public class HomeMvvm extends AndroidViewModel {
         }
     }
 
-    public void getCategoryData(String user_id) {
+    public void getCategoryData() {
         List<CategoryModel> list = new ArrayList<>();
 
         list.add(new CategoryModel(-1, getApplication().getApplicationContext().getString(R.string.all_items)));
@@ -1128,7 +1170,7 @@ public class HomeMvvm extends AndroidViewModel {
         getSelectedCategory().setValue(getSelectedCategory().getValue());
 
         Api.getService(Tags.base_url)
-                .categories(user_id)
+                .categories(userModel.getData().getSelectedUser().getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<CategoryDataModel>>() {
@@ -1858,7 +1900,7 @@ public class HomeMvvm extends AndroidViewModel {
                 }
 
                 itemModel.calculateTotal();
-                CartModel.Detail detail = new CartModel.Detail(itemModel.getId(),itemModel.getName(),itemModel.getTotalPrice()+"", variant_id, itemModel.getAmount(), price, totalDiscount + "", tax_rate + "", itemModel.getComment(), modifiers, discountsItem);
+                CartModel.Detail detail = new CartModel.Detail(itemModel.getId(), itemModel.getName(), itemModel.getTotalPrice() + "", variant_id, itemModel.getAmount(), price, totalDiscount + "", tax_rate + "", itemModel.getComment(), modifiers, discountsItem);
                 detailList.add(detail);
             }
 
@@ -1886,14 +1928,14 @@ public class HomeMvvm extends AndroidViewModel {
             }
 
             String dining_id = null;
-            String diningName ="";
+            String diningName = "";
             if (getSelectedDeliveryOptions().getValue() != null) {
                 dining_id = getSelectedDeliveryOptions().getValue().getId();
                 diningName = getSelectedDeliveryOptions().getValue().getName();
             }
             cartList.setDelivery_id(dining_id);
 
-            CartModel.Cart cart = new CartModel.Cart(getTicketName(), settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), dining_id,diningName, userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
+            CartModel.Cart cart = new CartModel.Cart(getTicketName(), settingModel.getShift_id(), getDate(), cartList.getNetTotalPrice(), cartList.getTotalTaxPrice(), cartList.getTotalDiscountValue(), cartList.getTotalPrice(), dining_id, diningName, userModel.getData().getSelectedPos().getId(), cartList.getSale_id(), sale_status, draft, payments, discounts, detailList);
             List<CartModel.Cart> carts = new ArrayList<>();
             carts.add(cart);
             CartModel cartModel = new CartModel(userModel.getData().getSelectedUser().getId(), userModel.getData().getSelectedWereHouse().getId(), customer_id, userModel.getData().getSelectedPos().getId(), carts);
@@ -1919,6 +1961,9 @@ public class HomeMvvm extends AndroidViewModel {
                                     if (response.body().getStatus() == 200) {
                                         getDraftTickets();
                                         clearCart();
+                                    } else if (response.body().getStatus() == 412) {
+                                        Toast.makeText(context, R.string.amount_not_avail, Toast.LENGTH_SHORT).show();
+
                                     }
 
                                 }

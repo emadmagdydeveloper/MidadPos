@@ -1372,6 +1372,9 @@ public class HomeActivity extends DrawerBaseActivity {
     }
 
     private void navigateToChargeActivity() {
+        baseMvvm.getOnNavigate().setValue(true);
+        mvvm.forNavigation = true;
+        App.navigate = true;
 
         String dining_id = null;
         if (mvvm.getSelectedDeliveryOptions().getValue() != null && mvvm.getCart().getValue() != null) {
@@ -1390,8 +1393,7 @@ public class HomeActivity extends DrawerBaseActivity {
 
 
         }
-        baseMvvm.getOnNavigate().setValue(true);
-        mvvm.forNavigation = true;
+
 
     }
 
@@ -2076,7 +2078,6 @@ public class HomeActivity extends DrawerBaseActivity {
         }
 
 
-
         if (mvvm.showPin){
             showPinCodeView();
         }else {
@@ -2118,6 +2119,7 @@ public class HomeActivity extends DrawerBaseActivity {
             mvvm.forNavigation = false;
 
         }
+
 
         if (mvvm.forNavigation){
             mvvm.showPin = false;

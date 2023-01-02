@@ -1,5 +1,6 @@
 package com.midad_app_pos.mvvm;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -54,6 +56,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -76,6 +79,8 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
     private MutableLiveData<String> paidAmount;
     private MutableLiveData<Boolean> isPaidShown;
     private MutableLiveData<Integer> paymentType;
+    private MutableLiveData<String> paymentName;
+
     private MutableLiveData<List<PaymentModel>> allPayment;
     public boolean showPin = false;
 
@@ -105,6 +110,7 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
     private CompositeDisposable disposable = new CompositeDisposable();
     private PrintUtils printUtils;
     private String lang = "ar";
+
 
     public ChargeMvvm(@NonNull Application application) {
         super(application);
@@ -176,6 +182,15 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
 
         }
         return paymentType;
+    }
+
+    public MutableLiveData<String> getPaymentName() {
+        if (paymentName == null) {
+            paymentName = new MutableLiveData<>();
+            paymentName.setValue("");
+
+        }
+        return paymentName;
     }
 
     public MutableLiveData<List<PrinterModel>> getPrinters() {
@@ -1020,12 +1035,13 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
 
                         double remaining = chargeModel.getPaidAmount() - Double.parseDouble(chargeModel.getPrice().replace(",", ""));
 
-                        CartModel.Payment payment = new CartModel.Payment(Double.parseDouble(chargeModel.getPrice().replace(",", "")), chargeModel.getPaidAmount(), remaining, chargeModel.getPaymentModel().getId());
+                        CartModel.Payment payment = new CartModel.Payment(chargeModel.getPaymentModel().getName(),Double.parseDouble(chargeModel.getPrice().replace(",", "")), chargeModel.getPaidAmount(), remaining, chargeModel.getPaymentModel().getId());
                         payments.add(payment);
                     }
                 }
             } else {
-                CartModel.Payment payment = new CartModel.Payment(cartList.getTotalPrice(), Double.parseDouble(getPaidAmount().getValue().replace(",", "")), getRemaining().getValue(), getPaymentType().getValue() + "");
+
+                CartModel.Payment payment = new CartModel.Payment(getPaymentName().getValue(),cartList.getTotalPrice(), Double.parseDouble(getPaidAmount().getValue().replace(",", "")), getRemaining().getValue(), getPaymentType().getValue() + "");
                 payments.add(payment);
             }
 
@@ -1079,6 +1095,7 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
                                         if (userModel.getData().getInvoiceSettings() != null && userModel.getData().getInvoiceSettings().getPrinted_receipts() != null) {
                                             Glide.with(context)
                                                     .asBitmap()
+                                                    .override(150,150)
                                                     .load(Uri.parse(Tags.base_url + userModel.getData().getInvoiceSettings().getPrinted_receipts()))
                                                     .into(new SimpleTarget<Bitmap>() {
                                                         @Override
@@ -1104,12 +1121,17 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
 
 
                                     }
+                                    else if (response.body().getStatus()==412){
+                                        Toast.makeText(context, R.string.amount_not_avail, Toast.LENGTH_SHORT).show();
+
+                                    }
 
                                 }
                             } else {
 
 
                                 try {
+                                    Toast.makeText(context, response.code() + "__" + response.errorBody().string(), Toast.LENGTH_SHORT).show();
                                     Log.e(TAG, response.code() + "__" + response.errorBody().string());
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -1135,37 +1157,59 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void print(AppCompatActivity context, CartModel cartModel, Bitmap logo, List<Integer> ids) {
         printUtils = new PrintUtils(this);
-
+        Toast.makeText(context, "Printing", Toast.LENGTH_SHORT).show();
         if (getPrinters().getValue() != null && getPrinters().getValue().size() > 0) {
             for (PrinterModel printerModel : getPrinters().getValue()) {
-                if (printerModel.getPrinter_type().equals("sunmi") && printerModel.isCanPrintAutomatic()) {
-                    int paper = 2;
-                    if (printerModel.getPaperWidth().equalsIgnoreCase("58")) {
-                        paper = 1;
-                    }
-                    SunmiPrintHelper.getInstance().initPrinter();
-                    SunmiPrintHelper.getInstance().printInvoice(getApplication().getApplicationContext(), userModel, paper, lang, cartModel, ids, logo);
-                } else if (printerModel.getPrinter_type().equals("other")&& printerModel.isCanPrintAutomatic()) {
-                    BluetoothDevice bluetoothDevice = printUtils.getBluetoothDeviceByMacAddress(printerModel.getBluetooth_mac_address(), context);
-                    int paperWidth = 576;
-                    if (printerModel.getPaperWidth().equals("58")) {
-                        paperWidth = 385;
-                    }
-                    if (bluetoothDevice != null) {
-                        printUtils.connectPrinter(this, false, bluetoothDevice, paperWidth, context, lang);
-                        try {
-                            if (lang.equals("ar")) {
-                                printArBluetoothInvoice(cartModel, ids, logo);
-                            } else {
-                                printEnBluetoothInvoice(cartModel, ids, logo);
 
+                if (printerModel.getPrinter_type().equals("sunmi") && printerModel.isCanPrintAutomatic()) {
+
+                    new Thread(() -> {
+                        int paper = 2;
+                        if (printerModel.getPaperWidth().equalsIgnoreCase("58")) {
+                            paper = 1;
+                        }
+                        SunmiPrintHelper.getInstance().initPrinter();
+                        SunmiPrintHelper.getInstance().printInvoice(getApplication().getApplicationContext(), userModel, paper, lang, cartModel, ids, logo);
+
+                    }).start();
+
+                } else if (printerModel.getPrinter_type().equals("other")) {
+
+
+                    if (printerModel.isCanPrintAutomatic()){
+                        BluetoothDevice bluetoothDevice = printUtils.getBluetoothDeviceByMacAddress(printerModel.getBluetooth_mac_address(), context);
+
+                        if (bluetoothDevice != null) {
+                            int paperWidth = 576;
+                            if (printerModel.getPaperWidth().equals("58")) {
+                                paperWidth = 385;
                             }
-                        } catch (Exception e) {
+                            printUtils.connectPrinter(this, false, bluetoothDevice, paperWidth, context, lang);
+                            try {
+                                Thread.sleep(5000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            new Thread(() -> {
+
+                                if (lang.equals("ar")) {
+                                    printArBluetoothInvoice(cartModel, ids, logo);
+                                } else {
+                                    printEnBluetoothInvoice(cartModel, ids, logo);
+
+                                }
+                            }).start();
+
+                        }else {
+                            Toast.makeText(context, "printer is not available or paired", Toast.LENGTH_SHORT).show();
 
                         }
                     }
+
+
                 } else if (printerModel.getPrinter_type().equals("kitchen")&& printerModel.isCanPrintAutomatic()) {
                     BluetoothDevice bluetoothDevice = printUtils.getBluetoothDeviceByMacAddress(printerModel.getBluetooth_mac_address(), context);
                     int paperWidth = 576;
@@ -1208,7 +1252,7 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
         for (CartModel.Cart cart : cartModel.getData()) {
             int invoice_id = ids.get(index);
             try {
-                String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH).format(cart.getDate());
+                String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH).format(Long.parseLong(cart.getDate()));
                 //Log.e("ddd",model.getData().getSelectedWereHouse().getName()+"___"+model.getData().getSelectedWereHouse().getTax_number()+"__"+model.getData().getSelectedUser().getName()+"__"+model.getData().getSelectedPos().getTitle());
                 printUtils.addLineWithHeight(50);
                 printUtils.addItem(28.0f, true, (userModel.getData().getSelectedUser() != null ? userModel.getData().getSelectedUser().getCompany_name() : "مداد"), PrintUtils.ALIGN_CENTER);
@@ -1247,13 +1291,39 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
                 printUtils.addLineWithHeight(50);
                 printUtils.addLineSeparator();
                 printUtils.addLineWithHeight(15);
-                printUtils.addRowItem(30.0f, true, "الإجمالى قبل الضريبة", String.format(Locale.US, "%.2f", cart.getTotal_price()), PrintUtils.ALIGN_RIGHT);
+                printUtils.addRowItem(30.0f, true, "المجموع قبل الضريبة", String.format(Locale.US, "%.2f", cart.getTotal_price()), PrintUtils.ALIGN_RIGHT);
+
+                printUtils.addLineWithHeight(25);
+
+                for (CartModel.Detail detail : cart.getDetails()) {
+                    if (Double.parseDouble(detail.getTax_rate())!=0){
+                        String text1 = "VAT "+detail.getTax_rate()+"%";
+                        String text2 = String.format(Locale.US,"%.2f",(detail.getQty()*detail.getNet_unit_price())*Double.parseDouble(detail.getTax_rate())/100);
+                        printUtils.addRowItem(25.0f, false, text1, text2, PrintUtils.ALIGN_RIGHT);
+                        printUtils.addLineWithHeight(8);
+                    }
+
+                }
+
+                if (cart.getOrder_discount()!=0){
+                    String text2 = String.format(Locale.US,"%.2f",cart.getOrder_discount());
+                    printUtils.addRowItem(25.0f, false, "الخصومات", text2, PrintUtils.ALIGN_RIGHT);
+                    printUtils.addLineWithHeight(8);
+                }
+
 
                 printUtils.addLineWithHeight(50);
                 printUtils.addLineSeparator();
                 printUtils.addLineWithHeight(15);
 
-                printUtils.addRowItem(30.0f, true, "الإجمالى شامل الضريبة", String.format(Locale.US, "%.2f", cart.getGrand_total()), PrintUtils.ALIGN_RIGHT);
+                printUtils.addRowItem(30.0f, true, "المجموع شامل الضريبة", String.format(Locale.US, "%.2f", cart.getGrand_total()), PrintUtils.ALIGN_RIGHT);
+                printUtils.addLineWithHeight(25);
+                for (CartModel.Payment payment :cart.getPayments()){
+                    printUtils.addRowItem(25.0f, false, payment.getName(), payment.getPaid()+"", PrintUtils.ALIGN_RIGHT);
+                    printUtils.addLineWithHeight(8);
+                }
+
+
 
                 printUtils.addLineWithHeight(50);
                 printUtils.addLineSeparator();
@@ -1282,7 +1352,7 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
         for (CartModel.Cart cart : cartModel.getData()) {
             int invoice_id = ids.get(index);
             try {
-                String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH).format(cart.getDate());
+                String date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH).format(Long.parseLong(cart.getDate()));
                 printUtils.addLineWithHeight(50);
                 printUtils.addItem(28.0f, true, (userModel.getData().getSelectedUser() != null ? userModel.getData().getSelectedUser().getCompany_name() : "Midad"), PrintUtils.ALIGN_CENTER);
                 printUtils.addItem(28.0f, false, "VAT" + ":" + (userModel.getData().getSelectedWereHouse() != null ? (userModel.getData().getSelectedWereHouse().getTax_number() != null ? userModel.getData().getSelectedWereHouse().getTax_number() : "") : ""), PrintUtils.ALIGN_CENTER);
@@ -1318,7 +1388,23 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
                 printUtils.addLineSeparator();
                 printUtils.addLineWithHeight(15);
                 printUtils.addRowItem(30.0f, true, "Total before tax", String.format(Locale.US, "%.2f", cart.getTotal_price()), PrintUtils.ALIGN_RIGHT);
+                printUtils.addLineWithHeight(25);
 
+                for (CartModel.Detail detail : cart.getDetails()) {
+                    if (Double.parseDouble(detail.getTax_rate())!=0){
+                        String text1 = "VAT "+detail.getTax_rate()+"%";
+                        String text2 = String.format(Locale.US,"%.2f",(detail.getQty()*detail.getNet_unit_price())*Double.parseDouble(detail.getTax_rate())/100);
+                        printUtils.addRowItem(25.0f, false, text1, text2, PrintUtils.ALIGN_RIGHT);
+                        printUtils.addLineWithHeight(8);
+                    }
+
+                }
+
+                if (cart.getOrder_discount()!=0){
+                    String text2 = String.format(Locale.US,"%.2f",cart.getOrder_discount());
+                    printUtils.addRowItem(25.0f, false, "Discounts", text2, PrintUtils.ALIGN_RIGHT);
+                    printUtils.addLineWithHeight(8);
+                }
                 printUtils.addLineWithHeight(50);
                 printUtils.addLineSeparator();
                 printUtils.addLineWithHeight(15);
@@ -1366,6 +1452,7 @@ public class ChargeMvvm extends AndroidViewModel implements PrintUtils.PrintResp
     public void onStartIntent() {
 
     }
+
 
 
 }

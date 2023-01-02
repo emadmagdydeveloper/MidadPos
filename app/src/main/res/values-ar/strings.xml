@@ -264,6 +264,7 @@
     <string name="more_settings_are_available_in_the_back_office">تتوفر المزيد من الإعدادت في المكتب الخلفي</string>
     <string name="go_to_back_office">الذهاب إلى المكتب الخلفي</string>
     <string name="got_it">حسناً</string>
+    <string name="amount_not_avail">الكمية غير متاحة</string>
 
 
     <string-array name="delivery_options">

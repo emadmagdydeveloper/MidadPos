@@ -7,6 +7,8 @@ import com.midad_app_pos.model.DeliveryDataModel;
 import com.midad_app_pos.model.DiscountDataModel;
 import com.midad_app_pos.model.HomeIndexModel;
 import com.midad_app_pos.model.InvoiceIdsModel;
+import com.midad_app_pos.model.InvoiceSettingData;
+import com.midad_app_pos.model.InvoiceSettings;
 import com.midad_app_pos.model.ItemsDataModel;
 import com.midad_app_pos.model.OrderDataModel;
 import com.midad_app_pos.model.PaymentDataModel;
@@ -250,4 +252,11 @@ public interface Service {
     @GET("api/setting/advantage")
     Single<Response<AdvantageDataModel>> getAdvantage(@Query("user_id") String user_id
     );
+
+    @GET("api/home/receiptSetting")
+    Single<Response<InvoiceSettingData>> getReceiptSetting(@Query("user_id") String user_id,
+                                                           @Query("warehouse_id") String warehouse_id
+    );
+
+
 }
