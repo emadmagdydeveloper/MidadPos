@@ -12,6 +12,9 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 
@@ -136,15 +139,37 @@ public class PrintUtils {
             }
 
             if (bluetoothAdapter.isEnabled()) {
-                return bluetoothAdapter.getRemoteDevice(mac);
+
+                Set<BluetoothDevice> pairedDevice = bluetoothAdapter.getBondedDevices();
+
+                if (pairedDevice.size() > 0) {
+                    List<BluetoothDevice> list = new ArrayList<>(pairedDevice);
+                    for (BluetoothDevice device:list){
+                        if (device.getAddress().equals(mac)){
+                            return device;
+                        }
+                    }
+                } else {
+                    new Handler(Looper.getMainLooper())
+                            .post(() -> Toast.makeText(context, "No devices available", Toast.LENGTH_SHORT).show());
+
+                }
+
+
             } else {
-                response.onStartIntent();
-                Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                context.startActivityForResult(enableBT, 0);
+                new Handler(Looper.getMainLooper())
+                        .post(() -> Toast.makeText(context, "Bluetooth is not enabled", Toast.LENGTH_SHORT).show());
+
             }
 
 
         } catch (Exception ex) {
+            new Handler(Looper.getMainLooper())
+                    .post(() ->
+                            Toast.makeText(context, "2"+ex.getMessage(), Toast.LENGTH_SHORT).show()
+
+                    );
+
             ex.printStackTrace();
         }
 
@@ -152,7 +177,7 @@ public class PrintUtils {
     }
 
 
-    public void connectPrinter(final PrinterConnectListener listener, boolean printKitchen, BluetoothDevice printer, int paperWidth, Context context, String lang) {
+    public void connectPrinter(final PrinterConnectListener listener, boolean printKitchen, BluetoothDevice printer, int paperWidth, AppCompatActivity context, String lang) {
         this.paperWidth = paperWidth;
         this.context = context;
         this.lang = lang;
@@ -596,14 +621,88 @@ public class PrintUtils {
 
     private void cut() {
         if (btOutputStream != null) {
-            byte[] cut = new byte[]{0x1d, 0x56, 0x01};
+
             try {
-                btOutputStream.write(cut);
+                btOutputStream.write(0x1D);
+                btOutputStream.write(86);
+                btOutputStream.write(48);
+                btOutputStream.write(0);
                 btOutputStream.flush();
+                btOutputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Bitmap printTestData(UserModel userModel, boolean isOrder, Bitmap logo) {
+
+        try {
+            Bitmap b = Bitmap.createBitmap(paperWidth, paper_height + 500, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(b);
+            Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
+            bg.setAntiAlias(true);
+            bg.setColor(ContextCompat.getColor(context, R.color.white));
+            canvas.drawPaint(bg);
+            canvas.drawColor(Color.WHITE);
+
+
+            if (logo != null) {
+                if (!isOrder) {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    logo.compress(Bitmap.CompressFormat.PNG,0,outputStream);
+                    int center = (paperWidth - 150) / 2;
+                    canvas.drawBitmap(logo, center, paperYPos, null);
+
+                }
+
+            }
+
+
+            for (PrintData printData : printDataList) {
+                canvas.drawText(printData.getText(), printData.getxPos(), printData.getyPos(), printData.getPaint());
+
+            }
+
+            if (!isOrder) {
+                ZatcaQRCodeGeneration.Builder builder = new ZatcaQRCodeGeneration.Builder();
+                builder.sellerName(userModel.getData().getSelectedUser().getName()) // Shawrma House
+                        .taxNumber(userModel.getData().getSelectedWereHouse().getTax_number()) // 1234567890
+                        .invoiceDate(getNow()) //..> 22/11/2021 03:00 am
+                        .totalAmount(String.format(Locale.US, "%.2f", 0.00)) // 100
+                        .taxAmount(String.format(Locale.US, "%.2f", 0.00));
+
+                BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                try {
+                    int center = (paperWidth - 300) / 2;
+                    Bitmap Qrcode = barcodeEncoder.encodeBitmap(builder.getBase64(), BarcodeFormat.QR_CODE, 300, 300);
+                    canvas.drawBitmap(Qrcode, center, paperYPos, null);
+
+
+
+
+                } catch (WriterException e) {
+                    e.printStackTrace();
+
+                }
+            }
+
+
+            printImageBitmap(b);
+            return b;
+        }catch (Exception e){
+            new Handler(Looper.getMainLooper())
+                    .post(()->{
+                        Toast.makeText(context, e.getMessage()+"_", Toast.LENGTH_SHORT).show();
+                    });
+        }
+
+
+        return null;
+    }
+
+    private String getNow() {
+        return new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.ENGLISH).format(new Date());
     }
 
     public void addItem(float textSize, boolean isBold, String text, int align) {
@@ -718,62 +817,7 @@ public class PrintUtils {
 
     }
 
-    public Bitmap printTestData(UserModel userModel, boolean isOrder, Bitmap logo) {
 
-
-        Bitmap b = Bitmap.createBitmap(paperWidth, paper_height + 500, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(b);
-        Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
-        bg.setAntiAlias(true);
-        bg.setColor(ContextCompat.getColor(context, R.color.white));
-        canvas.drawPaint(bg);
-        canvas.drawColor(Color.WHITE);
-
-
-        if (logo != null) {
-            if (!isOrder) {
-                Matrix matrix = new Matrix();
-                Bitmap scaleLogo = Bitmap.createBitmap(logo, 0, 0, 200, 200, matrix, true);
-                int center = (paperWidth - 200) / 2;
-                canvas.drawBitmap(scaleLogo, center, paperYPos, null);
-
-            }
-
-        }
-
-
-        for (PrintData printData : printDataList) {
-            canvas.drawText(printData.getText(), printData.getxPos(), printData.getyPos(), printData.getPaint());
-
-        }
-
-        if (!isOrder) {
-            ZatcaQRCodeGeneration.Builder builder = new ZatcaQRCodeGeneration.Builder();
-            builder.sellerName(userModel.getData().getSelectedUser().getName()) // Shawrma House
-                    .taxNumber(userModel.getData().getSelectedWereHouse().getTax_number()) // 1234567890
-                    .invoiceDate(getNow()) //..> 22/11/2021 03:00 am
-                    .totalAmount(String.format(Locale.US, "%.2f", 0.00)) // 100
-                    .taxAmount(String.format(Locale.US, "%.2f", 0.00));
-
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            try {
-                int center = (paperWidth - 300) / 2;
-                Bitmap Qrcode = barcodeEncoder.encodeBitmap(builder.getBase64(), BarcodeFormat.QR_CODE, 300, 300);
-                canvas.drawBitmap(Qrcode, center, paperYPos, null);
-
-            } catch (WriterException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        printImageBitmap(b);
-        return b;
-    }
-
-    private String getNow() {
-        return new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.ENGLISH).format(new Date());
-    }
 
     public void clear() {
         paper_height = 0;
@@ -785,7 +829,8 @@ public class PrintUtils {
 
 
     public void printImageBitmap(Bitmap bitmap) {
-
+        new Handler(Looper.getMainLooper())
+                .post(() -> Toast.makeText(context, "Prepare to print", Toast.LENGTH_SHORT).show());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
         double h = bitmap.getWidth() / 576.0;
